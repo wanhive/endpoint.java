@@ -32,38 +32,68 @@ package com.wanhive.iot.protocol.bean;
  */
 public class NameInfo {
 	/**
-	 * Host name (most likely an IP adress)
+	 * The host name (most likely an IP adress)
 	 */
 	private String host;
 	/**
-	 * Service name (most likely a PORT identifier)
+	 * The service name (most likely a PORT identifier)
 	 */
 	private String service;
 	/**
-	 * Host type
+	 * The host type
 	 */
 	private int type;
 
+	/**
+	 * Get the host name
+	 * 
+	 * @return The string containing the host name
+	 */
 	public String getHost() {
 		return host;
 	}
 
+	/**
+	 * Set the host name
+	 * 
+	 * @param host The string containing the host name
+	 */
 	public void setHost(String host) {
 		this.host = host;
 	}
 
+	/**
+	 * Get the service type
+	 * 
+	 * @return The string containing the service type
+	 */
 	public String getService() {
 		return service;
 	}
 
+	/**
+	 * Set the service type
+	 * 
+	 * @param service The string containing the service type
+	 */
 	public void setService(String service) {
 		this.service = service;
 	}
 
+	/**
+	 * Get the host type
+	 * 
+	 * @return The host type identifier
+	 */
 	public int getType() {
 		return type;
 	}
 
+	/**
+	 * Set the host type
+	 * 
+	 * @param type The host type identifier
+	 */
 	public void setType(int type) {
 		this.type = type;
 	}

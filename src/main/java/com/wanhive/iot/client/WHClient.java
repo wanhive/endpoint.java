@@ -1,7 +1,7 @@
 /*
  * WHClient.java
  * 
- * Reference implementation of Wanhive client
+ * Reference implementation of the Wanhive client
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -26,7 +26,6 @@ package com.wanhive.iot.client;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -35,7 +34,7 @@ import com.wanhive.iot.protocol.bean.NameInfo;
 import com.wanhive.iot.protocol.hosts.Hosts;
 
 /**
- * Reference implementation of Wanhive client hub
+ * Reference implementation of the Wanhive client
  * 
  * @author amit
  *
@@ -134,9 +133,8 @@ public class WHClient implements Client {
 	public void send(Message message) throws Exception {
 		int messageLength = message.getLength();
 		if (messageLength >= Message.HEADER_SIZE && messageLength <= Message.MTU) {
-			ByteBuffer buffer = message.getBuffer();
 			OutputStream out = socket.getOutputStream();
-			out.write(buffer.array(), 0, messageLength);
+			out.write(message.getBuffer(), 0, messageLength);
 		} else {
 			throw new Exception("Invalid message length");
 		}
@@ -145,10 +143,9 @@ public class WHClient implements Client {
 	@Override
 	public Message receive() throws Exception {
 		Message message = new Message();
-		ByteBuffer buffer = message.getBuffer();
 
 		InputStream in = socket.getInputStream();
-		int bytesRead = in.read(buffer.array(), 0, Message.HEADER_SIZE);
+		int bytesRead = in.read(message.getBuffer(), 0, Message.HEADER_SIZE);
 		if (bytesRead != Message.HEADER_SIZE) {
 			throw new Exception("Stream closed");
 		}
@@ -157,7 +154,7 @@ public class WHClient implements Client {
 		if (messageLength > Message.MTU || messageLength < Message.HEADER_SIZE) {
 			throw new Exception("Invalid message length");
 		} else if (messageLength > Message.HEADER_SIZE) {
-			bytesRead += in.read(buffer.array(), bytesRead, messageLength - Message.HEADER_SIZE);
+			bytesRead += in.read(message.getBuffer(), bytesRead, messageLength - Message.HEADER_SIZE);
 			if (bytesRead != messageLength) {
 				throw new Exception("Stream closed");
 			}

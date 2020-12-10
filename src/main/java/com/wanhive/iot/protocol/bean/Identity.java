@@ -51,36 +51,76 @@ public class Identity implements Serializable {
 	 */
 	private int rounds;
 
+	/**
+	 * The default constructor
+	 */
 	public Identity() {
 
 	}
 
+	/**
+	 * The constructor
+	 * 
+	 * @param uid      UID of the endpoint
+	 * @param password Password of the endpoint
+	 * @param rounds   Password hashing rounds
+	 */
 	public Identity(long uid, byte[] password, int rounds) {
 		this.uid.set(uid);
 		this.password = password;
 		this.rounds = rounds;
 	}
 
+	/**
+	 * Returns the Unique Identifier of the endpoint
+	 * 
+	 * @return The long value containing the unique identifier
+	 */
 	public long getUid() {
 		return uid.get();
 	}
 
+	/**
+	 * Sets the unique identifier
+	 * 
+	 * @param uid The unique identifier will be set to this value
+	 */
 	public void setUid(long uid) {
 		this.uid.set(uid);
 	}
 
+	/**
+	 * Returns the password
+	 * 
+	 * @return The byte array of password
+	 */
 	public byte[] getPassword() {
 		return password;
 	}
 
+	/**
+	 * Sets the password
+	 * 
+	 * @param password The byte array containing the password
+	 */
 	public void setPassword(byte[] password) {
 		this.password = password;
 	}
 
+	/**
+	 * Returns the password hashing rounds
+	 * 
+	 * @return The password hashing rounds
+	 */
 	public int getRounds() {
 		return rounds;
 	}
 
+	/**
+	 * Sets the password hashing rounds
+	 * 
+	 * @param rounds The desired password hashing rounds
+	 */
 	public void setRounds(int rounds) {
 		this.rounds = rounds;
 	}
