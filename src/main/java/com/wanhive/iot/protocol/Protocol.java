@@ -1,7 +1,7 @@
 /*
  * Protocol.java
  * 
- * The bare minimum wanhive protocol implementation
+ * The wanhive protocol implementation
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -25,20 +25,56 @@
 package com.wanhive.iot.protocol;
 
 import com.wanhive.iot.protocol.bean.IdentificationResponse;
-import com.wanhive.iot.protocol.bean.MessageHeader;
+import com.wanhive.iot.protocol.bean.MessageContext;
 
 /**
- * The bare minimum wanhive protocol implementation
+ * The wanhive protocol implementation
  * 
  * @author amit
  *
  */
 public class Protocol {
+	private static final String BADRESMSG = "Invalid response";
+	private static final String BADPARMMSG = "Invalid request";
+
 	private short sequenceNumber;
 	private byte session;
 
-	protected static final String BADRESMSG = "Invalid response";
-	protected static final String BADPARMMSG = "Invalid request";
+	/**
+	 * Checks message's context
+	 * 
+	 * @param message   The message to check
+	 * @param command   The expected command classifier
+	 * @param qualifier The expected command qualifier
+	 * @return true if the message matched the context, false otherwise
+	 */
+	protected static boolean checkContext(Message message, byte command, byte qualifier) {
+		return (message.getCommand() == command && message.getQualifier() == qualifier);
+	}
+
+	/**
+	 * Checks message's context
+	 * 
+	 * @param message   The message to check
+	 * @param command   The expected command classifier
+	 * @param qualifier The expected command qualifier
+	 * @param status    The expected status code
+	 * @return true if the message matched the context, false otherwise
+	 */
+	protected static boolean checkContext(Message message, byte command, byte qualifier, byte status) {
+		return checkContext(message, command, qualifier) && (message.getStatus() == status);
+	}
+
+	/**
+	 * Checks message's context
+	 * 
+	 * @param message The message to check
+	 * @param ctx     The MessageContext object to check the message against
+	 * @return true if the message matched the context, false otherwise
+	 */
+	protected static boolean checkContext(Message message, MessageContext ctx) {
+		return checkContext(message, ctx.getCommand(), ctx.getQualifier(), ctx.getStatus());
+	}
 
 	/**
 	 * Increments and returns the next sequence number
@@ -113,9 +149,8 @@ public class Protocol {
 		} else {
 			Message message = new Message();
 			message.prepareHeader(uid, id, (short) (Message.HEADER_SIZE + nonce.length), nextSequenceNumber(),
-					getSession(), (byte) 0, (byte) 1, (byte) 127);
+					getSession(), (byte) 0, (byte) 1, StatusCode.REQUEST);
 			message.setBlob(0, nonce);
-			message.freeze();
 			return message;
 		}
 	}
@@ -128,10 +163,9 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public IdentificationResponse processIdentificationResponse(Message message) throws Exception {
-		MessageHeader header = message.getHeader();
-		if (header.getCommand() != (byte) 0 || header.getQualifier() != (byte) 1 || header.getStatus() != (byte) 1) {
+		if (!checkContext(message, (byte) 0, (byte) 1, StatusCode.OK)) {
 			throw new Exception(BADRESMSG);
-		} else if (header.getLength() <= Message.HEADER_SIZE + 4) {
+		} else if (message.getLength() <= Message.HEADER_SIZE + 4) {
 			throw new Exception(BADRESMSG);
 		} else {
 			short saltLength = message.getShort(0);
@@ -161,9 +195,8 @@ public class Protocol {
 		} else {
 			Message message = new Message();
 			message.prepareHeader(0, id, (short) (Message.HEADER_SIZE + proof.length), nextSequenceNumber(),
-					getSession(), (byte) 0, (byte) 2, (byte) 127);
+					getSession(), (byte) 0, (byte) 2, StatusCode.REQUEST);
 			message.setBlob(0, proof);
-			message.freeze();
 			return message;
 		}
 	}
@@ -176,19 +209,19 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public byte[] processAuthenticationResponse(Message message) throws Exception {
-		MessageHeader header = message.getHeader();
-		if (header.getCommand() != (byte) 0 || header.getQualifier() != (byte) 2 || header.getStatus() != (byte) 1) {
+		short msgLen = message.getLength();
+		if (!checkContext(message, (byte) 0, (byte) 2, StatusCode.OK)) {
 			throw new Exception(BADRESMSG);
-		} else if (header.getLength() <= Message.HEADER_SIZE) {
+		} else if (msgLen <= Message.HEADER_SIZE) {
 			throw new Exception(BADRESMSG);
 		} else {
-			return message.getBlob(0, header.getLength() - Message.HEADER_SIZE);
+			return message.getBlob(0, msgLen - Message.HEADER_SIZE);
 		}
 	}
 
 	// -----------------------------------------------------------------
 	/**
-	 * Create a registration request
+	 * Creates a registration request
 	 * 
 	 * @param id  Remote host's identifier
 	 * @param uid desired identifier of the local client
@@ -203,8 +236,8 @@ public class Protocol {
 			length += hc.length;
 		}
 
-		message.prepareHeader(uid, id, length, nextSequenceNumber(), getSession(), (byte) 1, (byte) 0, (byte) 127);
-		message.freeze();
+		message.prepareHeader(uid, id, length, nextSequenceNumber(), getSession(), (byte) 1, (byte) 0,
+				StatusCode.REQUEST);
 		return message;
 	}
 
@@ -216,10 +249,9 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public boolean processRegisterResponse(Message message) throws Exception {
-		MessageHeader header = message.getHeader();
-		if (header.getCommand() != (byte) 1 || header.getQualifier() != (byte) 0 || header.getStatus() != (byte) 1) {
+		if (!checkContext(message, (byte) 1, (byte) 0, StatusCode.OK)) {
 			throw new Exception(BADRESMSG);
-		} else if (header.getLength() != Message.HEADER_SIZE) {
+		} else if (message.getLength() != Message.HEADER_SIZE) {
 			throw new Exception(BADRESMSG);
 		} else {
 			return true;
@@ -240,8 +272,8 @@ public class Protocol {
 			message.setBlob(0, hc);
 			length += hc.length;
 		}
-		message.prepareHeader(0, id, length, nextSequenceNumber(), getSession(), (byte) 1, (byte) 1, (byte) 127);
-		message.freeze();
+		message.prepareHeader(0, id, length, nextSequenceNumber(), getSession(), (byte) 1, (byte) 1,
+				StatusCode.REQUEST);
 		return message;
 	}
 
@@ -253,14 +285,14 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public byte[] processGetKeyResponse(Message message) throws Exception {
-		MessageHeader header = message.getHeader();
-		if (header.getCommand() != (byte) 1 || header.getQualifier() != (byte) 1 || header.getStatus() != (byte) 1) {
+		short msgLen = message.getLength();
+		if (!checkContext(message, (byte) 1, (byte) 1, StatusCode.OK)) {
 			throw new Exception(BADRESMSG);
-		} else if (header.getLength() <= Message.HEADER_SIZE) {
+		} else if (msgLen <= Message.HEADER_SIZE) {
 			throw new Exception(BADRESMSG);
-		} else if (header.getLength() == (Message.HEADER_SIZE + 64)) {
+		} else if (msgLen == (Message.HEADER_SIZE + 64)) {
 			return message.getBlob(0, 64);
-		} else if (header.getLength() == (Message.HEADER_SIZE + 128)) {
+		} else if (msgLen == (Message.HEADER_SIZE + 128)) {
 			return message.getBlob(64, 64);
 		} else {
 			throw new Exception(BADRESMSG);
@@ -278,9 +310,8 @@ public class Protocol {
 	public Message createFindRootRequest(long id, long uid) {
 		Message message = new Message();
 		message.prepareHeader(0, id, (short) (Message.HEADER_SIZE + 8), nextSequenceNumber(), getSession(), (byte) 1,
-				(byte) 2, (byte) 127);
+				(byte) 2, StatusCode.REQUEST);
 		message.setLong(0, uid);
-		message.freeze();
 		return message;
 	}
 
@@ -292,10 +323,9 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public long processFindRootResponse(Message message) throws Exception {
-		MessageHeader header = message.getHeader();
-		if (header.getCommand() != (byte) 1 || header.getQualifier() != (byte) 2 || header.getStatus() != (byte) 1) {
+		if (!checkContext(message, (byte) 1, (byte) 2, StatusCode.OK)) {
 			throw new Exception(BADRESMSG);
-		} else if (header.getLength() != (Message.HEADER_SIZE + 16)) {
+		} else if (message.getLength() != (Message.HEADER_SIZE + 16)) {
 			throw new Exception(BADRESMSG);
 		} else {
 			return message.getLong(8);
@@ -314,9 +344,8 @@ public class Protocol {
 	public Message createPublishRequest(long id, byte topic, byte[] payload) {
 		Message message = new Message();
 		message.prepareHeader(0, id, (short) (Message.HEADER_SIZE + (payload == null ? 0 : payload.length)),
-				nextSequenceNumber(), topic, (byte) 2, (byte) 0, (byte) 127);
+				nextSequenceNumber(), topic, (byte) 2, (byte) 0, StatusCode.REQUEST);
 		message.setBlob(0, payload);
-		message.freeze();
 		return message;
 	}
 
@@ -330,8 +359,7 @@ public class Protocol {
 	public Message createSubscribeRequest(long id, byte topic) {
 		Message message = new Message();
 		message.prepareHeader(0, id, (short) Message.HEADER_SIZE, nextSequenceNumber(), topic, (byte) 2, (byte) 1,
-				(byte) 127);
-		message.freeze();
+				StatusCode.REQUEST);
 		return message;
 	}
 
@@ -343,10 +371,9 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public boolean processSubscribeResponse(Message message) throws Exception {
-		MessageHeader header = message.getHeader();
-		if (header.getCommand() != (byte) 2 || header.getQualifier() != (byte) 1 || header.getStatus() != (byte) 1) {
+		if (!checkContext(message, (byte) 2, (byte) 1, StatusCode.OK)) {
 			throw new Exception(BADRESMSG);
-		} else if (header.getLength() != (Message.HEADER_SIZE)) {
+		} else if (message.getLength() != (Message.HEADER_SIZE)) {
 			throw new Exception(BADRESMSG);
 		} else {
 			return true;
@@ -363,8 +390,7 @@ public class Protocol {
 	public Message createUnsubscribeRequest(long id, byte topic) {
 		Message message = new Message();
 		message.prepareHeader(0, id, (short) Message.HEADER_SIZE, nextSequenceNumber(), topic, (byte) 2, (byte) 2,
-				(byte) 127);
-		message.freeze();
+				StatusCode.REQUEST);
 		return message;
 	}
 
@@ -376,10 +402,9 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public boolean processUnsubscribeResponse(Message message) throws Exception {
-		MessageHeader header = message.getHeader();
-		if (header.getCommand() != (byte) 2 || header.getQualifier() != (byte) 2 || header.getStatus() != (byte) 1) {
+		if (!checkContext(message, (byte) 2, (byte) 2, StatusCode.OK)) {
 			throw new Exception(BADRESMSG);
-		} else if (header.getLength() != (Message.HEADER_SIZE)) {
+		} else if (message.getLength() != (Message.HEADER_SIZE)) {
 			throw new Exception(BADRESMSG);
 		} else {
 			return true;

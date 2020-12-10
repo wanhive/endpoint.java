@@ -35,7 +35,7 @@ import com.wanhive.iot.protocol.bean.MessageHeader;
  */
 public class Message {
 	/**
-	 * Message data is stored here
+	 * Stores the message data
 	 */
 	private final ByteBuffer buffer;
 	/**
@@ -52,12 +52,12 @@ public class Message {
 	public static final int PAYLOAD_SIZE = (MTU - HEADER_SIZE);
 
 	/**
-	 * Validate whether the given length (in bytes) is valid message length
+	 * Verifies whether the given length (in bytes) is valid message length
 	 * 
-	 * @param length The desired message length
+	 * @param length The message length to validate
 	 * @return true if the length is valid, false otherwise
 	 */
-	public static boolean isValidMessageLength(int length) {
+	public static boolean isValidLength(int length) {
 		return length >= HEADER_SIZE && length <= MTU;
 	}
 
@@ -93,7 +93,7 @@ public class Message {
 	 */
 	public void prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
 			byte command, byte qualifier, byte status) {
-		if (isValidMessageLength(length)) {
+		if (isValidLength(length)) {
 			buffer.putLong(8, source);
 			buffer.putLong(16, destination);
 			buffer.putShort(24, length);
@@ -238,7 +238,7 @@ public class Message {
 	 * @throws IndexOutOfBoundsException Invalid length
 	 */
 	public void setLength(short length) {
-		if (isValidMessageLength(length)) {
+		if (isValidLength(length)) {
 			buffer.putShort(24, length);
 		} else {
 			throw new IndexOutOfBoundsException();

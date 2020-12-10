@@ -23,8 +23,7 @@
  * Wanhive hosts management
  */
 /**
- * Interfaces and concrete classes for management of the network addresses of
- * the Wanhive hosts.
+ * Interfaces and concrete classes for Wanhive Hosts management.
  * 
  * @author amit
  *

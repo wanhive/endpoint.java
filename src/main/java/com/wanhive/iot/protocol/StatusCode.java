@@ -1,7 +1,7 @@
 /*
  * StatusCode.java
  * 
- * The standard status codes for messaging
+ * The standard status codes
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -24,7 +24,7 @@
 package com.wanhive.iot.protocol;
 
 /**
- * The standard status codes for messaging
+ * The standard status codes
  * 
  * @author amit
  *

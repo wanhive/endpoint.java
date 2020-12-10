@@ -1,7 +1,7 @@
 /*
  * MessageContext.java
  * 
- * Context of a request/response
+ * The context of a request/response
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -24,7 +24,7 @@
 package com.wanhive.iot.protocol.bean;
 
 /**
- * Context of a request/response
+ * The context of a request/response
  * 
  * @author amit
  *
@@ -61,6 +61,12 @@ public class MessageContext {
 	public MessageContext() {
 		this.command = 0;
 		this.qualifier = 0;
+		this.status = 0;
+	}
+
+	public MessageContext(byte command, byte qualifier) {
+		this.command = command;
+		this.qualifier = qualifier;
 		this.status = 0;
 	}
 

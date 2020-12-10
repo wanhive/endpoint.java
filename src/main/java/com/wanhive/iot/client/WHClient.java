@@ -40,6 +40,8 @@ import com.wanhive.iot.protocol.hosts.Hosts;
  *
  */
 public class WHClient implements Client {
+	private static final String BADLENMSG = "Invalid message length";
+	private static final String BADSOCKMSG = "Invalid connection";
 	private Socket socket;
 
 	/**
@@ -52,16 +54,16 @@ public class WHClient implements Client {
 	/**
 	 * Constructor
 	 * 
-	 * @param socket Connection to use
+	 * @param socket The socket to use for communication
 	 */
 	WHClient(Socket socket) {
 		this.socket = socket;
 	}
 
 	/**
-	 * Opens new connection with a host after closing the existing one
+	 * Opens a new connection with a remote host. Closes any existing connection.
 	 * 
-	 * @param hosts       Database for network address resolution
+	 * @param hosts       For network address resolution of a remote host
 	 * @param host        Identifier of the host
 	 * @param timeoutMils Read timeout of the underlying connection (0=disable)
 	 * @param ssl         If set then a secure SSL connection is established
@@ -69,7 +71,7 @@ public class WHClient implements Client {
 	 */
 	void open(Hosts hosts, long host, int timeoutMils, boolean ssl) throws Exception {
 		try {
-			close(); // Close the existing socket connection
+			close();
 			socket = null;
 			NameInfo ni = hosts.get(host);
 			if (ssl) {
@@ -80,7 +82,7 @@ public class WHClient implements Client {
 			}
 			socket.setSoTimeout(timeoutMils);
 		} catch (Exception e) {
-			close(); // Prevent resource leak
+			close();
 			socket = null;
 			throw e;
 		}
@@ -89,7 +91,7 @@ public class WHClient implements Client {
 	/**
 	 * Releases the underlying socket connection
 	 * 
-	 * @return The socket connection
+	 * @return The Socket connection object
 	 */
 	Socket release() {
 		Socket rv = this.socket;
@@ -100,7 +102,7 @@ public class WHClient implements Client {
 	/**
 	 * Returns the underlying socket
 	 * 
-	 * @return Socket object
+	 * @return The Socket connection object
 	 */
 	Socket getSocket() {
 		return this.socket;
@@ -136,7 +138,7 @@ public class WHClient implements Client {
 			OutputStream out = socket.getOutputStream();
 			out.write(message.getBuffer(), 0, messageLength);
 		} else {
-			throw new Exception("Invalid message length");
+			throw new Exception(BADLENMSG);
 		}
 	}
 
@@ -147,22 +149,20 @@ public class WHClient implements Client {
 		InputStream in = socket.getInputStream();
 		int bytesRead = in.read(message.getBuffer(), 0, Message.HEADER_SIZE);
 		if (bytesRead != Message.HEADER_SIZE) {
-			throw new Exception("Stream closed");
+			throw new Exception(BADSOCKMSG);
 		}
 
 		int messageLength = message.getLength();
-		if (messageLength > Message.MTU || messageLength < Message.HEADER_SIZE) {
-			throw new Exception("Invalid message length");
+		if (!Message.isValidLength(messageLength)) {
+			throw new Exception(BADLENMSG);
 		} else if (messageLength > Message.HEADER_SIZE) {
 			bytesRead += in.read(message.getBuffer(), bytesRead, messageLength - Message.HEADER_SIZE);
 			if (bytesRead != messageLength) {
-				throw new Exception("Stream closed");
+				throw new Exception(BADSOCKMSG);
 			}
 		} else {
 			// No payload
 		}
-
-		message.freeze();
 		return message;
 	}
 

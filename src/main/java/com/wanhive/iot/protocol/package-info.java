@@ -23,7 +23,7 @@
  * Wanhive protocol
  */
 /**
- * Bare minimum implementation of the Wanhive protocol
+ * Reference implementation of the Wanhive protocol
  * 
  * @author amit
  */
