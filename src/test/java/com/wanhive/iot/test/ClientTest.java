@@ -1,7 +1,7 @@
 /*
  * ClientTest.java
  * 
- * Testing client connection with Wanhive IoT Platform
+ * Testing Client application
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -30,6 +30,8 @@ import org.apache.commons.configuration2.INIConfiguration;
 import com.wanhive.iot.client.Client;
 import com.wanhive.iot.client.ClientFactory;
 import com.wanhive.iot.client.Executor;
+import com.wanhive.iot.protocol.Message;
+import com.wanhive.iot.protocol.Protocol;
 import com.wanhive.iot.protocol.bean.Identity;
 import com.wanhive.iot.protocol.configuration.Configuration;
 import com.wanhive.iot.protocol.hosts.HostsCache;
@@ -37,6 +39,8 @@ import com.wanhive.iot.protocol.hosts.WanhiveHosts;
 import com.wanhive.iot.protocol.hosts.WanhiveHostsCache;
 
 /**
+ * Client application test
+ * 
  * @author amit
  *
  */
@@ -73,10 +77,10 @@ public class ClientTest {
 			Identity id = new Identity(65537,
 					config.getSection("CLIENT").getString("password", "").getBytes(Charset.forName("UTF-8")),
 					config.getSection("CLIENT").getInt("passwordHashRounds", 1));
-			
+
 			WanhiveHosts hosts = null;
 			String hostsDb = config.getSection("HOSTS").getString("hostsDb", null);
-			if(hostsDb!=null) {
+			if (hostsDb != null) {
 				hosts = new WanhiveHosts(hostsDb);
 			} else {
 				String hostsFile = config.getSection("HOSTS").getString("hostsFile", null);
@@ -99,7 +103,12 @@ public class ClientTest {
 			Executor exec = new Executor(client, queueCapacity, queueCapacity);
 			Thread th = new Thread(exec);
 			th.start();
-			Thread.sleep(5000, 0);
+			Protocol proto = new Protocol();
+			for (int i = 0; i < 5; i++) {
+				Message msg = proto.createPublishRequest(0, (byte) 5, "Hello".getBytes());
+				exec.offer(msg);
+				Thread.sleep(5000, 0);
+			}
 			exec.close();
 			th.join();
 			System.out.println("END");

@@ -69,7 +69,7 @@ public class Protocol {
 	 * Checks message's context
 	 * 
 	 * @param message The message to check
-	 * @param ctx     The MessageContext object to check the message against
+	 * @param ctx     The MessageContext object
 	 * @return true if the message matched the context, false otherwise
 	 */
 	protected static boolean checkContext(Message message, MessageContext ctx) {
@@ -149,7 +149,7 @@ public class Protocol {
 		} else {
 			Message message = new Message();
 			message.prepareHeader(uid, id, (short) (Message.HEADER_SIZE + nonce.length), nextSequenceNumber(),
-					getSession(), (byte) 0, (byte) 1, StatusCode.REQUEST);
+					getSession(), RequestContext.IDENTIFY);
 			message.setBlob(0, nonce);
 			return message;
 		}
@@ -163,7 +163,7 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public IdentificationResponse processIdentificationResponse(Message message) throws Exception {
-		if (!checkContext(message, (byte) 0, (byte) 1, StatusCode.OK)) {
+		if (!checkContext(message, ResponseContext.IDENTIFY)) {
 			throw new Exception(BADRESMSG);
 		} else if (message.getLength() <= Message.HEADER_SIZE + 4) {
 			throw new Exception(BADRESMSG);
@@ -195,7 +195,7 @@ public class Protocol {
 		} else {
 			Message message = new Message();
 			message.prepareHeader(0, id, (short) (Message.HEADER_SIZE + proof.length), nextSequenceNumber(),
-					getSession(), (byte) 0, (byte) 2, StatusCode.REQUEST);
+					getSession(), RequestContext.AUTHENTICATE);
 			message.setBlob(0, proof);
 			return message;
 		}
@@ -210,7 +210,7 @@ public class Protocol {
 	 */
 	public byte[] processAuthenticationResponse(Message message) throws Exception {
 		short msgLen = message.getLength();
-		if (!checkContext(message, (byte) 0, (byte) 2, StatusCode.OK)) {
+		if (!checkContext(message, ResponseContext.AUTHENTICATE)) {
 			throw new Exception(BADRESMSG);
 		} else if (msgLen <= Message.HEADER_SIZE) {
 			throw new Exception(BADRESMSG);
@@ -235,9 +235,7 @@ public class Protocol {
 			message.setBlob(0, hc);
 			length += hc.length;
 		}
-
-		message.prepareHeader(uid, id, length, nextSequenceNumber(), getSession(), (byte) 1, (byte) 0,
-				StatusCode.REQUEST);
+		message.prepareHeader(uid, id, length, nextSequenceNumber(), getSession(), RequestContext.REGISTER);
 		return message;
 	}
 
@@ -249,7 +247,7 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public boolean processRegisterResponse(Message message) throws Exception {
-		if (!checkContext(message, (byte) 1, (byte) 0, StatusCode.OK)) {
+		if (!checkContext(message, ResponseContext.REGISTER)) {
 			throw new Exception(BADRESMSG);
 		} else if (message.getLength() != Message.HEADER_SIZE) {
 			throw new Exception(BADRESMSG);
@@ -272,8 +270,7 @@ public class Protocol {
 			message.setBlob(0, hc);
 			length += hc.length;
 		}
-		message.prepareHeader(0, id, length, nextSequenceNumber(), getSession(), (byte) 1, (byte) 1,
-				StatusCode.REQUEST);
+		message.prepareHeader(0, id, length, nextSequenceNumber(), getSession(), RequestContext.GETKEY);
 		return message;
 	}
 
@@ -286,7 +283,7 @@ public class Protocol {
 	 */
 	public byte[] processGetKeyResponse(Message message) throws Exception {
 		short msgLen = message.getLength();
-		if (!checkContext(message, (byte) 1, (byte) 1, StatusCode.OK)) {
+		if (!checkContext(message, ResponseContext.GETKEY)) {
 			throw new Exception(BADRESMSG);
 		} else if (msgLen <= Message.HEADER_SIZE) {
 			throw new Exception(BADRESMSG);
@@ -309,8 +306,8 @@ public class Protocol {
 	 */
 	public Message createFindRootRequest(long id, long uid) {
 		Message message = new Message();
-		message.prepareHeader(0, id, (short) (Message.HEADER_SIZE + 8), nextSequenceNumber(), getSession(), (byte) 1,
-				(byte) 2, StatusCode.REQUEST);
+		message.prepareHeader(0, id, (short) (Message.HEADER_SIZE + 8), nextSequenceNumber(), getSession(),
+				RequestContext.FINDROOT);
 		message.setLong(0, uid);
 		return message;
 	}
@@ -323,7 +320,7 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public long processFindRootResponse(Message message) throws Exception {
-		if (!checkContext(message, (byte) 1, (byte) 2, StatusCode.OK)) {
+		if (!checkContext(message, ResponseContext.FINDROOT)) {
 			throw new Exception(BADRESMSG);
 		} else if (message.getLength() != (Message.HEADER_SIZE + 16)) {
 			throw new Exception(BADRESMSG);
@@ -344,7 +341,7 @@ public class Protocol {
 	public Message createPublishRequest(long id, byte topic, byte[] payload) {
 		Message message = new Message();
 		message.prepareHeader(0, id, (short) (Message.HEADER_SIZE + (payload == null ? 0 : payload.length)),
-				nextSequenceNumber(), topic, (byte) 2, (byte) 0, StatusCode.REQUEST);
+				nextSequenceNumber(), topic, RequestContext.PUBLISH);
 		message.setBlob(0, payload);
 		return message;
 	}
@@ -358,8 +355,8 @@ public class Protocol {
 	 */
 	public Message createSubscribeRequest(long id, byte topic) {
 		Message message = new Message();
-		message.prepareHeader(0, id, (short) Message.HEADER_SIZE, nextSequenceNumber(), topic, (byte) 2, (byte) 1,
-				StatusCode.REQUEST);
+		message.prepareHeader(0, id, (short) Message.HEADER_SIZE, nextSequenceNumber(), topic,
+				RequestContext.SUBSCRIBE);
 		return message;
 	}
 
@@ -371,7 +368,7 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public boolean processSubscribeResponse(Message message) throws Exception {
-		if (!checkContext(message, (byte) 2, (byte) 1, StatusCode.OK)) {
+		if (!checkContext(message, ResponseContext.SUBSCRIBE)) {
 			throw new Exception(BADRESMSG);
 		} else if (message.getLength() != (Message.HEADER_SIZE)) {
 			throw new Exception(BADRESMSG);
@@ -389,8 +386,8 @@ public class Protocol {
 	 */
 	public Message createUnsubscribeRequest(long id, byte topic) {
 		Message message = new Message();
-		message.prepareHeader(0, id, (short) Message.HEADER_SIZE, nextSequenceNumber(), topic, (byte) 2, (byte) 2,
-				StatusCode.REQUEST);
+		message.prepareHeader(0, id, (short) Message.HEADER_SIZE, nextSequenceNumber(), topic,
+				RequestContext.UNSUBSCRIBE);
 		return message;
 	}
 
@@ -402,7 +399,7 @@ public class Protocol {
 	 * @throws Exception Request denied or invalid response
 	 */
 	public boolean processUnsubscribeResponse(Message message) throws Exception {
-		if (!checkContext(message, (byte) 2, (byte) 2, StatusCode.OK)) {
+		if (!checkContext(message, ResponseContext.UNSUBSCRIBE)) {
 			throw new Exception(BADRESMSG);
 		} else if (message.getLength() != (Message.HEADER_SIZE)) {
 			throw new Exception(BADRESMSG);

@@ -25,6 +25,8 @@
 package com.wanhive.iot.protocol;
 
 import java.nio.ByteBuffer;
+
+import com.wanhive.iot.protocol.bean.MessageContext;
 import com.wanhive.iot.protocol.bean.MessageHeader;
 
 /**
@@ -79,7 +81,7 @@ public class Message {
 	}
 
 	/**
-	 * Populate the message header fields
+	 * Populates message's header
 	 * 
 	 * @param source         Source identifier of this message
 	 * @param destination    Destination identifier of this message
@@ -108,7 +110,23 @@ public class Message {
 	}
 
 	/**
-	 * Populate the message header fields
+	 * Populates message's header
+	 * 
+	 * @param source         Source identifier of this message
+	 * @param destination    Destination identifier of this message
+	 * @param length         Total length of this message in bytes
+	 * @param sequenceNumber Sequence number of this message
+	 * @param session        Session identifier of this message
+	 * @param ctx            Context of this message
+	 */
+	public void prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
+			MessageContext ctx) {
+		prepareHeader(source, destination, length, sequenceNumber, session, ctx.getCommand(), ctx.getQualifier(),
+				ctx.getStatus());
+	}
+
+	/**
+	 * Populates message's header
 	 * 
 	 * @param label          Label of this message
 	 * @param source         Source identifier of this message
@@ -128,7 +146,24 @@ public class Message {
 	}
 
 	/**
-	 * Populate this message's header using the given MessageHeader object
+	 * Populates message's header
+	 * 
+	 * @param label          Label of this message
+	 * @param source         Source identifier of this message
+	 * @param destination    Destination identifier of this message
+	 * @param length         Total length of this message in bytes
+	 * @param sequenceNumber Sequence number of this message
+	 * @param session        Session identifier of this message
+	 * @param ctx            Context of this message
+	 */
+	public void prepareHeader(long label, long source, long destination, short length, short sequenceNumber,
+			byte session, MessageContext ctx) {
+		prepareHeader(label, source, destination, length, sequenceNumber, session, ctx.getCommand(), ctx.getQualifier(),
+				ctx.getStatus());
+	}
+
+	/**
+	 * Populates message's header
 	 * 
 	 * @param header Desired message header
 	 * @throws IndexOutOfBoundsException Invalid message length
