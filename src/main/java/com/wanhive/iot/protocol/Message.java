@@ -54,7 +54,7 @@ public class Message {
 	public static final int PAYLOAD_SIZE = (MTU - HEADER_SIZE);
 
 	/**
-	 * Verifies whether the given length (in bytes) is valid message length
+	 * Returns true if the given value is a valid message length
 	 * 
 	 * @param length The message length to validate
 	 * @return true if the length is valid, false otherwise
@@ -203,54 +203,54 @@ public class Message {
 	}
 
 	/**
-	 * Returns the label of this message
+	 * Returns the label
 	 * 
-	 * @return This message's label
+	 * @return Message's label
 	 */
 	public long getLabel() {
 		return buffer.getLong(0);
 	}
 
 	/**
-	 * Sets the label of this message
+	 * Sets the label
 	 * 
-	 * @param label This message's label is set to the given value
+	 * @param label Message's label is set to the given value
 	 */
 	public void setLabel(long label) {
 		buffer.putLong(0, label);
 	}
 
 	/**
-	 * Returns the source identifier of this message
+	 * Returns the source identifier
 	 * 
-	 * @return This message's source identifier
+	 * @return Message's source identifier
 	 */
 	public long getSource() {
 		return buffer.getLong(8);
 	}
 
 	/**
-	 * Sets the source identifier of this message
+	 * Sets the source identifier
 	 * 
-	 * @param source This message's Source identifier is set to the given value
+	 * @param source Message's source identifier is set to the given value
 	 */
 	public void setSource(long source) {
 		buffer.putLong(8, source);
 	}
 
 	/**
-	 * Returns the destination identifier of this message
+	 * Returns the destination identifier
 	 * 
-	 * @return This message's destination identifier
+	 * @return Message's destination identifier
 	 */
 	public long getDestination() {
 		return buffer.getLong(16);
 	}
 
 	/**
-	 * Sets this message's destination identifier
+	 * Sets the destination identifier
 	 * 
-	 * @param destination This message's destination identifier is set to the given
+	 * @param destination Message's destination identifier is set to the given
 	 *                    value.
 	 */
 	public void setDestination(long destination) {
@@ -258,7 +258,7 @@ public class Message {
 	}
 
 	/**
-	 * Returns this message's length in bytes
+	 * Returns message's length in bytes
 	 * 
 	 * @return The message length
 	 */
@@ -267,9 +267,9 @@ public class Message {
 	}
 
 	/**
-	 * Sets the total length of this message (measured in bytes)
+	 * Sets the message length in bytes
 	 * 
-	 * @param length Number of bytes in this message
+	 * @param length Message's length is set to this value
 	 * @throws IndexOutOfBoundsException Invalid length
 	 */
 	public void setLength(short length) {
@@ -281,230 +281,226 @@ public class Message {
 	}
 
 	/**
-	 * Returns the sequence number of this message
+	 * Returns the sequence number
 	 * 
-	 * @return This message's sequence number
+	 * @return Message's sequence number
 	 */
 	public short getSequenceNumber() {
 		return buffer.getShort(26);
 	}
 
 	/**
-	 * Sets this message's sequence number
+	 * Sets the sequence number
 	 * 
-	 * @param sequenceNumber The sequence number of this message is set to the given
-	 *                       value
+	 * @param sequenceNumber Message's sequence number is set to the given value
 	 */
 	public void setSequenceNumber(short sequenceNumber) {
 		buffer.putShort(26, sequenceNumber);
 	}
 
 	/**
-	 * Returns the session identifier of this message
+	 * Returns the session identifier
 	 * 
-	 * @return This message's session identifier
+	 * @return Message's session identifier
 	 */
 	public byte getSession() {
 		return buffer.get(28);
 	}
 
 	/**
-	 * Sets this message's session identifier
+	 * Sets the session identifier
 	 * 
-	 * @param session The session identifier of this message is set to the given
-	 *                value
+	 * @param session Message's session identifier is set to the given value
 	 */
 	public void setSession(byte session) {
 		buffer.put(28, session);
 	}
 
 	/**
-	 * Returns the command classifier of this message
+	 * Returns the command classifier
 	 * 
-	 * @return This message's command classifier
+	 * @return Message's command classifier
 	 */
 	public byte getCommand() {
 		return buffer.get(29);
 	}
 
 	/**
-	 * Sets this message's command classifier in it's header
+	 * Sets the command classifier
 	 * 
-	 * @param command The command classifier of this message is set to the given
-	 *                value
+	 * @param command Message's command classifier is set to the given value
 	 */
 	public void setCommand(byte command) {
 		buffer.put(29, command);
 	}
 
 	/**
-	 * Returns the command qualifier of this message
+	 * Returns the command qualifier
 	 * 
-	 * @return This message's command qualifier
+	 * @return Message's command qualifier
 	 */
 	public byte getQualifier() {
 		return buffer.get(30);
 	}
 
 	/**
-	 * Sets this message's command qualifier in it's header
+	 * Sets the command qualifier
 	 * 
-	 * @param qualifier The command qualifier of this message is set to the given
-	 *                  value
+	 * @param qualifier Message's command qualifier is set to the given value
 	 */
 	public void setQualifier(byte qualifier) {
 		buffer.put(30, qualifier);
 	}
 
 	/**
-	 * Returns the request/response status of this message
+	 * Returns the request/response status code
 	 * 
-	 * @return This message's request/response status
+	 * @return Message's status code
 	 */
 	public byte getStatus() {
 		return buffer.get(31);
 	}
 
 	/**
-	 * Sets this message's request/response status in it's header
+	 * Sets the request/response status code
 	 * 
-	 * @param status The status of this message is set to the given value
+	 * @param status Message's status code is set to the given value
 	 */
 	public void setStatus(byte status) {
 		buffer.put(31, status);
 	}
 
 	/**
-	 * Read a byte value from the payload at the given offset
+	 * Reads a byte value from the payload at the given index
 	 * 
-	 * @param offset The offset within the payload
-	 * @return The byte value at the given offset
+	 * @param index The index from which the byte value will be read
+	 * @return The byte value at the given index
 	 */
-	public byte getByte(int offset) {
-		return buffer.get(HEADER_SIZE + offset);
+	public byte getByte(int index) {
+		return buffer.get(HEADER_SIZE + index);
 	}
 
 	/**
-	 * Write a byte value at the given offset in the payload
+	 * Writes a byte value at the given index in the payload
 	 * 
-	 * @param offset The offset at which the given value will be written
-	 * @param value  The byte value to write at the given offset
+	 * @param index The index at which the byte value will be written
+	 * @param value The byte value to write
 	 */
-	public void setByte(int offset, byte value) {
-		buffer.put(HEADER_SIZE + offset, value);
+	public void setByte(int index, byte value) {
+		buffer.put(HEADER_SIZE + index, value);
 	}
 
 	/**
-	 * Read a char value from the given offset in the payload
+	 * Reads a char value from the payload at the given index
 	 * 
-	 * @param offset The offset from which value will be read
-	 * @return The char value at the given offset
+	 * @param index The index from which the char value will be read
+	 * @return The char value at the given index
 	 */
-	public char getChar(int offset) {
-		return buffer.getChar(HEADER_SIZE + offset);
+	public char getChar(int index) {
+		return buffer.getChar(HEADER_SIZE + index);
 	}
 
 	/**
-	 * Write a char value at the given offset in the payload
+	 * Writes a char value at the given index in the payload
 	 * 
-	 * @param offset The offset at which value will be written
-	 * @param value  The char value to write at the given offset
+	 * @param index The index at which the char value will be written
+	 * @param value The char value to write
 	 */
-	public void setChar(int offset, char value) {
-		buffer.putChar(HEADER_SIZE + offset, value);
+	public void setChar(int index, char value) {
+		buffer.putChar(HEADER_SIZE + index, value);
 	}
 
 	/**
-	 * Read a short value from the given offset in the payload
+	 * Reads a short value from the payload at the given index
 	 * 
-	 * @param offset The offset from which value will be read
-	 * @return The short value at the given offset
+	 * @param index The index from which the short value will be read
+	 * @return The short value at the given index
 	 */
-	public short getShort(int offset) {
-		return buffer.getShort(HEADER_SIZE + offset);
+	public short getShort(int index) {
+		return buffer.getShort(HEADER_SIZE + index);
 	}
 
 	/**
-	 * Write a short value at the given offset in the payload
+	 * Writes a short value at the given index in the payload
 	 * 
-	 * @param offset The offset at which value will be written
-	 * @param value  The short value to be written at the given offset
+	 * @param index The index at which the short value will be written
+	 * @param value The short value to write
 	 */
-	public void setShort(int offset, short value) {
-		buffer.putShort(HEADER_SIZE + offset, value);
+	public void setShort(int index, short value) {
+		buffer.putShort(HEADER_SIZE + index, value);
 	}
 
 	/**
-	 * Read an int value from the given offset in the payload
+	 * Reads an int value from the payload at the given index
 	 * 
-	 * @param offset The offset from which value will be read
-	 * @return The int value at the given offset
+	 * @param index The index from which the int value will be read
+	 * @return The int value at the given index
 	 */
-	public int getInt(int offset) {
-		return buffer.getInt(HEADER_SIZE + offset);
+	public int getInt(int index) {
+		return buffer.getInt(HEADER_SIZE + index);
 	}
 
 	/**
-	 * Write an int value at the given offset in the payload
+	 * Writes an int value at the given index in the payload
 	 * 
-	 * @param offset The offset at which the given value will be written
-	 * @param value  The int value to write at the given offset
+	 * @param index The index at which the int value will be written
+	 * @param value The int value to write
 	 */
-	public void setInt(int offset, int value) {
-		buffer.putInt(HEADER_SIZE + offset, value);
+	public void setInt(int index, int value) {
+		buffer.putInt(HEADER_SIZE + index, value);
 	}
 
 	/**
-	 * Read a long value from the given offset in the payload
+	 * Reads a long value from the payload at the given index
 	 * 
-	 * @param offset The offset from which value will be read
-	 * @return The long value at the given offset
+	 * @param index The index from which the short value will be read
+	 * @return The long value at the given index
 	 */
-	public long getLong(int offset) {
-		return buffer.getLong(HEADER_SIZE + offset);
+	public long getLong(int index) {
+		return buffer.getLong(HEADER_SIZE + index);
 	}
 
 	/**
-	 * Write a long value at the given offset in the payload
+	 * Writes a long value at the given index in the payload
 	 * 
-	 * @param offset The offset at which value will be written
-	 * @param value  The long value to write at the given offset
+	 * @param index The index at which the long value will be written
+	 * @param value The long value to write
 	 */
-	public void setLong(int offset, long value) {
-		buffer.putLong(HEADER_SIZE + offset, value);
+	public void setLong(int index, long value) {
+		buffer.putLong(HEADER_SIZE + index, value);
 	}
 
 	/**
-	 * Read a double value from the given offset in the payload
+	 * Reads a double value from the payload at the given index
 	 * 
-	 * @param offset The offset from which value will be read
-	 * @return The double value at the given offset
+	 * @param index The index from which the double value will be read
+	 * @return The double value at the given index
 	 */
-	public double getDouble(int offset) {
-		return buffer.getDouble(HEADER_SIZE + offset);
+	public double getDouble(int index) {
+		return buffer.getDouble(HEADER_SIZE + index);
 	}
 
 	/**
-	 * Write a double value at the given offset in the payload
+	 * Writes a double value at the given index in the payload
 	 * 
-	 * @param offset The offset at which value will be written
-	 * @param value  The double value to write at the given offset
+	 * @param index The index at which the double value will be written
+	 * @param value The double value to write
 	 */
-	public void setDouble(int offset, double value) {
-		buffer.putDouble(HEADER_SIZE + offset, value);
+	public void setDouble(int index, double value) {
+		buffer.putDouble(HEADER_SIZE + index, value);
 	}
 
 	/**
-	 * Read a sequence of bytes from the given offset in the payload
+	 * Reads a sequence of bytes value from the payload at the given index
 	 * 
-	 * @param offset The offset from which bytes will be read
+	 * @param index  The index from which the bytes will be read
 	 * @param length The number of bytes to read
-	 * @return The byte array at the given offset
+	 * @return The byte array at the given index
 	 */
-	public byte[] getBlob(int offset, int length) {
+	public byte[] getBlob(int index, int length) {
 		int p = buffer.position();
 		try {
-			buffer.position(HEADER_SIZE + offset);
+			buffer.position(HEADER_SIZE + index);
 			byte[] blob = new byte[length];
 			buffer.get(blob);
 			return blob;
@@ -514,15 +510,15 @@ public class Message {
 	}
 
 	/**
-	 * Read a sequence of bytes from the given offset in the payload
+	 * Reads a sequence of bytes value from the payload at the given index
 	 * 
-	 * @param offset The offset from which bytes will be read
-	 * @param blob   The byte array where the bytes will be copied
+	 * @param index The index from which the bytes will be read
+	 * @param blob  The byte array where the bytes will be copied
 	 */
-	public void getBlob(int offset, byte[] blob) {
+	public void getBlob(int index, byte[] blob) {
 		int p = buffer.position();
 		try {
-			buffer.position(HEADER_SIZE + offset);
+			buffer.position(HEADER_SIZE + index);
 			buffer.get(blob);
 		} finally {
 			buffer.position(p);
@@ -530,15 +526,15 @@ public class Message {
 	}
 
 	/**
-	 * Write a sequence of bytes at the given offset in the payload
+	 * Writes a sequence of bytes at the given index in the payload
 	 * 
-	 * @param offset The offset at which the bytes will be written
-	 * @param blob   The byte array to write at the given offset
+	 * @param index The index at which the bytes will be written
+	 * @param blob  The bytes to write
 	 */
-	public void setBlob(int offset, byte[] blob) {
+	public void setBlob(int index, byte[] blob) {
 		int p = buffer.position();
 		try {
-			buffer.position(HEADER_SIZE + offset);
+			buffer.position(HEADER_SIZE + index);
 			buffer.put(blob);
 		} finally {
 			buffer.position(p);

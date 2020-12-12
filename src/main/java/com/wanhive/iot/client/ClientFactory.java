@@ -83,7 +83,7 @@ public class ClientFactory {
 						/*
 						 * Search for the host using a bootstrap node
 						 */
-						message = protocol.createFindRootRequest(0, identity.getUid());
+						message = protocol.createFindRootRequest(identity.getUid());
 						client.send(message);
 						message = client.receive();
 						long rootNode = protocol.processFindRootResponse(message);
@@ -94,7 +94,7 @@ public class ClientFactory {
 						/*
 						 * Create an unique session with the host
 						 */
-						message = protocol.createGetKeyRequest(0, null);
+						message = protocol.createGetKeyRequest(null);
 						client.send(message);
 						message = client.receive();
 						byte[] hc = protocol.processGetKeyResponse(message);
@@ -102,7 +102,7 @@ public class ClientFactory {
 						/*
 						 * Get the registration request signed by the authentication node
 						 */
-						message = protocol.createRegisterRequest(0, identity.getUid(), hc);
+						message = protocol.createRegisterRequest(identity.getUid(), hc);
 						/*
 						 * Complete registration
 						 */
@@ -137,7 +137,7 @@ public class ClientFactory {
 					 * Identification
 					 */
 					session.step1(config, Long.toString(identity.getUid()), identity.getPassword());
-					message = protocol.createIdentificationRequest(0, identity.getUid(),
+					message = protocol.createIdentificationRequest(identity.getUid(),
 							BigIntegerUtils.bigIntegerToBytes(session.getPublicClientValue()));
 					auth.send(message);
 					message = auth.receive();
@@ -148,7 +148,7 @@ public class ClientFactory {
 					 */
 					session.step2(BigIntegerUtils.bigIntegerFromBytes(iresp.getSalt()),
 							BigIntegerUtils.bigIntegerFromBytes(iresp.getNonce()));
-					message = protocol.createAuthenticationRequest(0,
+					message = protocol.createAuthenticationRequest(
 							BigIntegerUtils.bigIntegerToBytes(session.getClientEvidenceMessage()));
 					auth.send(message);
 					message = auth.receive();
@@ -166,7 +166,7 @@ public class ClientFactory {
 							/*
 							 * Search for the host using a bootstrap node
 							 */
-							message = protocol.createFindRootRequest(0, identity.getUid());
+							message = protocol.createFindRootRequest(identity.getUid());
 							client.send(message);
 							message = client.receive();
 							long rootNode = protocol.processFindRootResponse(message);
@@ -177,7 +177,7 @@ public class ClientFactory {
 							/*
 							 * Create an unique session with the host
 							 */
-							message = protocol.createGetKeyRequest(0, null);
+							message = protocol.createGetKeyRequest(null);
 							client.send(message);
 							message = client.receive();
 							byte[] hc = protocol.processGetKeyResponse(message);
@@ -185,7 +185,7 @@ public class ClientFactory {
 							/*
 							 * Get the registration request signed by the authentication node
 							 */
-							message = protocol.createRegisterRequest(0, identity.getUid(), hc);
+							message = protocol.createRegisterRequest(identity.getUid(), hc);
 							auth.send(message);
 							message = auth.receive();
 							/*

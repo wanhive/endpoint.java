@@ -105,7 +105,7 @@ public class ClientTest {
 			th.start();
 			Protocol proto = new Protocol();
 			for (int i = 0; i < 5; i++) {
-				Message msg = proto.createPublishRequest(0, (byte) 5, "Hello".getBytes());
+				Message msg = proto.createPublishRequest((byte) 5, "Hello".getBytes());
 				exec.offer(msg);
 				Thread.sleep(5000, 0);
 			}
