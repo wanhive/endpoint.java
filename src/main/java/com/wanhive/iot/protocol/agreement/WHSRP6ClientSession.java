@@ -1,7 +1,7 @@
 /*
  * WHSRP6ClientSession.java
  * 
- * SRP-6a client session manager
+ * SRP-6a client-side session manager
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -45,6 +45,12 @@ import com.nimbusds.srp6.SRP6Session;
 import com.nimbusds.srp6.URoutineContext;
 import com.nimbusds.srp6.XRoutine;
 
+/**
+ * Client-side session manager for identification and authentication
+ * 
+ * @author amit
+ *
+ */
 public class WHSRP6ClientSession extends SRP6Session {
 	/**
 	 * 
@@ -332,7 +338,6 @@ public class WHSRP6ClientSession extends SRP6Session {
 		}
 
 		state = State.STEP_2;
-
 		updateLastActivityTime();
 
 		return new SRP6ClientCredentials(A, M1);
@@ -359,7 +364,6 @@ public class WHSRP6ClientSession extends SRP6Session {
 	public void step3(final BigInteger M2) throws SRP6Exception {
 
 		// Check argument
-
 		if (M2 == null)
 			throw new IllegalArgumentException("The server evidence message 'M2' must not be null");
 
@@ -377,24 +381,18 @@ public class WHSRP6ClientSession extends SRP6Session {
 		BigInteger computedM2 = null;
 
 		if (serverEvidenceRoutine != null) {
-
 			// With custom routine
 			SRP6ServerEvidenceContext ctx = new SRP6ServerEvidenceContext(A, M1, S);
-
 			computedM2 = serverEvidenceRoutine.computeServerEvidence(config, ctx);
-
 		} else {
-			// With default routine
-			// MessageDigest digest = config.getMessageDigestInstance();
-			// computedM2 = srp6Routines.computeServerEvidence(digest, A, M1, S);
+			// With default routine: NONE
 		}
 
 		if (computedM2 != null && !computedM2.equals(M2)) {
 			throw new SRP6Exception("Bad server credentials", SRP6Exception.CauseType.BAD_CREDENTIALS);
 		}
-
+		
 		state = State.STEP_3;
-
 		updateLastActivityTime();
 	}
 
@@ -404,7 +402,6 @@ public class WHSRP6ClientSession extends SRP6Session {
 	 * @return The current state.
 	 */
 	public State getState() {
-
 		return state;
 	}
 }

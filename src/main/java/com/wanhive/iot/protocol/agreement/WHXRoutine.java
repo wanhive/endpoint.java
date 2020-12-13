@@ -30,13 +30,25 @@ import java.security.MessageDigest;
 import com.nimbusds.srp6.BigIntegerUtils;
 import com.nimbusds.srp6.XRoutine;
 
+/**
+ * Private key generator for client authentication
+ * 
+ * @author amit
+ *
+ */
 public class WHXRoutine implements XRoutine {
-	private int rounds;
+	private final int rounds;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param rounds Password hashing rounds
+	 */
 	public WHXRoutine(int rounds) {
 		this.rounds = rounds;
 	}
 
+	@Override
 	public BigInteger computeX(MessageDigest digest, byte[] salt, byte[] username, byte[] password) {
 		digest.reset();
 		digest.update(username);
@@ -44,12 +56,13 @@ public class WHXRoutine implements XRoutine {
 		digest.update(password);
 		byte[] x = digest.digest(); // H ( I | ":" | p)
 
+		int i = rounds;
 		do {
 			digest.reset();
 			digest.update(salt);
 			digest.update(x);
 			x = digest.digest();
-		} while ((--rounds) > 0);
+		} while ((--i) > 0);
 
 		return BigIntegerUtils.bigIntegerFromBytes(x);
 	}

@@ -34,19 +34,19 @@ import com.wanhive.iot.protocol.bean.NameInfo;
  */
 public interface Hosts extends AutoCloseable {
 	/**
-	 * Returns the address of a Wanhive host
+	 * Returns the network address of a Wanhive host
 	 * 
 	 * @param identity Identity of the host
-	 * @return A NameInfo object containing the address of the host
+	 * @return A NameInfo object containing the host's network address
 	 * @throws Exception
 	 */
 	public NameInfo get(long identity) throws Exception;
 
 	/**
-	 * Stores the address of a Wanhive host
+	 * Stores the network address of a Wanhive host
 	 * 
 	 * @param identity Host's identity
-	 * @param ni       NameInfo object containing the address of the host
+	 * @param ni       A NameInfo object containing the host's network address
 	 * @throws Exception
 	 */
 	public void put(long identity, NameInfo ni) throws Exception;
@@ -62,9 +62,9 @@ public interface Hosts extends AutoCloseable {
 	/**
 	 * Returns a list of host identifiers of the given type
 	 * 
-	 * @param type  Host type
-	 * @param limit Upper limit on the number of identifiers to return
-	 * @return Array containing host identifiers
+	 * @param type  The host's type
+	 * @param limit The upper limit on the number of identifiers to return
+	 * @return An array containing the host identifiers
 	 * @throws Exception
 	 */
 	public long[] list(int type, int limit) throws Exception;

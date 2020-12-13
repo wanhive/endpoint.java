@@ -25,12 +25,13 @@
 package com.wanhive.iot.protocol.hosts;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
 /**
- * Reference implementation of hosts cache
+ * The reference implementation of hosts cache
  * 
  * @author amit
  *
@@ -38,7 +39,7 @@ import java.util.Scanner;
 public class WanhiveHostsCache implements HostsCache {
 
 	@Override
-	public long[] get(String path, int count) throws Exception {
+	public long[] get(String path, int count) throws FileNotFoundException {
 		try (Scanner scanner = new Scanner(new File(path))) {
 			long[] list = new long[count];
 			int i = 0;

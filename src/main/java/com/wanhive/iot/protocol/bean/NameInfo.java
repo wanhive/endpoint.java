@@ -65,7 +65,7 @@ public class NameInfo {
 	/**
 	 * Get the service type
 	 * 
-	 * @return The string containing the service type
+	 * @return The service type string
 	 */
 	public String getService() {
 		return service;
@@ -74,7 +74,7 @@ public class NameInfo {
 	/**
 	 * Set the service type
 	 * 
-	 * @param service The string containing the service type
+	 * @param service The service type string
 	 */
 	public void setService(String service) {
 		this.service = service;

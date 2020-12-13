@@ -38,10 +38,10 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
  */
 public class Configuration {
 	/**
-	 * Parses and returns an ini configuration object
+	 * Parses a configuration file and returns an INI configuration object
 	 * 
-	 * @param pathName      pathname of the configuration file
-	 * @param listDelimiter the list delimiter character
+	 * @param pathName      The pathname of the configuration file
+	 * @param listDelimiter The list delimiter character
 	 * @return INIConfiguration object containing the configuration data
 	 * @throws ConfigurationException
 	 */

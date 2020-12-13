@@ -26,18 +26,21 @@ package com.wanhive.iot.protocol.hosts;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import com.wanhive.iot.protocol.bean.NameInfo;
 
 /**
- * Reference implementation of hosts manager based on SQLITE3 database
+ * Reference implementation of the Wanhive hosts manager.
  * 
  * @author amit
  *
@@ -48,6 +51,9 @@ public class WanhiveHosts implements Hosts {
 		init();
 	}
 
+	/**
+	 * Loads the SQLite3 database driver
+	 */
 	private static void init() {
 		try {
 			Class.forName("org.sqlite.JDBC");
@@ -56,11 +62,31 @@ public class WanhiveHosts implements Hosts {
 		}
 	}
 
-	private void createTables() throws Exception {
-		String query = "CREATE TABLE IF NOT EXISTS hosts (uid INTEGER NOT NULL UNIQUE ON CONFLICT REPLACE, name TEXT NOT NULL DEFAULT '127.0.0.1', service TEXT NOT NULL DEFAULT '9000', type INTEGER NOT NULL DEFAULT 0)";
-		try (PreparedStatement ps = conn.prepareStatement(query)) {
-			ps.execute();
+	/**
+	 * Initializes SQLite3 database and tables
+	 * 
+	 * @throws SQLException
+	 */
+	private Connection initDatabase(String db) throws SQLException {
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:sqlite:" + db);
+
+			String query = "CREATE TABLE IF NOT EXISTS hosts (uid INTEGER NOT NULL UNIQUE ON CONFLICT REPLACE, name TEXT NOT NULL DEFAULT '127.0.0.1', service TEXT NOT NULL DEFAULT '9000', type INTEGER NOT NULL DEFAULT 0)";
+			try (PreparedStatement ps = conn.prepareStatement(query)) {
+				ps.execute();
+			}
+
+			return conn;
 		} catch (Exception e) {
+			try {
+				if (conn != null) {
+					conn.close();
+					conn = null;
+				}
+			} catch (Exception e2) {
+
+			}
 			throw e;
 		}
 	}
@@ -68,25 +94,22 @@ public class WanhiveHosts implements Hosts {
 	/**
 	 * Constructor
 	 * 
-	 * @param db Pathname of the sqlite3 database file
-	 * @throws Exception
+	 * @param db Pathname of the SQLite3 database file
+	 * @throws SQLException
 	 */
-	public WanhiveHosts(String db) throws Exception {
-		try {
-			conn = DriverManager.getConnection("jdbc:sqlite:" + db);
-			createTables();
-		} catch (Exception e) {
-			throw e;
-		}
+	public WanhiveHosts(String db) throws SQLException {
+		conn = initDatabase(db);
 	}
 
 	/**
-	 * Imports hosts from a text file into the database
+	 * Imports the hosts from a text file to the database
 	 * 
 	 * @param pathname Pathname of the text file
-	 * @throws Exception
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 * @throws SQLException
 	 */
-	public void importHosts(String pathname) throws Exception {
+	public void importHosts(String pathname) throws FileNotFoundException, IOException, SQLException {
 		String query = "INSERT INTO hosts (uid, name, service, type) VALUES (?,?,?,?)";
 		try (BufferedReader reader = new BufferedReader(new FileReader(pathname))) {
 			boolean commitFlag = conn.getAutoCommit();
@@ -100,10 +123,10 @@ public class WanhiveHosts implements Hosts {
 						}
 
 						line = line.trim();
-						if (line.length() == 0) {
+						if (line.length() == 0 || line.startsWith("#")) {
 							continue;
 						}
-						
+
 						String[] data = line.split("\t");
 						if (data == null || data.length < 3) {
 							continue;
@@ -119,7 +142,6 @@ public class WanhiveHosts implements Hosts {
 							ps.setInt(4, 0);
 						}
 						ps.executeUpdate();
-
 					}
 				}
 				conn.commit();
@@ -130,15 +152,16 @@ public class WanhiveHosts implements Hosts {
 	}
 
 	/**
-	 * Exports the hosts database to the given text file
+	 * Exports the hosts database to a text file
 	 * 
 	 * @param pathname Pathname of the text file
-	 * @throws Exception
+	 * @param version  Text file's version identifier
+	 * @throws IOException
+	 * @throws SQLException
 	 */
-	public void exportHosts(String pathname) throws Exception {
-		String query = "SELECT uid, name, service, type from hosts";
-
+	public void exportHosts(String pathname, int version) throws IOException, SQLException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(pathname))) {
+			String query = "SELECT uid, name, service, type FROM hosts";
 			try (PreparedStatement ps = conn.prepareStatement(query)) {
 				try (ResultSet rs = ps.executeQuery()) {
 					while (rs.next()) {
@@ -147,16 +170,30 @@ public class WanhiveHosts implements Hosts {
 						writer.write(rs.getString(2));
 						writer.write("\t");
 						writer.write(rs.getString(3));
-						writer.write("\n");
+						if (version != 0) {
+							writer.write(rs.getString(4));
+						}
+						writer.write(System.lineSeparator());
 					}
 				}
 			}
 		}
 	}
 
+	/**
+	 * Exports the hosts database to a text file
+	 * 
+	 * @param pathname Pathname of the text file
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	public void exportHosts(String pathname) throws IOException, SQLException {
+		exportHosts(pathname, 0);
+	}
+
 	@Override
-	public NameInfo get(long identity) throws Exception {
-		String query = "SELECT name, service, type FROM hosts where uid=?";
+	public NameInfo get(long identity) throws SQLException, IllegalArgumentException {
+		String query = "SELECT name, service, type FROM hosts WHERE uid=?";
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
 			ps.setLong(1, identity);
 
@@ -168,16 +205,14 @@ public class WanhiveHosts implements Hosts {
 					ni.setType(rs.getInt(3));
 					return ni;
 				} else {
-					throw new Exception("Not found");
+					throw new IllegalArgumentException();
 				}
 			}
-		} catch (Exception e) {
-			throw e;
 		}
 	}
 
 	@Override
-	public void put(long identity, NameInfo ni) throws Exception {
+	public void put(long identity, NameInfo ni) throws SQLException {
 		String query = "INSERT INTO hosts (uid, name, service, type) VALUES (?,?,?,?)";
 
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
@@ -186,29 +221,25 @@ public class WanhiveHosts implements Hosts {
 			ps.setString(3, ni.getService());
 			ps.setInt(4, ni.getType());
 			ps.executeUpdate();
-		} catch (Exception e) {
-			throw e;
 		}
 	}
 
 	@Override
-	public void remove(long identity) throws Exception {
-		String query = "DELETE FROM hosts where uid=?";
+	public void remove(long identity) throws SQLException {
+		String query = "DELETE FROM hosts WHERE uid=?";
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
 			ps.setLong(1, identity);
 			ps.executeUpdate();
-		} catch (Exception e) {
-			throw e;
 		}
 	}
 
 	@Override
-	public long[] list(int type, int limit) throws Exception {
+	public long[] list(int type, int limit) throws SQLException {
 		if (limit <= 0) {
 			limit = 1;
 		}
 
-		String query = "SELECT uid FROM hosts where type=? order by RANDOM() limit ?";
+		String query = "SELECT uid FROM hosts WHERE type=? ORDER BY RANDOM() LIMIT ?";
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
 			ps.setInt(1, type);
 			ps.setInt(2, limit);
@@ -226,8 +257,6 @@ public class WanhiveHosts implements Hosts {
 					return Arrays.copyOfRange(list, 0, i);
 				}
 			}
-		} catch (Exception e) {
-			throw e;
 		}
 	}
 

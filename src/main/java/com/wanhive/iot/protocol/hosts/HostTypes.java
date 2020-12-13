@@ -30,7 +30,7 @@ package com.wanhive.iot.protocol.hosts;
  *
  */
 public enum HostTypes {
-	HOST(0), BROKER(1), AUTHENTICATOR(2);
+	HUB(0), BOOTSTRAP(1), AUTHENTICATOR(2);
 
 	private int type;
 

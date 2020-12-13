@@ -25,12 +25,13 @@ package com.wanhive.iot.protocol.configuration;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
- * Utility class for serialization and deserialization of objects
+ * Serializes and deserializes objects
  * 
  * @author amit
  *
@@ -39,11 +40,11 @@ public class ObjectSerializer {
 	/**
 	 * Writes a serializable object to the file system
 	 * 
-	 * @param pathName pathname of the file where the object will be stored
+	 * @param pathName The pathname of the file where the object will be stored
 	 * @param object   the serializable object
-	 * @throws Exception
+	 * @throws IOException
 	 */
-	public static void store(String pathName, Serializable object) throws Exception {
+	public static void store(String pathName, Serializable object) throws IOException {
 		try (FileOutputStream file = new FileOutputStream(pathName)) {
 			try (ObjectOutputStream out = new ObjectOutputStream(file)) {
 				out.writeObject(object);
@@ -54,13 +55,15 @@ public class ObjectSerializer {
 	}
 
 	/**
+	 * 
 	 * Reads a serializable object from the file system
 	 * 
-	 * @param pathName pathname of the file containing the serialized object
-	 * @return the object which was stored in the given file
-	 * @throws Exception
+	 * @param pathName The pathname of the file containing the serialized object
+	 * @return The deserialized object read from the given file
+	 * @throws ClassNotFoundException
+	 * @throws IOException
 	 */
-	public static Object load(String pathName) throws Exception {
+	public static Object load(String pathName) throws ClassNotFoundException, IOException {
 		try (FileInputStream file = new FileInputStream(pathName)) {
 			try (ObjectInputStream in = new ObjectInputStream(file)) {
 				return in.readObject();

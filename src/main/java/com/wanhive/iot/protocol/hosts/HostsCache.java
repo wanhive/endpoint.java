@@ -32,10 +32,10 @@ package com.wanhive.iot.protocol.hosts;
  */
 public interface HostsCache {
 	/**
-	 * Reads host identifiers from a file
+	 * Reads a list of host identifiers from a file
 	 * 
-	 * @param path  The absolute path to the file
-	 * @param count The number of hosts identifiers to read from the file
+	 * @param path  The pathname of the file
+	 * @param count The maximum number of identifiers to read from the file
 	 * @return A long array containing the identifiers
 	 * @throws Exception
 	 */

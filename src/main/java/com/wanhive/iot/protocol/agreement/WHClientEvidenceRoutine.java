@@ -34,7 +34,7 @@ import com.nimbusds.srp6.SRP6CryptoParams;
 import com.nimbusds.srp6.SRP6Routines;
 
 /**
- * Customized SRP-6a class for the generation of client's proof
+ * Generates client's proof
  * 
  * @author amit
  *
@@ -43,6 +43,7 @@ public class WHClientEvidenceRoutine extends SRP6Routines implements ClientEvide
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public BigInteger computeClientEvidence(SRP6CryptoParams cryptoParams, SRP6ClientEvidenceContext ctx) {
 		final int padLength = (cryptoParams.N.bitLength() + 7) / 8;
 		MessageDigest digest = cryptoParams.getMessageDigestInstance();

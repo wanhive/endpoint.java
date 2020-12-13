@@ -41,19 +41,19 @@ public class Protocol {
 	private byte session;
 
 	/**
-	 * Checks message's context
+	 * Verifies message's context
 	 * 
 	 * @param message   The message to check
 	 * @param command   The expected command classifier
 	 * @param qualifier The expected command qualifier
 	 * @return true if the message matched the context, false otherwise
 	 */
-	protected static boolean checkContext(Message message, byte command, byte qualifier) {
+	public static boolean checkContext(Message message, byte command, byte qualifier) {
 		return (message.getCommand() == command && message.getQualifier() == qualifier);
 	}
 
 	/**
-	 * Checks message's context
+	 * Verifies message's context
 	 * 
 	 * @param message   The message to check
 	 * @param command   The expected command classifier
@@ -61,18 +61,18 @@ public class Protocol {
 	 * @param status    The expected status code
 	 * @return true if the message matched the context, false otherwise
 	 */
-	protected static boolean checkContext(Message message, byte command, byte qualifier, byte status) {
+	public static boolean checkContext(Message message, byte command, byte qualifier, byte status) {
 		return checkContext(message, command, qualifier) && (message.getStatus() == status);
 	}
 
 	/**
-	 * Checks message's context
+	 * Verifies message's context
 	 * 
 	 * @param message The message to check
 	 * @param ctx     The MessageContext object
 	 * @return true if the message matched the context, false otherwise
 	 */
-	protected static boolean checkContext(Message message, MessageContext ctx) {
+	public static boolean checkContext(Message message, MessageContext ctx) {
 		return checkContext(message, ctx.getCommand(), ctx.getQualifier(), ctx.getStatus());
 	}
 

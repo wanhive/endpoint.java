@@ -34,7 +34,7 @@ import com.nimbusds.srp6.SRP6ServerEvidenceContext;
 import com.nimbusds.srp6.ServerEvidenceRoutine;
 
 /**
- * Customized SRP-6a class for the generation of host's proof
+ * Generates host's proof
  * 
  * @author amit
  *
@@ -42,6 +42,7 @@ import com.nimbusds.srp6.ServerEvidenceRoutine;
 public class WHServerEvidenceRoutine extends SRP6Routines implements ServerEvidenceRoutine {
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public BigInteger computeServerEvidence(SRP6CryptoParams cryptoParams, SRP6ServerEvidenceContext ctx) {
 		final int padLength = (cryptoParams.N.bitLength() + 7) / 8;
 		MessageDigest digest = cryptoParams.getMessageDigestInstance();
