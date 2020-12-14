@@ -170,7 +170,7 @@ public class WanhiveHosts implements Hosts {
 						writer.write(rs.getString(2));
 						writer.write("\t");
 						writer.write(rs.getString(3));
-						if (version != 0) {
+						if (version == 1) {
 							writer.write(rs.getString(4));
 						}
 						writer.write(System.lineSeparator());
