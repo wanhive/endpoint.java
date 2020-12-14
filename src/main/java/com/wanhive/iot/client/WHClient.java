@@ -23,9 +23,13 @@
  */
 package com.wanhive.iot.client;
 
+import java.io.EOFException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ProtocolException;
 import java.net.Socket;
+import java.net.SocketException;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -40,8 +44,6 @@ import com.wanhive.iot.protocol.hosts.Hosts;
  *
  */
 public class WHClient implements Client {
-	private static final String BADLENMSG = "Invalid message length";
-	private static final String BADSOCKMSG = "Invalid connection";
 	private Socket socket;
 
 	/**
@@ -61,12 +63,13 @@ public class WHClient implements Client {
 	}
 
 	/**
-	 * Opens a new connection with a remote host. Closes any existing connection.
+	 * Opens a new connection with a remote host. Closes the existing connection.
 	 * 
-	 * @param hosts       For network address resolution of a remote host
-	 * @param host        Identifier of the host
-	 * @param timeoutMils Read timeout of the underlying connection (0=disable)
-	 * @param ssl         If set then a secure SSL connection is established
+	 * @param hosts       For the network address resolution of remote hosts
+	 * @param host        The host identifier
+	 * @param timeoutMils The read timeout of the underlying connection (0 = block
+	 *                    forever)
+	 * @param ssl         If set then secure SSL connection is established
 	 * @throws Exception
 	 */
 	void open(Hosts hosts, long host, int timeoutMils, boolean ssl) throws Exception {
@@ -132,33 +135,33 @@ public class WHClient implements Client {
 	}
 
 	@Override
-	public void send(Message message) throws Exception {
+	public void send(Message message) throws IOException {
 		int messageLength = message.getLength();
 		if (messageLength >= Message.HEADER_SIZE && messageLength <= Message.MTU) {
 			OutputStream out = socket.getOutputStream();
 			out.write(message.getBuffer(), 0, messageLength);
 		} else {
-			throw new Exception(BADLENMSG);
+			throw new IllegalArgumentException();
 		}
 	}
 
 	@Override
-	public Message receive() throws Exception {
+	public Message receive() throws IOException {
 		Message message = new Message();
 
 		InputStream in = socket.getInputStream();
 		int bytesRead = in.read(message.getBuffer(), 0, Message.HEADER_SIZE);
 		if (bytesRead != Message.HEADER_SIZE) {
-			throw new Exception(BADSOCKMSG);
+			throw new EOFException();
 		}
 
 		int messageLength = message.getLength();
 		if (!Message.isValidLength(messageLength)) {
-			throw new Exception(BADLENMSG);
+			throw new ProtocolException();
 		} else if (messageLength > Message.HEADER_SIZE) {
 			bytesRead += in.read(message.getBuffer(), bytesRead, messageLength - Message.HEADER_SIZE);
 			if (bytesRead != messageLength) {
-				throw new Exception(BADSOCKMSG);
+				throw new EOFException();
 			}
 		} else {
 			// No payload
@@ -167,7 +170,7 @@ public class WHClient implements Client {
 	}
 
 	@Override
-	public Message receive(short sequenceNumber) throws Exception {
+	public Message receive(short sequenceNumber) throws IOException {
 		while (true) {
 			Message message = receive();
 			if (sequenceNumber == 0 || message.getSequenceNumber() == sequenceNumber) {
@@ -179,7 +182,7 @@ public class WHClient implements Client {
 	}
 
 	@Override
-	public void setTimeout(int milliseconds) throws Exception {
+	public void setTimeout(int milliseconds) throws SocketException {
 		socket.setSoTimeout(milliseconds);
 	}
 

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Throw meaningful exceptions.
 - Simplify the public interfaces.
 - Update the code documentation.
 - Clean up the magic constants.

@@ -1,7 +1,7 @@
 /*
  * Receiver.java
  * 
- * Incoming message handler
+ * Incoming message processor
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -26,17 +26,16 @@ package com.wanhive.iot.client;
 import com.wanhive.iot.protocol.Message;
 
 /**
- * Processes incoming messages handed over to it by the Executor
+ * Processes incoming messages
  * 
  * @author amit
  *
  */
 public interface Receiver {
 	/**
-	 * Accepts the given message and processes it
+	 * Processes an incoming message
 	 * 
-	 * @param message Message to process
-	 * @throws Exception
+	 * @param message The message to process
 	 */
-	public void receive(Message message) throws Exception;
+	public void receive(Message message);
 }

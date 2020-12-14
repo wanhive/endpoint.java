@@ -23,6 +23,8 @@
  */
 package com.wanhive.iot.client;
 
+import java.io.IOException;
+
 import com.wanhive.iot.protocol.Message;
 
 /**
@@ -35,34 +37,34 @@ public interface Client extends AutoCloseable {
 	/**
 	 * Sends a message to the network
 	 * 
-	 * @param message Message to send out
-	 * @throws Exception
+	 * @param message The message to send out
+	 * @throws IOException
 	 */
-	void send(Message message) throws Exception;
+	void send(Message message) throws IOException;
 
 	/**
 	 * Receives a message from the network
 	 * 
-	 * @return Message received from the network
-	 * @throws Exception
+	 * @return A message received from the network
+	 * @throws IOException
 	 */
-	Message receive() throws Exception;
+	Message receive() throws IOException;
 
 	/**
 	 * Reads from the connection until a message matching the given sequence number
 	 * is found
 	 * 
-	 * @param sequenceNumber desired sequence number (set to zero to ignore)
-	 * @return Message containing matching sequence number
-	 * @throws Exception
+	 * @param sequenceNumber The desired sequence number (set to zero to ignore)
+	 * @return A message containing the matching sequence number
+	 * @throws IOException
 	 */
-	Message receive(short sequenceNumber) throws Exception;
+	Message receive(short sequenceNumber) throws IOException;
 
 	/**
-	 * Sets connection's read timeout to the given value
+	 * Sets the socket connection's read timeout to the given value
 	 * 
-	 * @param milliseconds timeout value in milliseconds (0= disable timeout)
-	 * @throws Exception
+	 * @param milliseconds timeout value in milliseconds (set to 0 to block forever)
+	 * @throws IOException
 	 */
-	void setTimeout(int milliseconds) throws Exception;
+	void setTimeout(int milliseconds) throws IOException;
 }

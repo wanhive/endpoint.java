@@ -36,6 +36,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 import com.wanhive.iot.protocol.bean.NameInfo;
 
@@ -192,7 +193,7 @@ public class WanhiveHosts implements Hosts {
 	}
 
 	@Override
-	public NameInfo get(long identity) throws SQLException, IllegalArgumentException {
+	public NameInfo get(long identity) throws SQLException, NoSuchElementException {
 		String query = "SELECT name, service, type FROM hosts WHERE uid=?";
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
 			ps.setLong(1, identity);
@@ -205,7 +206,7 @@ public class WanhiveHosts implements Hosts {
 					ni.setType(rs.getInt(3));
 					return ni;
 				} else {
-					throw new IllegalArgumentException();
+					throw new NoSuchElementException();
 				}
 			}
 		}

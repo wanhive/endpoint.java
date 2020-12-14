@@ -1,7 +1,7 @@
 /*
  * ProfileMap.java
  * 
- * Record keeper of endpoint profiles
+ * Record keeper of the endpoint profiles
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -23,14 +23,14 @@
  */
 package com.wanhive.iot.profile;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import com.wanhive.iot.protocol.configuration.ObjectSerializer;
 
 /**
- * Reads and writes endpoint profiles from-and-to the filesystem
+ * Record keeper of the endpoint profiles
  * 
  * @author amit
  *
@@ -40,41 +40,37 @@ public class ProfileMap {
 	private final ConcurrentHashMap<Long, Profile> profiles = new ConcurrentHashMap<Long, Profile>();
 
 	/**
-	 * Loads all the profiles from the given file
+	 * Constructor
 	 * 
 	 * @param filename pathname of the file containing the profiles
-	 * @throws Exception
+	 * @throws IOException
+	 * @throws ClassNotFoundException
 	 */
-	public ProfileMap(String filename) throws Exception {
-		if (filename == null) {
-			throw new NullPointerException();
-		} else {
-			this.filename = filename;
-			reload();
-		}
+	public ProfileMap(String filename) throws ClassNotFoundException, IOException {
+		this.filename = filename;
+		reload();
 	}
 
 	/**
-	 * Reloads the profiles from the disk
+	 * Reads the profiles from the file system
+	 * 
+	 * @throws IOException
+	 * @throws ClassNotFoundException
 	 */
 	@SuppressWarnings("unchecked")
-	public void reload() {
-		try {
-			ConcurrentHashMap<Long, Profile> newProfiles = (ConcurrentHashMap<Long, Profile>) ObjectSerializer
-					.load(filename);
-			profiles.clear();
-			for (Map.Entry<Long, Profile> entry : newProfiles.entrySet()) {
-				profiles.put(entry.getKey(), entry.getValue());
-			}
-		} catch (Exception e) {
-			Logger.getGlobal().warning(e.getMessage());
+	public void reload() throws ClassNotFoundException, IOException {
+		ConcurrentHashMap<Long, Profile> newProfiles = (ConcurrentHashMap<Long, Profile>) ObjectSerializer
+				.load(filename);
+		profiles.clear();
+		for (Map.Entry<Long, Profile> entry : newProfiles.entrySet()) {
+			profiles.put(entry.getKey(), entry.getValue());
 		}
 	}
 
 	/**
 	 * Returns the map containing all the profiles
 	 * 
-	 * @return
+	 * @return A map of the profiles
 	 */
 	public Map<Long, Profile> get() {
 		return profiles;
@@ -83,9 +79,10 @@ public class ProfileMap {
 	/**
 	 * Commits the profiles to the disk
 	 * 
-	 * @throws Exception
+	 * @throws IOException
+	 * 
 	 */
-	public void commit() throws Exception {
+	public void commit() throws IOException {
 		ObjectSerializer.store(filename, profiles);
 	}
 }

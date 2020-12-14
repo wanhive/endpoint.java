@@ -30,9 +30,8 @@ import java.util.logging.Logger;
 import com.wanhive.iot.protocol.Message;
 
 /**
- * Bounded queue based IO executor for Wanhive. Maintains two separate queues
- * one for messages meant to be sent out to the network and another one for
- * messages read from the network.
+ * Bounded queue based IO engine for Wanhive. Maintains two separate queues, one
+ * for the outgoing messages and another one for the incoming messages.
  * 
  * @author amit
  *
@@ -49,7 +48,7 @@ public class Executor implements Runnable, AutoCloseable {
 	private final BlockingQueue<Message> out;
 
 	/**
-	 * Stops the Executor, Client is closed.
+	 * Stops the Executor and closes the client.
 	 */
 	private void stop() {
 		synchronized (notifier) {
@@ -68,9 +67,9 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Constructor
 	 * 
-	 * @param client      Client to be used for communication
-	 * @param inCapacity  Capacity of incoming messages queue
-	 * @param outCapacity Capacity of the outgoing messages queue
+	 * @param client      The Client to be used for communication
+	 * @param inCapacity  The capacity of the incoming messages queue
+	 * @param outCapacity The capacity of the outgoing messages queue
 	 */
 	public Executor(Client client, int inCapacity, int outCapacity) {
 		this.client = client;
@@ -81,9 +80,9 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Constructor
 	 * 
-	 * @param client      Client to be used for communication
-	 * @param receiver    Receiver for processing the message
-	 * @param outCapacity Capacity of the outgoing messages queue
+	 * @param client      The Client to be used for communication
+	 * @param receiver    The Receiver for processing the incoming messages
+	 * @param outCapacity The capacity of the outgoing messages queue
 	 */
 	public Executor(Client client, Receiver receiver, int outCapacity) {
 		this.client = client;
@@ -93,10 +92,10 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Sets up the Client, do not call while the Executor is running. Existing
-	 * Client if any is replaced, however not closed.
+	 * Sets executor's Client. Any existing Client is replaced, but not closed. Do
+	 * not call while the executor is running.
 	 * 
-	 * @param client Client to use with this Executor
+	 * @param client The Client to use with the Executor
 	 */
 	public void setClient(Client client) {
 		if (!isRunning()) {
@@ -107,10 +106,10 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Sets up the Receiver for the incoming messages. Existing Receiver is
-	 * replaced. Do not call while the Executor is running.
+	 * Sets the Receiver for the incoming messages. Do not call while the Executor
+	 * is running.
 	 * 
-	 * @param receiver Receiver to be assigned to this object
+	 * @param receiver The Receiver to use
 	 */
 	public void setReceiver(Receiver receiver) {
 		if (!isRunning() && in == null) {
@@ -134,9 +133,9 @@ public class Executor implements Runnable, AutoCloseable {
 	 * Puts a message into outgoing queue
 	 * 
 	 * @param message Message to send out
-	 * @throws Exception
+	 * @throws InterruptedException
 	 */
-	public void put(Message message) throws Exception {
+	public void put(Message message) throws InterruptedException {
 		out.put(message);
 	}
 
@@ -153,9 +152,9 @@ public class Executor implements Runnable, AutoCloseable {
 	 * Returns a message from the incoming queue
 	 * 
 	 * @return A message from the incoming queue
-	 * @throws Exception
+	 * @throws InterruptedException
 	 */
-	public Message take() throws Exception {
+	public Message take() throws InterruptedException {
 		if (in != null) {
 			return in.take();
 		} else {
@@ -164,7 +163,7 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Returns Executor's running status
+	 * Checks Executor's running state
 	 * 
 	 * @return true if the Executor is running, false otherwise
 	 */
@@ -235,7 +234,7 @@ public class Executor implements Runnable, AutoCloseable {
 			} catch (Exception e2) {
 
 			}
-			Logger.getGlobal().info("Executor finished");
+			Logger.getGlobal().info("Executor stopped");
 			stopped = true;
 		}
 	}

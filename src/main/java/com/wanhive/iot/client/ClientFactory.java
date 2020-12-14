@@ -23,6 +23,8 @@
  */
 package com.wanhive.iot.client;
 
+import java.net.ProtocolException;
+
 import com.nimbusds.srp6.BigIntegerUtils;
 import com.nimbusds.srp6.SRP6CryptoParams;
 import com.wanhive.iot.protocol.Message;
@@ -61,10 +63,10 @@ public class ClientFactory {
 	 * @param timeoutMils Socket read timeout (during handshaking)
 	 * @param secure      If true then SSL/TLS connection will be established
 	 * @return Client object which can be used for full-duplex messaging
-	 * @throws Exception
+	 * @throws ProtocolException Could not connect to the network
 	 */
 	public static Client createClient(Identity identity, Hosts hosts, long[] authNodes, long[] bootNodes,
-			int timeoutMils, boolean secure) throws Exception {
+			int timeoutMils, boolean secure) throws ProtocolException {
 		try {
 			boolean authNodeFound = false;
 			boolean bootNodeFound = false;
@@ -116,7 +118,7 @@ public class ClientFactory {
 
 					}
 				}
-				throw new Exception("Registration failed");
+				throw new ProtocolException();
 			}
 
 			/*
@@ -211,6 +213,6 @@ public class ClientFactory {
 
 		}
 
-		throw new Exception("Registration failed");
+		throw new ProtocolException();
 	}
 }

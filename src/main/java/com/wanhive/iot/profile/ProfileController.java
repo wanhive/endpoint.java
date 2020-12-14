@@ -31,48 +31,46 @@ package com.wanhive.iot.profile;
  */
 public interface ProfileController {
 	/**
-	 * Returns name of the controller
+	 * Returns the name
 	 * 
-	 * @return name of the controller
+	 * @return the Name of the controller
 	 */
 	String getName();
 
 	/**
-	 * Returns brief description of the controller
+	 * Returns a brief description of the controller
 	 * 
-	 * @return Brief description of the controller
+	 * @return A brief description of the controller
 	 */
 	String getDescription();
 
 	/**
-	 * Creates and executes an end point associated with the given profile
+	 * Creates and executes the endpoint associated with the given profile
 	 * 
-	 * @param profile Profile of the end point
-	 * @throws Exception
+	 * @param profile The endpoint's profile
 	 */
-	void start(Profile profile) throws Exception;
+	void start(Profile profile);
 
 	/**
-	 * Stops execution of the end point associated with the given profile
+	 * Stops the execution of the endpoint associated with the given profile
 	 * 
-	 * @param profile Profile of the end point
-	 * @throws Exception
+	 * @param profile The endpoint's profile
 	 */
-	void stop(Profile profile) throws Exception;
+	void stop(Profile profile);
 
 	/**
-	 * Checks whether an end point with given profile is in-use
+	 * Checks whether an endpoint with given profile is running
 	 * 
-	 * @param profile End point profile
-	 * @return Returns true if an end point associated with the profile is running,
+	 * @param profile The endpoint's profile
+	 * @return Returns true if an endpoint associated with the profile is running,
 	 *         false otherwise.
 	 */
 	boolean isActive(Profile profile);
 
 	/**
-	 * Returns true if there exists an active profile in the program
+	 * Returns true if there exists an active profile
 	 * 
-	 * @return true if an end point is running, otherwise false
+	 * @return true if an endpoint is running, false otherwise
 	 */
 	boolean hasActive();
 }

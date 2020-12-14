@@ -63,7 +63,6 @@ public interface ClientSession {
 	 * 
 	 * @param key   Key with which the given value will be associated
 	 * @param value Value which will be associated with the given key
-	 * @throws Exception
 	 */
 	void setProperty(Object key, Object value);
 
@@ -72,7 +71,6 @@ public interface ClientSession {
 	 * 
 	 * @param key Key whose association will be returned
 	 * @return Value associated with the given key
-	 * @throws Exception
 	 */
 	Object getProperty(Object key);
 }

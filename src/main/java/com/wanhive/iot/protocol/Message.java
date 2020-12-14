@@ -91,7 +91,6 @@ public class Message {
 	 * @param command        Command classifier of this message
 	 * @param qualifier      Command qualifier of this message
 	 * @param status         Request/response status of this message
-	 * @throws IndexOutOfBoundsException Invalid message length
 	 */
 	public void prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
 			byte command, byte qualifier, byte status) {
@@ -137,7 +136,6 @@ public class Message {
 	 * @param command        Command classifier of this message
 	 * @param qualifier      Command qualifier of this message
 	 * @param status         Request/response status of this message
-	 * @throws IndexOutOfBoundsException Invalid message length
 	 */
 	public void prepareHeader(long label, long source, long destination, short length, short sequenceNumber,
 			byte session, byte command, byte qualifier, byte status) {
@@ -166,7 +164,6 @@ public class Message {
 	 * Populates message's header
 	 * 
 	 * @param header Desired message header
-	 * @throws IndexOutOfBoundsException Invalid message length
 	 */
 	public void prepareHeader(MessageHeader header) {
 		prepareHeader(header.getLabel(), header.getSource(), header.getDestination(), header.getLength(),
@@ -270,7 +267,6 @@ public class Message {
 	 * Sets the message length in bytes
 	 * 
 	 * @param length Message's length is set to this value
-	 * @throws IndexOutOfBoundsException Invalid length
 	 */
 	public void setLength(short length) {
 		if (isValidLength(length)) {
