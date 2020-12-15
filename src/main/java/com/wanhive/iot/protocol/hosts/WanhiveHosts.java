@@ -162,7 +162,7 @@ public class WanhiveHosts implements Hosts {
 	 */
 	public void exportHosts(String pathname, int version) throws IOException, SQLException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(pathname))) {
-			String query = "SELECT uid, name, service, type FROM hosts";
+			String query = "SELECT uid, name, service, type FROM hosts ORDER BY uid ASC";
 			try (PreparedStatement ps = conn.prepareStatement(query)) {
 				try (ResultSet rs = ps.executeQuery()) {
 					while (rs.next()) {
@@ -172,6 +172,7 @@ public class WanhiveHosts implements Hosts {
 						writer.write("\t");
 						writer.write(rs.getString(3));
 						if (version == 1) {
+							writer.write("\t");
 							writer.write(rs.getString(4));
 						}
 						writer.write(System.lineSeparator());
