@@ -194,7 +194,7 @@ public class WanhiveHosts implements Hosts {
 	}
 
 	@Override
-	public NameInfo get(long identity) throws SQLException, NoSuchElementException {
+	public NameInfo get(long identity) {
 		String query = "SELECT name, service, type FROM hosts WHERE uid=?";
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
 			ps.setLong(1, identity);
@@ -210,11 +210,13 @@ public class WanhiveHosts implements Hosts {
 					throw new NoSuchElementException();
 				}
 			}
+		} catch (SQLException e) {
+			throw new IllegalStateException();
 		}
 	}
 
 	@Override
-	public void put(long identity, NameInfo ni) throws SQLException {
+	public void put(long identity, NameInfo ni) {
 		String query = "INSERT INTO hosts (uid, name, service, type) VALUES (?,?,?,?)";
 
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
@@ -223,28 +225,28 @@ public class WanhiveHosts implements Hosts {
 			ps.setString(3, ni.getService());
 			ps.setInt(4, ni.getType());
 			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new IllegalStateException();
 		}
 	}
 
 	@Override
-	public void remove(long identity) throws SQLException {
+	public void remove(long identity) {
 		String query = "DELETE FROM hosts WHERE uid=?";
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
 			ps.setLong(1, identity);
 			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new IllegalStateException();
 		}
 	}
 
 	@Override
-	public long[] list(int type, int limit) throws SQLException {
-		if (limit <= 0) {
-			limit = 1;
-		}
-
+	public long[] list(int type, int limit) {
 		String query = "SELECT uid FROM hosts WHERE type=? ORDER BY RANDOM() LIMIT ?";
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
 			ps.setInt(1, type);
-			ps.setInt(2, limit);
+			ps.setInt(2, ((limit >= 0) ? limit : 0));
 
 			try (ResultSet rs = ps.executeQuery()) {
 				long[] list = new long[limit];
@@ -259,6 +261,8 @@ public class WanhiveHosts implements Hosts {
 					return Arrays.copyOfRange(list, 0, i);
 				}
 			}
+		} catch (SQLException e) {
+			throw new IllegalStateException();
 		}
 	}
 

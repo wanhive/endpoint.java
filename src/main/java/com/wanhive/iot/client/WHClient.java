@@ -70,9 +70,9 @@ public class WHClient implements Client {
 	 * @param timeoutMils The read timeout of the underlying connection (0 = block
 	 *                    forever)
 	 * @param ssl         If set then secure SSL connection is established
-	 * @throws Exception
+	 * @throws IOException
 	 */
-	void open(Hosts hosts, long host, int timeoutMils, boolean ssl) throws Exception {
+	void open(Hosts hosts, long host, int timeoutMils, boolean ssl) throws IOException {
 		try {
 			close();
 			socket = null;
@@ -84,10 +84,14 @@ public class WHClient implements Client {
 				socket = new Socket(ni.getHost(), Integer.parseInt(ni.getService()));
 			}
 			socket.setSoTimeout(timeoutMils);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			close();
 			socket = null;
 			throw e;
+		} catch (Exception e) {
+			close();
+			socket = null;
+			throw new IllegalArgumentException();
 		}
 	}
 

@@ -38,26 +38,23 @@ public interface Hosts extends AutoCloseable {
 	 * 
 	 * @param identity Identity of the host
 	 * @return A NameInfo object containing the host's network address
-	 * @throws Exception
 	 */
-	public NameInfo get(long identity) throws Exception;
+	public NameInfo get(long identity);
 
 	/**
 	 * Stores the network address of a Wanhive host
 	 * 
 	 * @param identity Host's identity
 	 * @param ni       A NameInfo object containing the host's network address
-	 * @throws Exception
 	 */
-	public void put(long identity, NameInfo ni) throws Exception;
+	public void put(long identity, NameInfo ni);
 
 	/**
 	 * Removes a Wanhive host
 	 * 
 	 * @param identity Identity of the host to remove
-	 * @throws Exception
 	 */
-	public void remove(long identity) throws Exception;
+	public void remove(long identity);
 
 	/**
 	 * Returns a list of host identifiers of the given type
@@ -65,7 +62,6 @@ public interface Hosts extends AutoCloseable {
 	 * @param type  The host's type
 	 * @param limit The upper limit on the number of identifiers to return
 	 * @return An array containing the host identifiers
-	 * @throws Exception
 	 */
-	public long[] list(int type, int limit) throws Exception;
+	public long[] list(int type, int limit);
 }
