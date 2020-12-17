@@ -5,29 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2020-12-17
 
 ### Added
 
-- Classes and Interfaces to simplify request and response handling.
-- The new **hosts file** format (Revision 1). The new format adds a numeric **TYPE** column. The old format remains supported.
+- New classes and interfaces to simplify the request and response handling.
+- Support for the new **hosts file** format (Revision 1). The new format adds a numeric **TYPE** column. The old format remains supported.
 
 ### Changed
 
 - Throw meaningful exceptions.
-- Simplify the public interfaces.
-- Update the code documentation.
+- Simplify the interfaces.
 - Clean up the magic constants.
-- Rename and update the code of conduct file.
+- Update the documentation.
 
 ### Fixed
 
-- SRP-6a based private key generator should not modify it's password hash rounds field.
+- The *password hash rounds* field of the private key generator should be immutable.
 
 ### Security
 
-- Strict sanity checking of the response messages.
-- Upgrade the junit version in pom.xml to fix a security issue with the older version.
+- Improve sanity checking of the response messages.
+- Upgrade the JUnit version in pom.xml to fix a security issue with the older version.
 
 ## [0.1.0] - 2020-11-25
 
