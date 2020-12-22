@@ -24,13 +24,19 @@
 
 package com.wanhive.iot.protocol.bean;
 
+import java.io.Serializable;
+
 /**
- * Network address structure of a wanhive host
+ * The network address structure of a wanhive host
  * 
  * @author amit
  *
  */
-public class NameInfo {
+public class NameInfo implements Serializable {
+	/**
+	 * The version number
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * The host name (most likely an IP adress)
 	 */

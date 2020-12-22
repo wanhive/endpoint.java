@@ -1,7 +1,7 @@
 /*
  * WHSRP6ClientSession.java
  * 
- * SRP-6a client-side session manager
+ * Client-side SRP-6a session manager
  * 
  * This program is part of Wanhive IoT Platform.
  * 

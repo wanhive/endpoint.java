@@ -79,7 +79,7 @@ public class ClientFactory {
 						break;
 					}
 					try (WHClient client = new WHClient()) {
-						client.open(hosts, bootstrapNode, timeoutMils, secure);
+						client.connect(hosts, bootstrapNode, timeoutMils, secure);
 						bootNodeFound = true;
 						// -----------------------------------------------------------------
 						/*
@@ -90,7 +90,7 @@ public class ClientFactory {
 						message = client.receive();
 						long rootNode = protocol.processFindRootResponse(message);
 						if (rootNode != bootstrapNode) {
-							client.open(hosts, rootNode, timeoutMils, secure);
+							client.connect(hosts, rootNode, timeoutMils, secure);
 						}
 						// -----------------------------------------------------------------
 						/*
@@ -132,7 +132,7 @@ public class ClientFactory {
 					break;
 				}
 				try (WHClient auth = new WHClient()) {
-					auth.open(hosts, authNode, timeoutMils, secure);
+					auth.connect(hosts, authNode, timeoutMils, secure);
 					authNodeFound = true;
 					// -----------------------------------------------------------------
 					/*
@@ -162,7 +162,7 @@ public class ClientFactory {
 							break;
 						}
 						try (WHClient client = new WHClient()) {
-							client.open(hosts, bootstrapNode, timeoutMils, secure);
+							client.connect(hosts, bootstrapNode, timeoutMils, secure);
 							bootNodeFound = true;
 							// -----------------------------------------------------------------
 							/*
@@ -173,7 +173,7 @@ public class ClientFactory {
 							message = client.receive();
 							long rootNode = protocol.processFindRootResponse(message);
 							if (rootNode != bootstrapNode) {
-								client.open(hosts, rootNode, timeoutMils, secure);
+								client.connect(hosts, rootNode, timeoutMils, secure);
 							}
 							// -----------------------------------------------------------------
 							/*

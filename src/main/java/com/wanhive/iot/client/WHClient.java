@@ -47,7 +47,7 @@ public class WHClient implements Client {
 	private Socket socket;
 
 	/**
-	 * Default constructor
+	 * The default constructor
 	 */
 	WHClient() {
 
@@ -65,33 +65,42 @@ public class WHClient implements Client {
 	/**
 	 * Opens a new connection with a remote host. Closes the existing connection.
 	 * 
-	 * @param hosts       For the network address resolution of remote hosts
-	 * @param host        The host identifier
-	 * @param timeoutMils The read timeout of the underlying connection (0 = block
+	 * @param hosts       For the network address resolution of the remote hosts
+	 * @param uid         The remote host identifier
+	 * @param timeoutMils The read timeout in milliseconds (set to 0 to block
 	 *                    forever)
 	 * @param ssl         If set then secure SSL connection is established
 	 * @throws IOException
 	 */
-	void open(Hosts hosts, long host, int timeoutMils, boolean ssl) throws IOException {
+	void connect(Hosts hosts, long uid, int timeoutMils, boolean ssl) throws IOException {
+		NameInfo host = hosts.get(uid);
+		connect(host, timeoutMils, ssl);
+	}
+
+	/**
+	 * Opens a new connection with a remote host. Closes the existing connection.
+	 * 
+	 * @param host        The network address of the remote host
+	 * @param timeoutMils The read timeout in milliseconds (set to 0 to block
+	 *                    forever).
+	 * @param ssl         Set this value to true to create a secure connection
+	 * @throws IOException
+	 */
+	void connect(NameInfo host, int timeoutMils, boolean ssl) throws IOException {
 		try {
 			close();
 			socket = null;
-			NameInfo ni = hosts.get(host);
 			if (ssl) {
 				SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-				socket = ssf.createSocket(ni.getHost(), Integer.parseInt(ni.getService()));
+				socket = ssf.createSocket(host.getHost(), Integer.parseInt(host.getService()));
 			} else {
-				socket = new Socket(ni.getHost(), Integer.parseInt(ni.getService()));
+				socket = new Socket(host.getHost(), Integer.parseInt(host.getService()));
 			}
 			socket.setSoTimeout(timeoutMils);
 		} catch (IOException e) {
 			close();
 			socket = null;
 			throw e;
-		} catch (Exception e) {
-			close();
-			socket = null;
-			throw new IllegalArgumentException();
 		}
 	}
 

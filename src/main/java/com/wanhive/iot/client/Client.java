@@ -28,7 +28,7 @@ import java.io.IOException;
 import com.wanhive.iot.protocol.Message;
 
 /**
- * Wanhive client (Blocking IO) interface
+ * The Wanhive client interface for blocking IO
  * 
  * @author amit
  *

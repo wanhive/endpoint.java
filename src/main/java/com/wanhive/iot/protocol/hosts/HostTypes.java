@@ -24,7 +24,7 @@
 package com.wanhive.iot.protocol.hosts;
 
 /**
- * Host type enumeration
+ * Enumeration of the standard host types
  * 
  * @author amit
  *
@@ -38,6 +38,10 @@ public enum HostTypes {
 		this.type = type;
 	}
 
+	/**
+	 * Returns the numeric host type identifier
+	 * @return The host type
+	 */
 	public int getType() {
 		return this.type;
 	}

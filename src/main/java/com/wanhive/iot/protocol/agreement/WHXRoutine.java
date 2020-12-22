@@ -1,7 +1,7 @@
 /*
  * WHXRoutine.java
  * 
- * SRP-6a routine for private key (x) generation
+ * SRP-6a based private key (x) generator
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -31,7 +31,7 @@ import com.nimbusds.srp6.BigIntegerUtils;
 import com.nimbusds.srp6.XRoutine;
 
 /**
- * Private key generator for client authentication
+ * The Private key generator for clients
  * 
  * @author amit
  *

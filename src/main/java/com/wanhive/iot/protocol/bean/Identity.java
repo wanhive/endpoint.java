@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Identity implements Serializable {
 	/**
-	 * 
+	 * The version number
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
@@ -123,9 +123,5 @@ public class Identity implements Serializable {
 	 */
 	public void setRounds(int rounds) {
 		this.rounds = rounds;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 }

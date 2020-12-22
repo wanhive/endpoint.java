@@ -31,7 +31,7 @@ package com.wanhive.iot.client;
  */
 public interface ClientSession {
 	/**
-	 * Set local identity
+	 * Sets the local identity
 	 * 
 	 * @param identity Unique identity of the local end point
 	 */
@@ -45,7 +45,7 @@ public interface ClientSession {
 	long getLocalIdentity();
 
 	/**
-	 * Set identity of the remote end point
+	 * Sets identity of the remote end point
 	 * 
 	 * @param identity Unique identity of the remote end point
 	 */

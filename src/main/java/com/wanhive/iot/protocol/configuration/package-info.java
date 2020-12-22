@@ -23,8 +23,7 @@
  * Configuration management
  */
 /**
- * Routines for writing and reading application data to-and-from the local
- * filesystem.
+ * Routines for reading and writing application data from-and-to the filesystem.
  * 
  * @author amit
  *

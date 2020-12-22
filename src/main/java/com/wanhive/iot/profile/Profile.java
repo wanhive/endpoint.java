@@ -36,7 +36,7 @@ import com.wanhive.iot.protocol.bean.Identity;
  */
 public class Profile extends Identity {
 	/**
-	 * 
+	 * The version number
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
@@ -74,9 +74,5 @@ public class Profile extends Identity {
 
 	public void setReference(Serializable reference) {
 		this.reference = reference;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 }

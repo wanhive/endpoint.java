@@ -1,7 +1,7 @@
 /*
  * Executor.java
  * 
- * IO engine for Wanhive
+ * The IO engine for Wanhive
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -30,16 +30,17 @@ import java.util.logging.Logger;
 import com.wanhive.iot.protocol.Message;
 
 /**
- * Bounded queue based IO engine for Wanhive. Maintains two separate queues, one
- * for the outgoing messages and another one for the incoming messages.
+ * Bounded queue based threaded IO engine for Wanhive. Maintains two separate
+ * queues, one for the outgoing messages and another one for the incoming
+ * messages.
  * 
  * @author amit
  *
  */
 public class Executor implements Runnable, AutoCloseable {
 	private final Object notifier = new Object();
-	private volatile boolean running; // Used as condition variable
-	private volatile boolean stopped = true; // For proper status reporting
+	private volatile boolean running = false; // The condition variable
+	private volatile boolean stopped = true; // The status tracker
 
 	private Client client;
 	private Receiver receiver;

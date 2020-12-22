@@ -24,6 +24,8 @@
 
 package com.wanhive.iot.protocol.hosts;
 
+import java.io.FileNotFoundException;
+
 /**
  * Cache of wanhive host identifiers
  * 
@@ -34,10 +36,10 @@ public interface HostsCache {
 	/**
 	 * Reads a list of host identifiers from a file
 	 * 
-	 * @param path  The pathname of the file
+	 * @param pathname  The pathname of the file
 	 * @param count The maximum number of identifiers to read from the file
 	 * @return A long array containing the identifiers
-	 * @throws Exception
+	 * @throws FileNotFoundException
 	 */
-	public long[] get(String path, int count) throws Exception;
+	public long[] get(String pathname, int count) throws FileNotFoundException;
 }
