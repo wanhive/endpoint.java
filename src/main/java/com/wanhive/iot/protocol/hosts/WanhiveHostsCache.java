@@ -39,8 +39,8 @@ import java.util.Scanner;
 public class WanhiveHostsCache implements HostsCache {
 
 	@Override
-	public long[] get(String path, int count) throws FileNotFoundException {
-		try (Scanner scanner = new Scanner(new File(path))) {
+	public long[] get(String pathname, int count) throws FileNotFoundException {
+		try (Scanner scanner = new Scanner(new File(pathname))) {
 			long[] list = new long[count];
 			int i = 0;
 			while (scanner.hasNextLong() && i < count) {
