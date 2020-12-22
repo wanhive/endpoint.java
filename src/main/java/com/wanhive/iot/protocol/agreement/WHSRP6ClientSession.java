@@ -158,7 +158,7 @@ public class WHSRP6ClientSession extends SRP6Session {
 	}
 
 	/**
-	 * Creates and returns default configuration suitable for Wanhive
+	 * Creates and returns default parameters suitable for Wanhive
 	 * 
 	 * @return SRP6CryptoParams object suitable for Wanhive
 	 */

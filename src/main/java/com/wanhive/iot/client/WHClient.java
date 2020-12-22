@@ -62,6 +62,18 @@ public class WHClient implements Client {
 	}
 
 	/**
+	 * Constructor
+	 * 
+	 * @param host    The remote host
+	 * @param timeout The read timeout in milliseconds (set to 0 to block forever)
+	 * @param ssl     Enable or disable secure connection
+	 * @throws IOException
+	 */
+	WHClient(NameInfo host, int timeout, boolean ssl) throws IOException {
+		connect(host, timeout, ssl);
+	}
+
+	/**
 	 * Releases the underlying socket connection
 	 * 
 	 * @return The Socket connection object
@@ -97,13 +109,12 @@ public class WHClient implements Client {
 	/**
 	 * Connects to a remote host (closes any existing connection).
 	 * 
-	 * @param host        The remote host
-	 * @param timeoutMils The read timeout in milliseconds (set to 0 to block
-	 *                    forever)
-	 * @param ssl         Enable or disable secure connection
+	 * @param host    The remote host
+	 * @param timeout The read timeout in milliseconds (set to 0 to block forever)
+	 * @param ssl     Enable or disable secure connection
 	 * @throws IOException
 	 */
-	void connect(NameInfo host, int timeoutMils, boolean ssl) throws IOException {
+	void connect(NameInfo host, int timeout, boolean ssl) throws IOException {
 		try {
 			close();
 			socket = null;
@@ -113,7 +124,7 @@ public class WHClient implements Client {
 			} else {
 				socket = new Socket(host.getHost(), Integer.parseInt(host.getService()));
 			}
-			socket.setSoTimeout(timeoutMils);
+			socket.setSoTimeout(timeout);
 		} catch (IOException e) {
 			close();
 			socket = null;
@@ -176,6 +187,12 @@ public class WHClient implements Client {
 				continue;
 			}
 		}
+	}
+
+	public Message execute(Message request) throws IOException {
+		short sn = request.getSequenceNumber();
+		send(request);
+		return receive(sn);
 	}
 
 	@Override

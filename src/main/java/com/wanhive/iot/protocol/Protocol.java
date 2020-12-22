@@ -76,9 +76,9 @@ public class Protocol {
 	}
 
 	/**
-	 * Increments and returns the next sequence number
+	 * Increments the counter and returns the next sequence number
 	 * 
-	 * @return next sequence number
+	 * @return The next sequence number
 	 */
 	public short nextSequenceNumber() {
 		sequenceNumber += 1;

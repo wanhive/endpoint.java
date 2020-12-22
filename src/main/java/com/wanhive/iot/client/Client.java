@@ -61,6 +61,15 @@ public interface Client extends AutoCloseable {
 	Message receive(short sequenceNumber) throws IOException;
 
 	/**
+	 * Executes a request. Combines send and receive calls in a single operation.
+	 * 
+	 * @param request The request
+	 * @return The response to the request
+	 * @throws IOException
+	 */
+	Message execute(Message request) throws IOException;
+
+	/**
 	 * Sets the socket connection's read timeout to the given value
 	 * 
 	 * @param milliseconds timeout value in milliseconds (set to 0 to block forever)
