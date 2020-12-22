@@ -35,7 +35,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 import com.wanhive.iot.protocol.Message;
 import com.wanhive.iot.protocol.bean.NameInfo;
-import com.wanhive.iot.protocol.hosts.Hosts;
 
 /**
  * Reference implementation of the Wanhive client
@@ -60,48 +59,6 @@ public class WHClient implements Client {
 	 */
 	WHClient(Socket socket) {
 		this.socket = socket;
-	}
-
-	/**
-	 * Opens a new connection with a remote host. Closes the existing connection.
-	 * 
-	 * @param hosts       For the network address resolution of the remote hosts
-	 * @param uid         The remote host identifier
-	 * @param timeoutMils The read timeout in milliseconds (set to 0 to block
-	 *                    forever)
-	 * @param ssl         If set then secure SSL connection is established
-	 * @throws IOException
-	 */
-	void connect(Hosts hosts, long uid, int timeoutMils, boolean ssl) throws IOException {
-		NameInfo host = hosts.get(uid);
-		connect(host, timeoutMils, ssl);
-	}
-
-	/**
-	 * Opens a new connection with a remote host. Closes the existing connection.
-	 * 
-	 * @param host        The network address of the remote host
-	 * @param timeoutMils The read timeout in milliseconds (set to 0 to block
-	 *                    forever).
-	 * @param ssl         Set this value to true to create a secure connection
-	 * @throws IOException
-	 */
-	void connect(NameInfo host, int timeoutMils, boolean ssl) throws IOException {
-		try {
-			close();
-			socket = null;
-			if (ssl) {
-				SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-				socket = ssf.createSocket(host.getHost(), Integer.parseInt(host.getService()));
-			} else {
-				socket = new Socket(host.getHost(), Integer.parseInt(host.getService()));
-			}
-			socket.setSoTimeout(timeoutMils);
-		} catch (IOException e) {
-			close();
-			socket = null;
-			throw e;
-		}
 	}
 
 	/**
@@ -135,6 +92,33 @@ public class WHClient implements Client {
 			this.socket = socket;
 		}
 
+	}
+
+	/**
+	 * Connects to a remote host (closes any existing connection).
+	 * 
+	 * @param host        The remote host
+	 * @param timeoutMils The read timeout in milliseconds (set to 0 to block
+	 *                    forever)
+	 * @param ssl         Enable or disable secure connection
+	 * @throws IOException
+	 */
+	void connect(NameInfo host, int timeoutMils, boolean ssl) throws IOException {
+		try {
+			close();
+			socket = null;
+			if (ssl) {
+				SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+				socket = ssf.createSocket(host.getHost(), Integer.parseInt(host.getService()));
+			} else {
+				socket = new Socket(host.getHost(), Integer.parseInt(host.getService()));
+			}
+			socket.setSoTimeout(timeoutMils);
+		} catch (IOException e) {
+			close();
+			socket = null;
+			throw e;
+		}
 	}
 
 	@Override

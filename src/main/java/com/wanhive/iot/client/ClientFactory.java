@@ -79,7 +79,7 @@ public class ClientFactory {
 						break;
 					}
 					try (WHClient client = new WHClient()) {
-						client.connect(hosts, bootstrapNode, timeoutMils, secure);
+						client.connect(hosts.get(bootstrapNode), timeoutMils, secure);
 						bootNodeFound = true;
 						// -----------------------------------------------------------------
 						/*
@@ -90,11 +90,11 @@ public class ClientFactory {
 						message = client.receive();
 						long rootNode = protocol.processFindRootResponse(message);
 						if (rootNode != bootstrapNode) {
-							client.connect(hosts, rootNode, timeoutMils, secure);
+							client.connect(hosts.get(rootNode), timeoutMils, secure);
 						}
 						// -----------------------------------------------------------------
 						/*
-						 * Create an unique session with the host
+						 * Establish a unique session with the host
 						 */
 						message = protocol.createGetKeyRequest(null);
 						client.send(message);
@@ -102,7 +102,7 @@ public class ClientFactory {
 						byte[] hc = protocol.processGetKeyResponse(message);
 						// -----------------------------------------------------------------
 						/*
-						 * Get the registration request signed by the authentication node
+						 * Create the registration request
 						 */
 						message = protocol.createRegisterRequest(identity.getUid(), hc);
 						/*
@@ -132,7 +132,7 @@ public class ClientFactory {
 					break;
 				}
 				try (WHClient auth = new WHClient()) {
-					auth.connect(hosts, authNode, timeoutMils, secure);
+					auth.connect(hosts.get(authNode), timeoutMils, secure);
 					authNodeFound = true;
 					// -----------------------------------------------------------------
 					/*
@@ -162,7 +162,7 @@ public class ClientFactory {
 							break;
 						}
 						try (WHClient client = new WHClient()) {
-							client.connect(hosts, bootstrapNode, timeoutMils, secure);
+							client.connect(hosts.get(bootstrapNode), timeoutMils, secure);
 							bootNodeFound = true;
 							// -----------------------------------------------------------------
 							/*
@@ -173,11 +173,11 @@ public class ClientFactory {
 							message = client.receive();
 							long rootNode = protocol.processFindRootResponse(message);
 							if (rootNode != bootstrapNode) {
-								client.connect(hosts, rootNode, timeoutMils, secure);
+								client.connect(hosts.get(rootNode), timeoutMils, secure);
 							}
 							// -----------------------------------------------------------------
 							/*
-							 * Create an unique session with the host
+							 * Establish a unique session with the host
 							 */
 							message = protocol.createGetKeyRequest(null);
 							client.send(message);
