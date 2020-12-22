@@ -61,10 +61,10 @@ public interface Client extends AutoCloseable {
 	Message receive(short sequenceNumber) throws IOException;
 
 	/**
-	 * Executes a request. Combines send and receive calls in a single operation.
+	 * Executes a request
 	 * 
-	 * @param request The request
-	 * @return The response to the request
+	 * @param request The request to the host
+	 * @return The response from the host
 	 * @throws IOException
 	 */
 	Message execute(Message request) throws IOException;
