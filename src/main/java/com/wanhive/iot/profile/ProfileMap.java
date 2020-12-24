@@ -23,6 +23,8 @@
  */
 package com.wanhive.iot.profile;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,23 +44,29 @@ public class ProfileMap {
 	/**
 	 * Constructor
 	 * 
-	 * @param filename pathname of the file containing the profiles
+	 * @param pathname Pathname of the file containing the profiles. If the file
+	 *                 doesn't exist then an empty ProfileMap is created.
 	 * @throws IOException
 	 * @throws ClassNotFoundException
+	 * @throws FileNotFoundException
 	 */
-	public ProfileMap(String filename) throws ClassNotFoundException, IOException {
-		this.filename = filename;
-		reload();
+	public ProfileMap(String pathname) throws FileNotFoundException, ClassNotFoundException, IOException {
+		this.filename = pathname;
+		File file = new File(this.filename);
+		if (file.exists()) {
+			load();
+		}
 	}
 
 	/**
-	 * Reads the profiles from the file system
+	 * Reads the profiles from the file system.
 	 * 
 	 * @throws IOException
 	 * @throws ClassNotFoundException
+	 * @throws FileNotFoundException
 	 */
 	@SuppressWarnings("unchecked")
-	public void reload() throws ClassNotFoundException, IOException {
+	public void load() throws FileNotFoundException, ClassNotFoundException, IOException {
 		ConcurrentHashMap<Long, Profile> newProfiles = (ConcurrentHashMap<Long, Profile>) ObjectSerializer
 				.load(filename);
 		profiles.clear();
@@ -68,21 +76,21 @@ public class ProfileMap {
 	}
 
 	/**
-	 * Returns the map containing all the profiles
+	 * Returns a map containing all the profiles
 	 * 
-	 * @return A map of the profiles
+	 * @return The profiles Map
 	 */
 	public Map<Long, Profile> get() {
 		return profiles;
 	}
 
 	/**
-	 * Commits the profiles to the disk
+	 * Writes the profiles to the file system
 	 * 
 	 * @throws IOException
-	 * 
+	 * @throws FileNotFoundException
 	 */
-	public void commit() throws IOException {
+	public void store() throws FileNotFoundException, IOException {
 		ObjectSerializer.store(filename, profiles);
 	}
 }

@@ -23,7 +23,9 @@
  */
 package com.wanhive.iot.protocol.configuration;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -40,17 +42,28 @@ public class ObjectSerializer {
 	/**
 	 * Writes a serializable object to the file system
 	 * 
-	 * @param pathName The pathname of the file where the object will be stored
-	 * @param object   the serializable object
+	 * @param pathname The pathname of the file where the object will be stored
+	 * @param object   The serializable object
 	 * @throws IOException
+	 * @throws FileNotFoundException
 	 */
-	public static void store(String pathName, Serializable object) throws IOException {
-		try (FileOutputStream file = new FileOutputStream(pathName)) {
-			try (ObjectOutputStream out = new ObjectOutputStream(file)) {
-				out.writeObject(object);
-			}
-		} catch (Exception e) {
-			throw e;
+	public static void store(String pathname, Serializable object) throws FileNotFoundException, IOException {
+		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(pathname))) {
+			out.writeObject(object);
+		}
+	}
+
+	/**
+	 * Writes a serializable object to the file system
+	 * 
+	 * @param file   The file where the object will be stored
+	 * @param object The serializable object
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	public static void store(File file, Serializable object) throws FileNotFoundException, IOException {
+		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+			out.writeObject(object);
 		}
 	}
 
@@ -58,18 +71,30 @@ public class ObjectSerializer {
 	 * 
 	 * Reads a serializable object from the file system
 	 * 
-	 * @param pathName The pathname of the file containing the serialized object
-	 * @return The deserialized object read from the given file
-	 * @throws ClassNotFoundException
+	 * @param pathname The pathname of the file containing the serialized object
+	 * @return The object read from the given file
 	 * @throws IOException
+	 * @throws FileNotFoundException
+	 * @throws ClassNotFoundException
 	 */
-	public static Object load(String pathName) throws ClassNotFoundException, IOException {
-		try (FileInputStream file = new FileInputStream(pathName)) {
-			try (ObjectInputStream in = new ObjectInputStream(file)) {
-				return in.readObject();
-			}
-		} catch (Exception e) {
-			throw e;
+	public static Object load(String pathname) throws FileNotFoundException, IOException, ClassNotFoundException {
+		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(pathname))) {
+			return in.readObject();
+		}
+	}
+
+	/**
+	 * Reads a serializable object from the file system
+	 * 
+	 * @param file The file from where the object will be read
+	 * @return The object read from the given file
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 * @throws ClassNotFoundException
+	 */
+	public static Object load(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
+		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+			return in.readObject();
 		}
 	}
 }
