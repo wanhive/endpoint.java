@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Client.execute** method that sends out a request to the remote host and retrieves the response. Previously, the same process required two separate calls (send and receive).
+
+### Changed
+
+- **ObjectSerializer**, **ClientFactory** and **Executor** implementations.
+- The public method names of **ProfileMap**.
+
+### Fixed
+
+- **Executor** should silently discard all the incoming messages if no **Receiver** provided.
+
 ## [0.2.0] - 2020-12-17
 
 ### Added

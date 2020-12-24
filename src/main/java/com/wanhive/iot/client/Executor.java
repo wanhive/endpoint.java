@@ -66,7 +66,7 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Creates an Executor that stores the incoming message into it's incoming
+	 * Creates an Executor that stores the incoming messages into it's incoming
 	 * queue.
 	 * 
 	 * @param client      The Client to be used for communication
@@ -95,7 +95,7 @@ public class Executor implements Runnable, AutoCloseable {
 
 	/**
 	 * Sets executor's Client. Existing Client is replaced, but not closed. Fails if
-	 * the executor is running.
+	 * the Executor is running.
 	 * 
 	 * @param client The Client to use with the Executor
 	 */
@@ -108,8 +108,8 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Sets the Receiver for the incoming messages. Fails if the executor is
-	 * running. Also fails if the executor was created with an incoming queue.
+	 * Sets the Receiver for the incoming messages. Fails if the Executor is
+	 * running. Also fails if the Executor was created with an incoming queue.
 	 * 
 	 * @param receiver The Receiver to use
 	 */
@@ -215,6 +215,9 @@ public class Executor implements Runnable, AutoCloseable {
 		});
 
 		try {
+			if (receiver == null && in == null) {
+				Logger.getGlobal().warning("No receiver, will discard all incoming messages");
+			}
 			running = true;
 			stopped = false;
 			reader.start();
