@@ -49,7 +49,7 @@ public class Executor implements Runnable, AutoCloseable {
 	private final BlockingQueue<Message> out;
 
 	/**
-	 * Stops the Executor and closes the client.
+	 * Stops the Executor and closes the Client.
 	 */
 	private void stop() {
 		synchronized (notifier) {
@@ -66,7 +66,8 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Constructor
+	 * Creates an Executor that stores the incoming message into it's incoming
+	 * queue.
 	 * 
 	 * @param client      The Client to be used for communication
 	 * @param inCapacity  The capacity of the incoming messages queue
@@ -79,10 +80,10 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Constructor
+	 * Creates an Executor that uses a Receiver to process the incoming messages.
 	 * 
 	 * @param client      The Client to be used for communication
-	 * @param receiver    The Receiver for processing the incoming messages
+	 * @param receiver    The Receiver for the incoming messages
 	 * @param outCapacity The capacity of the outgoing messages queue
 	 */
 	public Executor(Client client, Receiver receiver, int outCapacity) {
@@ -93,8 +94,8 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Sets executor's Client. Any existing Client is replaced, but not closed. Do
-	 * not call while the executor is running.
+	 * Sets executor's Client. Existing Client is replaced, but not closed. Fails if
+	 * the executor is running.
 	 * 
 	 * @param client The Client to use with the Executor
 	 */
@@ -107,16 +108,18 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Sets the Receiver for the incoming messages. Do not call while the Executor
-	 * is running.
+	 * Sets the Receiver for the incoming messages. Fails if the executor is
+	 * running. Also fails if the executor was created with an incoming queue.
 	 * 
 	 * @param receiver The Receiver to use
 	 */
 	public void setReceiver(Receiver receiver) {
-		if (!isRunning() && in == null) {
-			this.receiver = receiver;
-		} else {
+		if (isRunning()) {
 			throw new IllegalStateException();
+		} else if (in != null) {
+			throw new IllegalArgumentException();
+		} else {
+			this.receiver = receiver;
 		}
 	}
 
@@ -181,8 +184,10 @@ public class Executor implements Runnable, AutoCloseable {
 				while (true) {
 					if (receiver != null) {
 						receiver.receive(client.receive());
-					} else {
+					} else if (in != null) {
 						in.put(client.receive());
+					} else {
+						client.receive();
 					}
 				}
 			} catch (Exception e) {
