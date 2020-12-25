@@ -50,7 +50,8 @@ public class WanhiveHostsCache implements HostsCache {
 			if (i < count) {
 				list = Arrays.copyOfRange(list, 0, i);
 			}
-
+			
+			//Apply Fisher–Yates shuffle algorithm
 			Random rand = new Random();
 			for (int x = (list.length - 1); x > 0; --x) {
 				int j = rand.nextInt(list.length);
