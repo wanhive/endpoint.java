@@ -104,7 +104,7 @@ public class Message {
 			buffer.put(30, qualifier);
 			buffer.put(31, status);
 		} else {
-			throw new IndexOutOfBoundsException();
+			throw new IllegalArgumentException();
 		}
 	}
 
@@ -272,7 +272,7 @@ public class Message {
 		if (isValidLength(length)) {
 			buffer.putShort(24, length);
 		} else {
-			throw new IndexOutOfBoundsException();
+			throw new IllegalArgumentException();
 		}
 	}
 
