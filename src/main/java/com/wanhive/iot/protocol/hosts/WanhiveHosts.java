@@ -79,7 +79,7 @@ public class WanhiveHosts implements Hosts {
 			}
 
 			return conn;
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			try {
 				if (conn != null) {
 					conn.close();
@@ -207,11 +207,11 @@ public class WanhiveHosts implements Hosts {
 					ni.setType(rs.getInt(3));
 					return ni;
 				} else {
-					throw new NoSuchElementException();
+					throw new NoSuchElementException("Not found");
 				}
 			}
-		} catch (SQLException e) {
-			throw new IllegalStateException();
+		} catch (Exception e) {
+			throw new IllegalStateException(e.getMessage());
 		}
 	}
 
@@ -225,8 +225,8 @@ public class WanhiveHosts implements Hosts {
 			ps.setString(3, ni.getService());
 			ps.setInt(4, ni.getType());
 			ps.executeUpdate();
-		} catch (SQLException e) {
-			throw new IllegalStateException();
+		} catch (Exception e) {
+			throw new IllegalStateException(e.getMessage());
 		}
 	}
 
@@ -236,8 +236,8 @@ public class WanhiveHosts implements Hosts {
 		try (PreparedStatement ps = conn.prepareStatement(query)) {
 			ps.setLong(1, identity);
 			ps.executeUpdate();
-		} catch (SQLException e) {
-			throw new IllegalStateException();
+		} catch (Exception e) {
+			throw new IllegalStateException(e.getMessage());
 		}
 	}
 
@@ -261,8 +261,8 @@ public class WanhiveHosts implements Hosts {
 					return Arrays.copyOfRange(list, 0, i);
 				}
 			}
-		} catch (SQLException e) {
-			throw new IllegalStateException();
+		} catch (Exception e) {
+			throw new IllegalStateException(e.getMessage());
 		}
 	}
 

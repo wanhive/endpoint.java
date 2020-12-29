@@ -38,6 +38,8 @@ import com.wanhive.iot.protocol.bean.MessageContext;
 public class Protocol {
 	private short sequenceNumber;
 	private byte session;
+	protected static final String BAD_REQUEST = "Invalid request";
+	protected static final String BAD_RESPONSE = "Invalid response or request denied";
 
 	/**
 	 * Verifies message's context
@@ -142,7 +144,7 @@ public class Protocol {
 	 */
 	public Message createIdentificationRequest(long uid, final byte[] nonce) {
 		if (nonce == null || nonce.length == 0 || nonce.length > Message.PAYLOAD_SIZE) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(BAD_REQUEST);
 		} else {
 			Message message = new Message();
 			message.prepareHeader(uid, 0, (short) (Message.HEADER_SIZE + nonce.length), nextSequenceNumber(),
@@ -161,14 +163,14 @@ public class Protocol {
 	 */
 	public IdentificationResponse processIdentificationResponse(Message message) throws ProtocolException {
 		if (!checkContext(message, ResponseContext.IDENTIFY) || message.getSource() != 0) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.getLength() <= Message.HEADER_SIZE + 4) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else {
 			short saltLength = message.getShort(0);
 			short nonceLength = message.getShort(2);
 			if (saltLength <= 0 || nonceLength <= 0 || (saltLength + nonceLength + 4) > Message.PAYLOAD_SIZE) {
-				throw new ProtocolException();
+				throw new ProtocolException(BAD_RESPONSE);
 			}
 
 			IdentificationResponse response = new IdentificationResponse();
@@ -186,7 +188,7 @@ public class Protocol {
 	 */
 	public Message createAuthenticationRequest(final byte[] proof) {
 		if (proof == null || proof.length == 0 || proof.length > Message.PAYLOAD_SIZE) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(BAD_REQUEST);
 		} else {
 			Message message = new Message();
 			message.prepareHeader(0, 0, (short) (Message.HEADER_SIZE + proof.length), nextSequenceNumber(),
@@ -206,9 +208,9 @@ public class Protocol {
 	public byte[] processAuthenticationResponse(Message message) throws ProtocolException {
 		short msgLen = message.getLength();
 		if (!checkContext(message, ResponseContext.AUTHENTICATE) || message.getSource() != 0) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else if (msgLen <= Message.HEADER_SIZE) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else {
 			return message.getBlob(0, msgLen - Message.HEADER_SIZE);
 		}
@@ -242,9 +244,9 @@ public class Protocol {
 	 */
 	public boolean processRegisterResponse(Message message) throws ProtocolException {
 		if (!checkContext(message, ResponseContext.REGISTER) || message.getSource() != 0) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.getLength() != Message.HEADER_SIZE) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else {
 			return true;
 		}
@@ -277,15 +279,15 @@ public class Protocol {
 	public byte[] processGetKeyResponse(Message message) throws ProtocolException {
 		short msgLen = message.getLength();
 		if (!checkContext(message, ResponseContext.GETKEY) || message.getSource() != 0) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else if (msgLen <= Message.HEADER_SIZE) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else if (msgLen == (Message.HEADER_SIZE + 64)) {
 			return message.getBlob(0, 64);
 		} else if (msgLen == (Message.HEADER_SIZE + 128)) {
 			return message.getBlob(64, 64);
 		} else {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		}
 	}
 
@@ -313,9 +315,9 @@ public class Protocol {
 	 */
 	public long processFindRootResponse(Message message) throws ProtocolException {
 		if (!checkContext(message, ResponseContext.FINDROOT) || message.getSource() != 0) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.getLength() != (Message.HEADER_SIZE + 16)) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else {
 			return message.getLong(8);
 		}
@@ -358,9 +360,9 @@ public class Protocol {
 	 */
 	public byte processSubscribeResponse(Message message) throws ProtocolException {
 		if (!checkContext(message, ResponseContext.SUBSCRIBE) || message.getSource() != 0) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.getLength() != (Message.HEADER_SIZE)) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else {
 			return message.getSession();
 		}
@@ -388,9 +390,9 @@ public class Protocol {
 	 */
 	public byte processUnsubscribeResponse(Message message) throws ProtocolException {
 		if (!checkContext(message, ResponseContext.UNSUBSCRIBE) || message.getSource() != 0) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.getLength() != (Message.HEADER_SIZE)) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_RESPONSE);
 		} else {
 			return message.getSession();
 		}

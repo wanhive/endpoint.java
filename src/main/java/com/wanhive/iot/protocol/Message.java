@@ -36,6 +36,7 @@ import com.wanhive.iot.protocol.bean.MessageHeader;
  *
  */
 public class Message {
+	private static final String BAD_MSG_LENGTH = "Invalid message length";
 	/**
 	 * Stores the message data
 	 */
@@ -45,7 +46,7 @@ public class Message {
 	 */
 	public static final int MTU = 1024;
 	/**
-	 * Message header size in bytes (fixed)
+	 * Message header size in bytes
 	 */
 	public static final int HEADER_SIZE = MessageHeader.SIZE;
 	/**
@@ -104,7 +105,7 @@ public class Message {
 			buffer.put(30, qualifier);
 			buffer.put(31, status);
 		} else {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(BAD_MSG_LENGTH);
 		}
 	}
 
@@ -272,7 +273,7 @@ public class Message {
 		if (isValidLength(length)) {
 			buffer.putShort(24, length);
 		} else {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(BAD_MSG_LENGTH);
 		}
 	}
 

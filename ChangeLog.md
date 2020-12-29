@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Client.execute** method that sends out a request to the remote host and retrieves the response. Previously, the same process required two separate calls (send and receive).
+- Throw exceptions with detail message.
 
 ### Changed
 

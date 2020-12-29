@@ -43,6 +43,8 @@ import com.wanhive.iot.protocol.bean.NameInfo;
  *
  */
 public class WHClient implements Client {
+	private static final String BAD_MESSAGE = "Invalid message";
+	private static final String BAD_CONNECTION = "Invalid connection";
 	private Socket socket;
 
 	/**
@@ -99,7 +101,7 @@ public class WHClient implements Client {
 	 * @param socket The socket connection
 	 */
 	void setSocket(Socket socket) {
-		if (socket == null || socket != this.socket) {
+		if (socket != this.socket) {
 			close();
 			this.socket = socket;
 		}
@@ -117,7 +119,6 @@ public class WHClient implements Client {
 	void connect(NameInfo host, int timeout, boolean ssl) throws IOException {
 		try {
 			close();
-			socket = null;
 			if (ssl) {
 				SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 				socket = ssf.createSocket(host.getHost(), Integer.parseInt(host.getService()));
@@ -127,7 +128,6 @@ public class WHClient implements Client {
 			socket.setSoTimeout(timeout);
 		} catch (IOException e) {
 			close();
-			socket = null;
 			throw e;
 		}
 	}
@@ -139,6 +139,8 @@ public class WHClient implements Client {
 				socket.close();
 			}
 		} catch (Exception e) {
+		} finally {
+			socket = null;
 		}
 	}
 
@@ -149,7 +151,7 @@ public class WHClient implements Client {
 			OutputStream out = socket.getOutputStream();
 			out.write(message.getBuffer(), 0, messageLength);
 		} else {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(BAD_MESSAGE);
 		}
 	}
 
@@ -158,18 +160,18 @@ public class WHClient implements Client {
 		Message message = new Message();
 
 		InputStream in = socket.getInputStream();
-		int bytesRead = in.read(message.getBuffer(), 0, Message.HEADER_SIZE);
-		if (bytesRead != Message.HEADER_SIZE) {
-			throw new EOFException();
+		int bytes = in.read(message.getBuffer(), 0, Message.HEADER_SIZE);
+		if (bytes != Message.HEADER_SIZE) {
+			throw new EOFException(BAD_CONNECTION);
 		}
 
 		int messageLength = message.getLength();
 		if (!Message.isValidLength(messageLength)) {
-			throw new ProtocolException();
+			throw new ProtocolException(BAD_MESSAGE);
 		} else if (messageLength > Message.HEADER_SIZE) {
-			bytesRead += in.read(message.getBuffer(), bytesRead, messageLength - Message.HEADER_SIZE);
-			if (bytesRead != messageLength) {
-				throw new EOFException();
+			bytes += in.read(message.getBuffer(), bytes, messageLength - Message.HEADER_SIZE);
+			if (bytes != messageLength) {
+				throw new EOFException(BAD_CONNECTION);
 			}
 		} else {
 			// No payload

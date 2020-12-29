@@ -40,6 +40,9 @@ import com.wanhive.iot.protocol.hosts.Hosts;
  *
  */
 public class ClientFactory {
+	private static final String AUTHENTICATION_FAIL = "Authentication failed";
+	private static final String BOOTSTRAP_FAIL = "Bootstrapping failed";
+
 	/**
 	 * Configures the trust store
 	 * 
@@ -66,12 +69,18 @@ public class ClientFactory {
 	 */
 	public static Client createClient(Identity identity, Hosts hosts, long[] authNodes, long[] bootNodes, int timeout,
 			boolean secure) throws ProtocolException {
-		try (Client auth = authenticate(identity, hosts, authNodes, timeout, secure)) {
+		Client auth = null;
+		try {
+			auth = authenticate(identity, hosts, authNodes, timeout, secure);
 			return bootstrap(identity, hosts, auth, bootNodes, timeout, secure);
-		} catch (ProtocolException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new ProtocolException();
+		} finally {
+			try {
+				if (auth != null) {
+					auth.close();
+				}
+			} catch (Exception e2) {
+
+			}
 		}
 	}
 
@@ -117,10 +126,10 @@ public class ClientFactory {
 			}
 		}
 
-		throw new ProtocolException();
+		throw new ProtocolException(AUTHENTICATION_FAIL);
 	}
 
-	private static Client bootstrap(Identity identity, Hosts hosts, Client auth, long[] nodes, int timeout,
+	private static Client bootstrap(Identity identity, Hosts hosts, Client authenticator, long[] nodes, int timeout,
 			boolean secure) throws ProtocolException {
 		Protocol protocol = new Protocol();
 		boolean connected = false;
@@ -153,8 +162,8 @@ public class ClientFactory {
 				 * Get the registration request signed by the authentication node
 				 */
 				message = protocol.createRegisterRequest(identity.getUid(), hc);
-				if (auth != null) {
-					message = auth.execute(message);
+				if (authenticator != null) {
+					message = authenticator.execute(message);
 				}
 				/*
 				 * Complete registration
@@ -169,6 +178,6 @@ public class ClientFactory {
 			}
 		}
 
-		throw new ProtocolException();
+		throw new ProtocolException(BOOTSTRAP_FAIL);
 	}
 }

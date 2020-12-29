@@ -25,6 +25,7 @@ package com.wanhive.iot.client;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import com.wanhive.iot.protocol.Message;
@@ -38,9 +39,10 @@ import com.wanhive.iot.protocol.Message;
  *
  */
 public class Executor implements Runnable, AutoCloseable {
+	private static final String BAD_REQUEST = "Request denied";
 	private final Object notifier = new Object();
-	private volatile boolean running = false; // The condition variable
-	private volatile boolean stopped = true; // The status tracker
+	private boolean running = false; // The condition variable
+	private final AtomicBoolean stopped = new AtomicBoolean(true); // The status tracker
 
 	private Client client;
 	private Receiver receiver;
@@ -56,9 +58,12 @@ public class Executor implements Runnable, AutoCloseable {
 			try {
 				if (client != null) {
 					client.close();
+					Logger.getGlobal().info("Connection closed");
 				}
 			} catch (Exception e) {
-
+				Logger.getGlobal().warning(e.getMessage());
+			} finally {
+				client = null;
 			}
 			running = false;
 			notifier.notify();
@@ -103,7 +108,7 @@ public class Executor implements Runnable, AutoCloseable {
 		if (!isRunning()) {
 			this.client = client;
 		} else {
-			throw new IllegalStateException();
+			throw new IllegalStateException(BAD_REQUEST);
 		}
 	}
 
@@ -115,9 +120,9 @@ public class Executor implements Runnable, AutoCloseable {
 	 */
 	public void setReceiver(Receiver receiver) {
 		if (isRunning()) {
-			throw new IllegalStateException();
+			throw new IllegalStateException(BAD_REQUEST);
 		} else if (in != null) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(BAD_REQUEST);
 		} else {
 			this.receiver = receiver;
 		}
@@ -162,7 +167,7 @@ public class Executor implements Runnable, AutoCloseable {
 		if (in != null) {
 			return in.take();
 		} else {
-			throw new IllegalStateException();
+			throw new IllegalStateException(BAD_REQUEST);
 		}
 	}
 
@@ -172,7 +177,7 @@ public class Executor implements Runnable, AutoCloseable {
 	 * @return true if the Executor is running, false otherwise
 	 */
 	public boolean isRunning() {
-		return !stopped;
+		return !stopped.get();
 	}
 
 	@Override
@@ -215,14 +220,11 @@ public class Executor implements Runnable, AutoCloseable {
 		});
 
 		try {
-			if (receiver == null && in == null) {
-				Logger.getGlobal().warning("No receiver, will discard all incoming messages");
-			}
-			running = true;
-			stopped = false;
-			reader.start();
-			writer.start();
+			stopped.set(false);
 			synchronized (notifier) {
+				reader.start();
+				writer.start();
+				running = true;
 				while (running) {
 					notifier.wait();
 				}
@@ -244,7 +246,7 @@ public class Executor implements Runnable, AutoCloseable {
 
 			}
 			Logger.getGlobal().info("Executor stopped");
-			stopped = true;
+			stopped.set(true);
 		}
 	}
 
