@@ -1,7 +1,7 @@
 /*
  * ClientSession.java
  * 
- * Management of end-point pairs
+ * Management of endpoint pairs
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -24,7 +24,7 @@
 package com.wanhive.iot.client;
 
 /**
- * Paired end points management
+ * Endpoint pair management
  * 
  * @author amit
  *
@@ -59,7 +59,7 @@ public interface ClientSession {
 	long getRemoteIdentity();
 
 	/**
-	 * Associates given value with the given key, replaces on conflict
+	 * Associates the given value with the given key, replaces on conflict
 	 * 
 	 * @param key   Key with which the given value will be associated
 	 * @param value Value which will be associated with the given key
@@ -67,10 +67,10 @@ public interface ClientSession {
 	void setProperty(Object key, Object value);
 
 	/**
-	 * Returns value associated with the given key, null if not found
+	 * Returns the value associated with the given key, null if not found
 	 * 
-	 * @param key Key whose association will be returned
-	 * @return Value associated with the given key
+	 * @param key The key whose association will be returned
+	 * @return The value associated with the given key
 	 */
 	Object getProperty(Object key);
 }

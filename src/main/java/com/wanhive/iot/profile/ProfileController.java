@@ -31,9 +31,9 @@ package com.wanhive.iot.profile;
  */
 public interface ProfileController {
 	/**
-	 * Returns the name
+	 * Returns the name of the controller
 	 * 
-	 * @return the Name of the controller
+	 * @return Name of the controller
 	 */
 	String getName();
 

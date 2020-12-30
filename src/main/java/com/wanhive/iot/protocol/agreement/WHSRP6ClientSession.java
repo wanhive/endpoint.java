@@ -145,9 +145,9 @@ public class WHSRP6ClientSession extends SRP6Session {
 	/**
 	 * Creates and returns default session suitable for Wanhive
 	 * 
-	 * @param rounds Number of password hashing rounds
+	 * @param rounds The password hashing rounds
 	 * 
-	 * @return new WHSRP6ClientSession object suitable for Wanhive
+	 * @return A WHSRP6ClientSession object suitable for Wanhive
 	 */
 	public static WHSRP6ClientSession getDefaultSession(int rounds) {
 		WHSRP6ClientSession session = new WHSRP6ClientSession();

@@ -24,6 +24,8 @@
 
 package com.wanhive.iot.protocol.configuration;
 
+import java.io.File;
+
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
@@ -38,17 +40,34 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
  */
 public class Configuration {
 	/**
-	 * Parses a configuration file and returns an INI configuration object
+	 * Parses an INI configuration file
 	 * 
-	 * @param pathName      The pathname of the configuration file
+	 * @param pathname      The pathname of the INI file
 	 * @param listDelimiter The list delimiter character
-	 * @return INIConfiguration object containing the configuration data
+	 * @return An INIConfiguration object containing the configuration data
 	 * @throws ConfigurationException
 	 */
-	public static INIConfiguration get(String pathName, char listDelimiter) throws ConfigurationException {
+	public static INIConfiguration get(String pathname, char listDelimiter) throws ConfigurationException {
 		FileBasedConfigurationBuilder<INIConfiguration> builder = new FileBasedConfigurationBuilder<INIConfiguration>(
 				INIConfiguration.class)
-						.configure(new Parameters().properties().setFileName(pathName).setThrowExceptionOnMissing(true)
+						.configure(new Parameters().properties().setFileName(pathname).setThrowExceptionOnMissing(true)
+								.setListDelimiterHandler(new DefaultListDelimiterHandler(listDelimiter)));
+		INIConfiguration config = builder.getConfiguration();
+		return config;
+	}
+
+	/**
+	 * Parses an INI configuration file
+	 * 
+	 * @param file          The configuration file
+	 * @param listDelimiter The list delimiter character
+	 * @return An INIConfiguration object containing the configuration data
+	 * @throws ConfigurationException
+	 */
+	public static INIConfiguration get(File file, char listDelimiter) throws ConfigurationException {
+		FileBasedConfigurationBuilder<INIConfiguration> builder = new FileBasedConfigurationBuilder<INIConfiguration>(
+				INIConfiguration.class)
+						.configure(new Parameters().properties().setFile(file).setThrowExceptionOnMissing(true)
 								.setListDelimiterHandler(new DefaultListDelimiterHandler(listDelimiter)));
 		INIConfiguration config = builder.getConfiguration();
 		return config;

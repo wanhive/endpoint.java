@@ -50,17 +50,17 @@ public interface Hosts extends AutoCloseable {
 	public void put(long identity, NameInfo ni);
 
 	/**
-	 * Removes a Wanhive host
+	 * Removes a Wanhive host from the record
 	 * 
-	 * @param identity Identity of the host to remove
+	 * @param identity The identity of the host to remove
 	 */
 	public void remove(long identity);
 
 	/**
-	 * Returns a list of host identifiers of the given type
+	 * Returns list of host identifiers of the given type
 	 * 
 	 * @param type  The host's type
-	 * @param limit The upper limit on the number of identifiers to return
+	 * @param limit The maximum number of identifiers to return
 	 * @return An array containing the host identifiers
 	 */
 	public long[] list(int type, int limit);
