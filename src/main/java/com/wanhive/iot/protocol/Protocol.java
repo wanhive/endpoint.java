@@ -36,10 +36,10 @@ import com.wanhive.iot.protocol.bean.MessageContext;
  *
  */
 public class Protocol {
+	private static final String BAD_REQUEST = "Invalid request";
+	private static final String BAD_RESPONSE = "Invalid response or request denied";
 	private short sequenceNumber;
 	private byte session;
-	protected static final String BAD_REQUEST = "Invalid request";
-	protected static final String BAD_RESPONSE = "Invalid response or request denied";
 
 	/**
 	 * Verifies message's context
