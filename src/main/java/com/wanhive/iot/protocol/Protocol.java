@@ -83,7 +83,7 @@ public class Protocol {
 	 * @return The next sequence number
 	 */
 	public short nextSequenceNumber() {
-		sequenceNumber += 1;
+		++sequenceNumber;
 		if (sequenceNumber <= 0) {
 			sequenceNumber = 1;
 		}
@@ -229,7 +229,7 @@ public class Protocol {
 		Message message = new Message();
 		if (hc != null) {
 			message.setBlob(0, hc);
-			length += hc.length;
+			length += (short) hc.length;
 		}
 		message.prepareHeader(uid, 0, length, nextSequenceNumber(), getSession(), RequestContext.REGISTER);
 		return message;
@@ -263,7 +263,7 @@ public class Protocol {
 		Message message = new Message();
 		if (hc != null) {
 			message.setBlob(0, hc);
-			length += hc.length;
+			length += (short) hc.length;
 		}
 		message.prepareHeader(0, 0, length, nextSequenceNumber(), getSession(), RequestContext.GETKEY);
 		return message;
