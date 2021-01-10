@@ -69,22 +69,12 @@ public class ClientFactory {
 	 */
 	public static Client createClient(Identity identity, Hosts hosts, long[] authNodes, long[] bootNodes, int timeout,
 			boolean secure) throws ProtocolException {
-		Client auth = null;
-		try {
-			auth = authenticate(identity, hosts, authNodes, timeout, secure);
+		try (WHClient auth = authenticate(identity, hosts, authNodes, timeout, secure)) {
 			return bootstrap(identity, hosts, auth, bootNodes, timeout, secure);
-		} finally {
-			try {
-				if (auth != null) {
-					auth.close();
-				}
-			} catch (Exception e2) {
-
-			}
 		}
 	}
 
-	private static Client authenticate(Identity identity, Hosts hosts, long[] nodes, int timeout, boolean secure)
+	private static WHClient authenticate(Identity identity, Hosts hosts, long[] nodes, int timeout, boolean secure)
 			throws ProtocolException {
 		if (identity.getPassword() == null || identity.getPassword().length == 0) {
 			return null;
@@ -129,7 +119,7 @@ public class ClientFactory {
 		throw new ProtocolException(AUTHENTICATION_FAIL);
 	}
 
-	private static Client bootstrap(Identity identity, Hosts hosts, Client authenticator, long[] nodes, int timeout,
+	private static WHClient bootstrap(Identity identity, Hosts hosts, Client authenticator, long[] nodes, int timeout,
 			boolean secure) throws ProtocolException {
 		Protocol protocol = new Protocol();
 		boolean connected = false;
