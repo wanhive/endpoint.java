@@ -361,7 +361,7 @@ public class Protocol {
 	public byte processSubscribeResponse(Message message) throws ProtocolException {
 		if (!checkContext(message, ResponseContext.SUBSCRIBE) || message.getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (message.getLength() != (Message.HEADER_SIZE)) {
+		} else if (message.getLength() != Message.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
 			return message.getSession();
@@ -391,7 +391,7 @@ public class Protocol {
 	public byte processUnsubscribeResponse(Message message) throws ProtocolException {
 		if (!checkContext(message, ResponseContext.UNSUBSCRIBE) || message.getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (message.getLength() != (Message.HEADER_SIZE)) {
+		} else if (message.getLength() != Message.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
 			return message.getSession();

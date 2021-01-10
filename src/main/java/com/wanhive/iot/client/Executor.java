@@ -39,7 +39,7 @@ import com.wanhive.iot.protocol.Message;
  *
  */
 public class Executor implements Runnable, AutoCloseable {
-	private static final String BAD_REQUEST = "Request denied";
+	private static final String BAD_REQUEST = "Not allowed";
 	private final Object notifier = new Object();
 	private boolean running = false; // The condition variable
 	private final AtomicBoolean stopped = new AtomicBoolean(true); // The status tracker
