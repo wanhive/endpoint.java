@@ -10,7 +10,7 @@ This package is part of the Wanhive IoT Platform.
 
 # Package
 
-This package can be compiled using **maven** into a java archive (JAR) and subsequently be used for the development of IoT endpoints.
+Compile this package into a java archive (JAR) with **maven** and use the output JAR to develop IoT endpoints.
 
 # Resources
 
