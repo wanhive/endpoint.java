@@ -65,11 +65,12 @@ public class Message {
 	}
 
 	/**
-	 * Create a new message
+	 * Create a new message. MTU is the default message length.
 	 */
 	public Message() {
 		buffer = ByteBuffer.allocate(MTU);
-		buffer.putLong(0, 0);
+		setLength((short) MTU);
+		setLabel(0);
 	}
 
 	/**
@@ -82,7 +83,7 @@ public class Message {
 	}
 
 	/**
-	 * Populates message's header
+	 * Populates message's header. Doesn't modify the label.
 	 * 
 	 * @param source         Source identifier of this message
 	 * @param destination    Destination identifier of this message
@@ -96,23 +97,12 @@ public class Message {
 	 */
 	public Message prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
 			byte command, byte qualifier, byte status) {
-		if (isValidLength(length)) {
-			buffer.putLong(8, source);
-			buffer.putLong(16, destination);
-			buffer.putShort(24, length);
-			buffer.putShort(26, sequenceNumber);
-			buffer.put(28, session);
-			buffer.put(29, command);
-			buffer.put(30, qualifier);
-			buffer.put(31, status);
-			return this;
-		} else {
-			throw new IllegalArgumentException(BAD_MSG_LENGTH);
-		}
+		return this.setLength(length).setSource(source).setDestination(destination).setSequenceNumber(sequenceNumber)
+				.setSession(session).setCommand(command).setQualifier(qualifier).setStatus(status);
 	}
 
 	/**
-	 * Populates message's header
+	 * Populates message's header. Doesn't modify the label.
 	 * 
 	 * @param source         Source identifier of this message
 	 * @param destination    Destination identifier of this message
@@ -144,9 +134,8 @@ public class Message {
 	 */
 	public Message prepareHeader(long label, long source, long destination, short length, short sequenceNumber,
 			byte session, byte command, byte qualifier, byte status) {
-		prepareHeader(source, destination, length, sequenceNumber, session, command, qualifier, status);
-		buffer.putLong(0, label);
-		return this;
+		return prepareHeader(source, destination, length, sequenceNumber, session, command, qualifier, status)
+				.setLabel(label);
 	}
 
 	/**
@@ -185,15 +174,15 @@ public class Message {
 	 * @param header This message's header data is copied here
 	 */
 	public void getHeader(MessageHeader header) {
-		header.setLabel(buffer.getLong(0));
-		header.setSource(buffer.getLong(8));
-		header.setDestination(buffer.getLong(16));
-		header.setLength(buffer.getShort(24));
-		header.setSequenceNumber(buffer.getShort(26));
-		header.setSession(buffer.get(28));
-		header.setCommand(buffer.get(29));
-		header.setQualifier(buffer.get(30));
-		header.setStatus(buffer.get(31));
+		header.setLabel(getLabel());
+		header.setSource(getSource());
+		header.setDestination(getDestination());
+		header.setLength(getLength());
+		header.setSequenceNumber(getSequenceNumber());
+		header.setSession(getSession());
+		header.setCommand(getCommand());
+		header.setQualifier(getQualifier());
+		header.setStatus(getStatus());
 	}
 
 	/**
@@ -285,7 +274,7 @@ public class Message {
 	 */
 	public Message setLength(short length) {
 		if (isValidLength(length)) {
-			buffer.putShort(24, length);
+			buffer.limit(length).putShort(24, length);
 			return this;
 		} else {
 			throw new IllegalArgumentException(BAD_MSG_LENGTH);
@@ -575,16 +564,5 @@ public class Message {
 		} finally {
 			buffer.position(p);
 		}
-	}
-
-	/**
-	 * Match the internal buffer's limit to the current message length.
-	 * 
-	 * @return This message
-	 */
-	public Message freeze() {
-		buffer.position(getLength());
-		buffer.flip();
-		return this;
 	}
 }

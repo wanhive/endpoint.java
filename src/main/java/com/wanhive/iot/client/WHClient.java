@@ -147,7 +147,7 @@ public class WHClient implements Client {
 	@Override
 	public void send(Message message) throws IOException {
 		int messageLength = message.getLength();
-		if (messageLength >= Message.HEADER_SIZE && messageLength <= Message.MTU) {
+		if (Message.isValidLength(messageLength)) {
 			OutputStream out = socket.getOutputStream();
 			out.write(message.getBuffer(), 0, messageLength);
 		} else {

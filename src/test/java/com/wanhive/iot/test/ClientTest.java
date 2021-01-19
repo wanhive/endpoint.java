@@ -84,7 +84,7 @@ public class ClientTest {
 				hosts = new WanhiveHosts(hostsDb);
 			} else {
 				String hostsFile = config.getSection("HOSTS").getString("hostsFile", null);
-				hosts = new WanhiveHosts(":memory:");
+				hosts = new WanhiveHosts(WanhiveHosts.IN_MEMORY);
 				hosts.importHosts(hostsFile);
 			}
 
@@ -97,7 +97,7 @@ public class ClientTest {
 			System.out.println("CONNECTED");
 
 			/*
-			 * Run the client for 5 seconds
+			 * Execute the client
 			 */
 			int queueCapacity = config.getSection("HUB").getInt("messagePoolSize", 1024);
 			Executor exec = new Executor(client, queueCapacity, queueCapacity);
@@ -105,7 +105,7 @@ public class ClientTest {
 			th.start();
 			Protocol proto = new Protocol();
 			for (int i = 0; i < 5; i++) {
-				Message msg = proto.createPublishRequest((byte) 5, "Hello".getBytes());
+				Message msg = proto.createPublishRequest((byte) 5, "HelloWorld".getBytes());
 				exec.offer(msg);
 				Thread.sleep(5000, 0);
 			}

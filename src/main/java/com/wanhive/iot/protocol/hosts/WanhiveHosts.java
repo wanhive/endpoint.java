@@ -47,6 +47,10 @@ import com.wanhive.iot.protocol.bean.NameInfo;
  *
  */
 public class WanhiveHosts implements Hosts {
+	/**
+	 * The pathname of in-memory database
+	 */
+	public static final String IN_MEMORY = ":memory:";
 	private final Connection conn;
 	static {
 		init();
