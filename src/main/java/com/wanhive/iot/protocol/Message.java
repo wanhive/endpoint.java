@@ -92,8 +92,9 @@ public class Message {
 	 * @param command        Command classifier of this message
 	 * @param qualifier      Command qualifier of this message
 	 * @param status         Request/response status of this message
+	 * @return This message
 	 */
-	public void prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
+	public Message prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
 			byte command, byte qualifier, byte status) {
 		if (isValidLength(length)) {
 			buffer.putLong(8, source);
@@ -104,6 +105,7 @@ public class Message {
 			buffer.put(29, command);
 			buffer.put(30, qualifier);
 			buffer.put(31, status);
+			return this;
 		} else {
 			throw new IllegalArgumentException(BAD_MSG_LENGTH);
 		}
@@ -118,10 +120,11 @@ public class Message {
 	 * @param sequenceNumber Sequence number of this message
 	 * @param session        Session identifier of this message
 	 * @param ctx            Context of this message
+	 * @return This message
 	 */
-	public void prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
+	public Message prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
 			MessageContext ctx) {
-		prepareHeader(source, destination, length, sequenceNumber, session, ctx.getCommand(), ctx.getQualifier(),
+		return prepareHeader(source, destination, length, sequenceNumber, session, ctx.getCommand(), ctx.getQualifier(),
 				ctx.getStatus());
 	}
 
@@ -137,11 +140,13 @@ public class Message {
 	 * @param command        Command classifier of this message
 	 * @param qualifier      Command qualifier of this message
 	 * @param status         Request/response status of this message
+	 * @return This message
 	 */
-	public void prepareHeader(long label, long source, long destination, short length, short sequenceNumber,
+	public Message prepareHeader(long label, long source, long destination, short length, short sequenceNumber,
 			byte session, byte command, byte qualifier, byte status) {
 		prepareHeader(source, destination, length, sequenceNumber, session, command, qualifier, status);
 		buffer.putLong(0, label);
+		return this;
 	}
 
 	/**
@@ -154,20 +159,22 @@ public class Message {
 	 * @param sequenceNumber Sequence number of this message
 	 * @param session        Session identifier of this message
 	 * @param ctx            Context of this message
+	 * @return This message
 	 */
-	public void prepareHeader(long label, long source, long destination, short length, short sequenceNumber,
+	public Message prepareHeader(long label, long source, long destination, short length, short sequenceNumber,
 			byte session, MessageContext ctx) {
-		prepareHeader(label, source, destination, length, sequenceNumber, session, ctx.getCommand(), ctx.getQualifier(),
-				ctx.getStatus());
+		return prepareHeader(label, source, destination, length, sequenceNumber, session, ctx.getCommand(),
+				ctx.getQualifier(), ctx.getStatus());
 	}
 
 	/**
 	 * Populates message's header
 	 * 
 	 * @param header Desired message header
+	 * @return This message
 	 */
-	public void prepareHeader(MessageHeader header) {
-		prepareHeader(header.getLabel(), header.getSource(), header.getDestination(), header.getLength(),
+	public Message prepareHeader(MessageHeader header) {
+		return prepareHeader(header.getLabel(), header.getSource(), header.getDestination(), header.getLength(),
 				header.getSequenceNumber(), header.getSession(), header.getCommand(), header.getQualifier(),
 				header.getStatus());
 	}
@@ -213,9 +220,11 @@ public class Message {
 	 * Sets the label
 	 * 
 	 * @param label Message's label is set to the given value
+	 * @return This message
 	 */
-	public void setLabel(long label) {
+	public Message setLabel(long label) {
 		buffer.putLong(0, label);
+		return this;
 	}
 
 	/**
@@ -231,9 +240,11 @@ public class Message {
 	 * Sets the source identifier
 	 * 
 	 * @param source Message's source identifier is set to the given value
+	 * @return This message
 	 */
-	public void setSource(long source) {
+	public Message setSource(long source) {
 		buffer.putLong(8, source);
+		return this;
 	}
 
 	/**
@@ -250,9 +261,11 @@ public class Message {
 	 * 
 	 * @param destination Message's destination identifier is set to the given
 	 *                    value.
+	 * @return This message
 	 */
-	public void setDestination(long destination) {
+	public Message setDestination(long destination) {
 		buffer.putLong(16, destination);
+		return this;
 	}
 
 	/**
@@ -268,10 +281,12 @@ public class Message {
 	 * Sets the message length in bytes
 	 * 
 	 * @param length Message's length is set to this value
+	 * @return This message
 	 */
-	public void setLength(short length) {
+	public Message setLength(short length) {
 		if (isValidLength(length)) {
 			buffer.putShort(24, length);
+			return this;
 		} else {
 			throw new IllegalArgumentException(BAD_MSG_LENGTH);
 		}
@@ -290,9 +305,11 @@ public class Message {
 	 * Sets the sequence number
 	 * 
 	 * @param sequenceNumber Message's sequence number is set to the given value
+	 * @return This message
 	 */
-	public void setSequenceNumber(short sequenceNumber) {
+	public Message setSequenceNumber(short sequenceNumber) {
 		buffer.putShort(26, sequenceNumber);
+		return this;
 	}
 
 	/**
@@ -308,9 +325,11 @@ public class Message {
 	 * Sets the session identifier
 	 * 
 	 * @param session Message's session identifier is set to the given value
+	 * @return This message
 	 */
-	public void setSession(byte session) {
+	public Message setSession(byte session) {
 		buffer.put(28, session);
+		return this;
 	}
 
 	/**
@@ -326,9 +345,11 @@ public class Message {
 	 * Sets the command classifier
 	 * 
 	 * @param command Message's command classifier is set to the given value
+	 * @return This message
 	 */
-	public void setCommand(byte command) {
+	public Message setCommand(byte command) {
 		buffer.put(29, command);
+		return this;
 	}
 
 	/**
@@ -344,9 +365,11 @@ public class Message {
 	 * Sets the command qualifier
 	 * 
 	 * @param qualifier Message's command qualifier is set to the given value
+	 * @return This message
 	 */
-	public void setQualifier(byte qualifier) {
+	public Message setQualifier(byte qualifier) {
 		buffer.put(30, qualifier);
+		return this;
 	}
 
 	/**
@@ -362,9 +385,11 @@ public class Message {
 	 * Sets the request/response status code
 	 * 
 	 * @param status Message's status code is set to the given value
+	 * @return This message
 	 */
-	public void setStatus(byte status) {
+	public Message setStatus(byte status) {
 		buffer.put(31, status);
+		return this;
 	}
 
 	/**
@@ -382,9 +407,11 @@ public class Message {
 	 * 
 	 * @param index The index at which the byte value will be written
 	 * @param value The byte value to write
+	 * @return This message
 	 */
-	public void setByte(int index, byte value) {
+	public Message setByte(int index, byte value) {
 		buffer.put(HEADER_SIZE + index, value);
+		return this;
 	}
 
 	/**
@@ -402,9 +429,11 @@ public class Message {
 	 * 
 	 * @param index The index at which the char value will be written
 	 * @param value The char value to write
+	 * @return This message
 	 */
-	public void setChar(int index, char value) {
+	public Message setChar(int index, char value) {
 		buffer.putChar(HEADER_SIZE + index, value);
+		return this;
 	}
 
 	/**
@@ -422,9 +451,11 @@ public class Message {
 	 * 
 	 * @param index The index at which the short value will be written
 	 * @param value The short value to write
+	 * @return This message
 	 */
-	public void setShort(int index, short value) {
+	public Message setShort(int index, short value) {
 		buffer.putShort(HEADER_SIZE + index, value);
+		return this;
 	}
 
 	/**
@@ -442,9 +473,11 @@ public class Message {
 	 * 
 	 * @param index The index at which the int value will be written
 	 * @param value The int value to write
+	 * @return This message
 	 */
-	public void setInt(int index, int value) {
+	public Message setInt(int index, int value) {
 		buffer.putInt(HEADER_SIZE + index, value);
+		return this;
 	}
 
 	/**
@@ -462,9 +495,11 @@ public class Message {
 	 * 
 	 * @param index The index at which the long value will be written
 	 * @param value The long value to write
+	 * @return This message
 	 */
-	public void setLong(int index, long value) {
+	public Message setLong(int index, long value) {
 		buffer.putLong(HEADER_SIZE + index, value);
+		return this;
 	}
 
 	/**
@@ -482,9 +517,11 @@ public class Message {
 	 * 
 	 * @param index The index at which the double value will be written
 	 * @param value The double value to write
+	 * @return This message
 	 */
-	public void setDouble(int index, double value) {
+	public Message setDouble(int index, double value) {
 		buffer.putDouble(HEADER_SIZE + index, value);
+		return this;
 	}
 
 	/**
@@ -527,12 +564,14 @@ public class Message {
 	 * 
 	 * @param index The index at which the bytes will be written
 	 * @param blob  The bytes to write
+	 * @return This message
 	 */
-	public void setBlob(int index, byte[] blob) {
+	public Message setBlob(int index, byte[] blob) {
 		int p = buffer.position();
 		try {
 			buffer.position(HEADER_SIZE + index);
 			buffer.put(blob);
+			return this;
 		} finally {
 			buffer.position(p);
 		}
@@ -540,9 +579,12 @@ public class Message {
 
 	/**
 	 * Match the internal buffer's limit to the current message length.
+	 * 
+	 * @return This message
 	 */
-	public void freeze() {
+	public Message freeze() {
 		buffer.position(getLength());
 		buffer.flip();
+		return this;
 	}
 }
