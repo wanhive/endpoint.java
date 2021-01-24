@@ -176,7 +176,9 @@ public class WHClient implements Client {
 		} else {
 			// No payload
 		}
-		return message;
+		
+		//Make the message internally consistent and return
+		return message.setLength(message.getLength());
 	}
 
 	@Override

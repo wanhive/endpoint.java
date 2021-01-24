@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The **Message.freeze** method.
 
+### Fixed
+
+- **WHClient.receive** should return internally consistent message.
+
 ## [0.4.0] - 2021-01-16
 
 ### Changed
