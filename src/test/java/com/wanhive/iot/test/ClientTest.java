@@ -27,9 +27,9 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.configuration2.INIConfiguration;
 
-import com.wanhive.iot.client.Client;
-import com.wanhive.iot.client.ClientFactory;
-import com.wanhive.iot.client.Executor;
+import com.wanhive.iot.edge.Executor;
+import com.wanhive.iot.protocol.Client;
+import com.wanhive.iot.protocol.ClientFactory;
 import com.wanhive.iot.protocol.Message;
 import com.wanhive.iot.protocol.Protocol;
 import com.wanhive.iot.protocol.bean.Identity;

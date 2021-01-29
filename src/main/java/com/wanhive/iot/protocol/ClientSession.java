@@ -21,7 +21,7 @@
  * limitations under the License.
  * 
  */
-package com.wanhive.iot.client;
+package com.wanhive.iot.protocol;
 
 /**
  * Endpoint pair management

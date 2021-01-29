@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Major package restructuring to provide proper encapsulation.
 - Setters in the **Message** class use the builder pattern.
 - **Message.MTU** is the default length of the new Messages.
 

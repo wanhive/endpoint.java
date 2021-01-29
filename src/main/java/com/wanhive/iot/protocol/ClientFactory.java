@@ -21,13 +21,11 @@
  * limitations under the License.
  * 
  */
-package com.wanhive.iot.client;
+package com.wanhive.iot.protocol;
 
 import java.net.ProtocolException;
 
 import com.nimbusds.srp6.BigIntegerUtils;
-import com.wanhive.iot.protocol.Message;
-import com.wanhive.iot.protocol.Protocol;
 import com.wanhive.iot.protocol.agreement.WHSRP6ClientSession;
 import com.wanhive.iot.protocol.bean.IdentificationResponse;
 import com.wanhive.iot.protocol.bean.Identity;

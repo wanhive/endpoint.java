@@ -21,7 +21,7 @@
  * limitations under the License.
  * 
  */
-package com.wanhive.iot.client;
+package com.wanhive.iot.protocol;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -33,7 +33,6 @@ import java.net.SocketException;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import com.wanhive.iot.protocol.Message;
 import com.wanhive.iot.protocol.bean.NameInfo;
 
 /**

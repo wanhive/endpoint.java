@@ -21,11 +21,9 @@
  * limitations under the License.
  * 
  */
-package com.wanhive.iot.client;
+package com.wanhive.iot.protocol;
 
 import java.io.IOException;
-
-import com.wanhive.iot.protocol.Message;
 
 /**
  * The Wanhive client interface for blocking IO

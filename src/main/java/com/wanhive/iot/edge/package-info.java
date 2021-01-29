@@ -20,12 +20,12 @@
  */
 
 /**
- * Wanhive client
+ * IO engine
  */
 /**
- * The reference implementation of Wanhive client
+ * The IO engine for the Wanhive IoT endpoints.
  * 
  * @author amit
  *
  */
-package com.wanhive.iot.client;
+package com.wanhive.iot.edge;

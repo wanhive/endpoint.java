@@ -65,21 +65,21 @@ public class Message {
 	}
 
 	/**
+	 * Returns the backing array that stores the message data
+	 * 
+	 * @return The byte array that stores the message data
+	 */
+	byte[] getBuffer() {
+		return buffer.array();
+	}
+
+	/**
 	 * Create a new message. MTU is the default message length.
 	 */
 	public Message() {
 		buffer = ByteBuffer.allocate(MTU);
 		setLength((short) MTU);
 		setLabel(0);
-	}
-
-	/**
-	 * Returns the backing array that stores the message data
-	 * 
-	 * @return The byte array that stores the message data
-	 */
-	public byte[] getBuffer() {
-		return buffer.array();
 	}
 
 	/**
