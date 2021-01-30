@@ -13,13 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Major package restructuring to provide proper encapsulation.
+- Major package restructuring (not backward compatible) to ensure proper encapsulation.
 - Setters in the **Message** class use the builder pattern.
 - **Message.MTU** is the default length of the new Messages.
 
 ### Removed
 
 - The **Message.freeze** method.
+- The public access modifier of the **Message.getBuffer** method.
 
 ### Fixed
 

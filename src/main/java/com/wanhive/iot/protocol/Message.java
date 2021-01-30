@@ -55,6 +55,15 @@ public class Message {
 	public static final int PAYLOAD_SIZE = (MTU - HEADER_SIZE);
 
 	/**
+	 * Returns the backing array that stores the message data
+	 * 
+	 * @return The byte array that stores the message data
+	 */
+	byte[] getBuffer() {
+		return buffer.array();
+	}
+
+	/**
 	 * Returns true if the given value is a valid message length
 	 * 
 	 * @param length The message length to validate
@@ -62,15 +71,6 @@ public class Message {
 	 */
 	public static boolean isValidLength(int length) {
 		return length >= HEADER_SIZE && length <= MTU;
-	}
-
-	/**
-	 * Returns the backing array that stores the message data
-	 * 
-	 * @return The byte array that stores the message data
-	 */
-	byte[] getBuffer() {
-		return buffer.array();
 	}
 
 	/**
