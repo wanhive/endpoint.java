@@ -274,7 +274,8 @@ public class Message {
 	 */
 	public Message setLength(short length) {
 		if (isValidLength(length)) {
-			buffer.limit(length).putShort(24, length);
+			buffer.limit(length);
+			buffer.putShort(24, length);
 			return this;
 		} else {
 			throw new IllegalArgumentException(BAD_MSG_LENGTH);
