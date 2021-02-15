@@ -14,5 +14,6 @@ Compile this package into a java archive (JAR) with **maven** and use the output
 
 # Resources
 
+* [CHANGELOG](ChangeLog.md)
 * [INSTALL](INSTALL.md)
 * [LICENSE](LICENSE)
