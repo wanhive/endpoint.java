@@ -67,12 +67,12 @@ public class ClientFactory {
 	 */
 	public static Client createClient(Identity identity, Hosts hosts, long[] authNodes, long[] bootNodes, int timeout,
 			boolean secure) throws ProtocolException {
-		try (WHClient auth = authenticate(identity, hosts, authNodes, timeout, secure)) {
+		try (WanhiveClient auth = authenticate(identity, hosts, authNodes, timeout, secure)) {
 			return bootstrap(identity, hosts, auth, bootNodes, timeout, secure);
 		}
 	}
 
-	private static WHClient authenticate(Identity identity, Hosts hosts, long[] nodes, int timeout, boolean secure)
+	private static WanhiveClient authenticate(Identity identity, Hosts hosts, long[] nodes, int timeout, boolean secure)
 			throws ProtocolException {
 		if (identity.getPassword() == null || identity.getPassword().length == 0) {
 			return null;
@@ -84,7 +84,7 @@ public class ClientFactory {
 			if (connected) { // Something bad happened
 				break;
 			}
-			try (WHClient auth = new WHClient(hosts.get(node), timeout, secure)) {
+			try (WanhiveClient auth = new WanhiveClient(hosts.get(node), timeout, secure)) {
 				connected = true;
 				// -----------------------------------------------------------------
 				/*
@@ -108,7 +108,7 @@ public class ClientFactory {
 				message = auth.execute(message);
 				byte[] hostresp = protocol.processAuthenticationResponse(message);
 				session.step3(BigIntegerUtils.bigIntegerFromBytes(hostresp));
-				return new WHClient(auth.release());
+				return new WanhiveClient(auth.release());
 			} catch (Exception e) {
 
 			}
@@ -117,8 +117,8 @@ public class ClientFactory {
 		throw new ProtocolException(AUTHENTICATION_FAIL);
 	}
 
-	private static WHClient bootstrap(Identity identity, Hosts hosts, Client authenticator, long[] nodes, int timeout,
-			boolean secure) throws ProtocolException {
+	private static WanhiveClient bootstrap(Identity identity, Hosts hosts, Client authenticator, long[] nodes,
+			int timeout, boolean secure) throws ProtocolException {
 		Protocol protocol = new Protocol();
 		boolean connected = false;
 
@@ -126,7 +126,7 @@ public class ClientFactory {
 			if (connected) { // Something bad happened
 				break;
 			}
-			try (WHClient client = new WHClient(hosts.get(node), timeout, secure)) {
+			try (WanhiveClient client = new WanhiveClient(hosts.get(node), timeout, secure)) {
 				connected = true;
 				// -----------------------------------------------------------------
 				/*
@@ -154,13 +154,13 @@ public class ClientFactory {
 					message = authenticator.execute(message);
 				}
 				/*
-				 * Complete registration
+				 * Complete the registration
 				 */
 				message = client.execute(message);
 				protocol.processRegisterResponse(message);
 				// -----------------------------------------------------------------
 				client.setTimeout(0);
-				return new WHClient(client.release());
+				return new WanhiveClient(client.release());
 			} catch (Exception e) {
 
 			}

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Rename the **WHClient** class to **WanhiveClient**.
+
 ### Fixed
 
 - Refactor the **Message** class to fix the CodeQL (static code analyzer) build failure.

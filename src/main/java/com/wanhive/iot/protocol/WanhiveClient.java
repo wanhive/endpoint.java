@@ -1,5 +1,5 @@
 /*
- * WHClient.java
+ * WanhiveClient.java
  * 
  * Reference implementation of the Wanhive client
  * 
@@ -41,7 +41,7 @@ import com.wanhive.iot.protocol.bean.NameInfo;
  * @author amit
  *
  */
-public class WHClient implements Client {
+public class WanhiveClient implements Client {
 	private static final String BAD_MESSAGE = "Invalid message";
 	private static final String BAD_CONNECTION = "Invalid connection";
 	private Socket socket;
@@ -49,7 +49,7 @@ public class WHClient implements Client {
 	/**
 	 * The default constructor
 	 */
-	WHClient() {
+	WanhiveClient() {
 
 	}
 
@@ -58,7 +58,7 @@ public class WHClient implements Client {
 	 * 
 	 * @param socket The socket to use for communication
 	 */
-	WHClient(Socket socket) {
+	WanhiveClient(Socket socket) {
 		this.socket = socket;
 	}
 
@@ -70,7 +70,7 @@ public class WHClient implements Client {
 	 * @param ssl     Enable or disable secure connection
 	 * @throws IOException
 	 */
-	WHClient(NameInfo host, int timeout, boolean ssl) throws IOException {
+	WanhiveClient(NameInfo host, int timeout, boolean ssl) throws IOException {
 		connect(host, timeout, ssl);
 	}
 
@@ -175,8 +175,8 @@ public class WHClient implements Client {
 		} else {
 			// No payload
 		}
-		
-		//Make the message internally consistent and return
+
+		// Make the message internally consistent and return
 		return message.setLength(message.getLength());
 	}
 
