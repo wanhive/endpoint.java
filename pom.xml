@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.wanhive.iot</groupId>
 	<artifactId>wanhive-endpoint</artifactId>
-	<version>0.6.0</version>
+	<version>0.7.0-SNAPSHOT</version>
 	<name>Wanhive EndPoint</name>
 	<description>Wanhive IoT endpoint development library in Java programming language.</description>
 	<url>http://www.wanhive.com</url>

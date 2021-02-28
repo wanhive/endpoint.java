@@ -52,21 +52,12 @@ public class ClientTest {
 	public static void main(String[] args) {
 		try {
 			/*
-			 * Load configuration file from disk
+			 * STEP 1: Read the configuration file
 			 */
 			INIConfiguration config = Configuration.get(args[0], ',');
 
 			/*
-			 * Configure SSL
-			 */
-			boolean enableSSL = config.getSection("SSL").getBoolean("enable", false);
-			if (enableSSL) {
-				ClientFactory.setTrustStore(config.getSection("SSL").getString("trust", null),
-						config.getSection("SSL").getString("password", null));
-			}
-
-			/*
-			 * Create a new client
+			 * STEP 2: Configure TLS/SSL (communication security)
 			 */
 			boolean sslEnabled = config.getSection("SSL").getBoolean("enable", false);
 			if (sslEnabled) {
@@ -74,13 +65,12 @@ public class ClientTest {
 						config.getSection("SSL").getString("password", null));
 			}
 
-			Identity id = new Identity(65537,
-					config.getSection("CLIENT").getString("password", "").getBytes(Charset.forName("UTF-8")),
-					config.getSection("CLIENT").getInt("passwordHashRounds", 1));
-
+			/*
+			 * STEP 3: Read the hosts database
+			 */
 			WanhiveHosts hosts = null;
 			String hostsDb = config.getSection("HOSTS").getString("hostsDb", null);
-			if (hostsDb != null) {
+			if (hostsDb != null && hostsDb.length() > 0) {
 				hosts = new WanhiveHosts(hostsDb);
 			} else {
 				String hostsFile = config.getSection("HOSTS").getString("hostsFile", null);
@@ -88,30 +78,41 @@ public class ClientTest {
 				hosts.importHosts(hostsFile);
 			}
 
+			/*
+			 * STEP 4: Read the bootstrapping data
+			 */
 			HostsCache cache = new WanhiveHostsCache();
 			long[] auths = cache.get(config.getSection("BOOTSTRAP").getString("auths"), 16);
 			long[] boots = cache.get(config.getSection("BOOTSTRAP").getString("nodes"), 16);
 			int timeout = config.getSection("CLIENT").getInt("timeOut", 0);
 
+			/*
+			 * STEP 5: Create a new client
+			 */
+			Identity id = new Identity(65537,
+					config.getSection("CLIENT").getString("password", "").getBytes(Charset.forName("UTF-8")),
+					config.getSection("CLIENT").getInt("passwordHashRounds", 1));
+
 			Client client = ClientFactory.createClient(id, hosts, auths, boots, timeout, sslEnabled);
 			System.out.println("CONNECTED");
 
 			/*
-			 * Execute the client
+			 * STEP 6:Execute the client
 			 */
 			int queueCapacity = config.getSection("HUB").getInt("messagePoolSize", 1024);
 			Executor exec = new Executor(client, queueCapacity, queueCapacity);
 			Thread th = new Thread(exec);
 			th.start();
 			Protocol proto = new Protocol();
+			// Publish five (5) messages to the topic five (5)
 			for (int i = 0; i < 5; i++) {
 				Message msg = proto.createPublishRequest((byte) 5, "HelloWorld".getBytes());
 				exec.offer(msg);
-				Thread.sleep(5000, 0);
+				Thread.sleep(2000, 0);
 			}
 			exec.close();
 			th.join();
-			System.out.println("END");
+			System.out.println("FINISHED");
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
 			e.printStackTrace();
