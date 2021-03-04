@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Limit the time allowed to establish a socket connection (connect timeout) in **WanhiveClient.connect**.
 - Clean up the example client.
 
 ## [0.6.0] - 2021-02-18

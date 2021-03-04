@@ -27,6 +27,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -119,12 +120,12 @@ public class WanhiveClient implements Client {
 		try {
 			close();
 			if (ssl) {
-				SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-				socket = ssf.createSocket(host.getHost(), Integer.parseInt(host.getService()));
+				socket = SSLSocketFactory.getDefault().createSocket();
 			} else {
-				socket = new Socket(host.getHost(), Integer.parseInt(host.getService()));
+				socket = new Socket();
 			}
-			socket.setSoTimeout(timeout);
+			socket.connect(new InetSocketAddress(host.getHost(), Integer.parseInt(host.getService())), timeout);
+			setTimeout(timeout);
 		} catch (IOException e) {
 			close();
 			throw e;
