@@ -6,13 +6,13 @@ This package is part of the Wanhive IoT Platform.
 
 ## Features
 
-- Implementation of Wanhive protocol in Java.
+- Implementation of [Wanhive protocol](https://www.wanhive.com/docs/wanhive-protocol-v1.0.0.pdf) in Java.
 
 # Package
 
 Use this library to develop client applications that run on the Java virtual machine (JVM) and other Java compatible platforms (Android for example).
 
-- [Usage guide](INSTALL.md)
+- [Installation and getting started](INSTALL.md)
 
 
 # Resources

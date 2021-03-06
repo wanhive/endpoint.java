@@ -1,17 +1,17 @@
 # System requirements
 
-* JDK 8 or above
-* maven (for building)
+* Java SE 8 or above
+* maven
 
 # Build and install
 
-To generate a JAR file, invoke:
+- Generate a JAR file:
 
 ```
 mvn clean package
 ```
 
-To install into the local maven repository, invoke:
+- Install in the local maven repository:
 
 ```
 mvn clean install
@@ -25,7 +25,7 @@ To use the installed library in a maven project, add the following dependency to
 		<dependency>
 			<groupId>com.wanhive.iot</groupId>
 			<artifactId>wanhive-endpoint</artifactId>
-			<version>0.6.0</version>
+			<version>0.7.0</version>
 		</dependency>
 ```
 
