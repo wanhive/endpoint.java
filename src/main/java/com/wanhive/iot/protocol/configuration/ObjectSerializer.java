@@ -33,7 +33,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
- * Serializes and deserializes objects
+ * Serializable object handler
  * 
  * @author amit
  *

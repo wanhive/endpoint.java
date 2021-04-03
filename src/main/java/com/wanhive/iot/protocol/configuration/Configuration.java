@@ -1,7 +1,7 @@
 /*
  * Configuration.java
  * 
- * INI configuration file handler
+ * INI configuration file loader
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -33,7 +33,7 @@ import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 
 /**
- * INI configuration file handler
+ * INI configuration file loader
  * 
  * @author amit
  *
@@ -42,7 +42,7 @@ public class Configuration {
 	/**
 	 * Parses an INI configuration file
 	 * 
-	 * @param pathname      The pathname of the INI file
+	 * @param pathname      Pathname of the INI configuration file
 	 * @param listDelimiter The list delimiter character
 	 * @return An INIConfiguration object containing the configuration data
 	 * @throws ConfigurationException
@@ -59,7 +59,7 @@ public class Configuration {
 	/**
 	 * Parses an INI configuration file
 	 * 
-	 * @param file          The configuration file
+	 * @param file          The INI configuration file
 	 * @param listDelimiter The list delimiter character
 	 * @return An INIConfiguration object containing the configuration data
 	 * @throws ConfigurationException

@@ -1,7 +1,7 @@
 /*
  * Executor.java
  * 
- * The IO engine for Wanhive
+ * The IO engine for Wanhive IoT endpoints
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -32,9 +32,9 @@ import com.wanhive.iot.protocol.Client;
 import com.wanhive.iot.protocol.Message;
 
 /**
- * Bounded queue based threaded IO engine for Wanhive. Maintains two separate
- * queues, one for the outgoing messages and another one for the incoming
- * messages.
+ * Bounded queue based threaded executor for the Wanhive IoT endpoints.
+ * Maintains two separate queues, one for the outgoing messages and another one
+ * for the incoming messages.
  * 
  * @author amit
  *
@@ -42,8 +42,8 @@ import com.wanhive.iot.protocol.Message;
 public class Executor implements Runnable, AutoCloseable {
 	private static final String BAD_REQUEST = "Not allowed";
 	private final Object notifier = new Object();
-	private boolean running = false; // The condition variable
-	private final AtomicBoolean stopped = new AtomicBoolean(true); // The status tracker
+	private boolean running = false; // Condition variable
+	private final AtomicBoolean stopped = new AtomicBoolean(true); // Status flag
 
 	private Client client;
 	private Receiver receiver;
@@ -72,10 +72,9 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Creates an Executor that stores the incoming messages into it's incoming
-	 * queue.
+	 * Creates an Executor that stores the incoming messages in a bounded queue.
 	 * 
-	 * @param client      The Client to be used for communication
+	 * @param client      The Client to use for communication
 	 * @param inCapacity  The capacity of the incoming messages queue
 	 * @param outCapacity The capacity of the outgoing messages queue
 	 */
@@ -86,10 +85,10 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Creates an Executor that uses a Receiver to process the incoming messages.
+	 * Creates an Executor that forwards the incoming messages to a Receiver.
 	 * 
-	 * @param client      The Client to be used for communication
-	 * @param receiver    The Receiver for the incoming messages
+	 * @param client      The Client to use for communication
+	 * @param receiver    The Receiver of the incoming messages
 	 * @param outCapacity The capacity of the outgoing messages queue
 	 */
 	public Executor(Client client, Receiver receiver, int outCapacity) {
@@ -100,10 +99,10 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Sets executor's Client. Existing Client is replaced, but not closed. Fails if
-	 * the Executor is running.
+	 * Assigns a Client to this Executor. The existing Client is replaced, but not
+	 * closed. Fails if the Executor is running.
 	 * 
-	 * @param client The Client to use with the Executor
+	 * @param client The Client to use with this Executor
 	 */
 	public void setClient(Client client) {
 		if (!isRunning()) {
@@ -114,8 +113,9 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Sets the Receiver for the incoming messages. Fails if the Executor is
-	 * running. Also fails if the Executor was created with an incoming queue.
+	 * Assigns a Receiver for processing the incoming messages. Fails if the
+	 * Executor is running. Also fails if the Executor was created with an incoming
+	 * messages queue.
 	 * 
 	 * @param receiver The Receiver to use
 	 */
@@ -140,7 +140,7 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Puts a message into outgoing queue
+	 * Puts a message into the outgoing queue
 	 * 
 	 * @param message Message to send out
 	 * @throws InterruptedException
@@ -154,7 +154,7 @@ public class Executor implements Runnable, AutoCloseable {
 	 * 
 	 * @return true if the incoming queue is not empty, false otherwise
 	 */
-	public boolean hasMessage() {
+	public boolean hasIncomingMessage() {
 		return (in != null) && !in.isEmpty();
 	}
 
@@ -173,7 +173,7 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Checks Executor's running state
+	 * Checks whether this Executor is in the running state
 	 * 
 	 * @return true if the Executor is running, false otherwise
 	 */

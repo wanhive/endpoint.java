@@ -23,7 +23,7 @@
  * IO engine
  */
 /**
- * The IO engine for the Wanhive IoT endpoints.
+ * The Wanhive IoT endpoint executor.
  * 
  * @author amit
  *

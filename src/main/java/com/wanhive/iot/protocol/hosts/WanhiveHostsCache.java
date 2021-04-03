@@ -31,7 +31,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * The reference implementation of hosts cache
+ * The reference implementation of the hosts cache
  * 
  * @author amit
  *

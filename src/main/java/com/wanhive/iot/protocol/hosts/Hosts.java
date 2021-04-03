@@ -27,7 +27,7 @@ package com.wanhive.iot.protocol.hosts;
 import com.wanhive.iot.protocol.bean.NameInfo;
 
 /**
- * Wanhive hosts manager interface
+ * Wanhive's hosts manager interface
  * 
  * @author amit
  *

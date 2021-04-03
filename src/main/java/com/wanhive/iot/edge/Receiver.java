@@ -1,7 +1,7 @@
 /*
  * Receiver.java
  * 
- * The incoming message processor
+ * The incoming message processor interface
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -26,7 +26,7 @@ package com.wanhive.iot.edge;
 import com.wanhive.iot.protocol.Message;
 
 /**
- * The incoming message processor
+ * The incoming message processor interface
  * 
  * @author amit
  *

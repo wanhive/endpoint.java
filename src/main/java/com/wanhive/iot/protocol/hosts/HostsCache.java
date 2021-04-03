@@ -27,7 +27,7 @@ package com.wanhive.iot.protocol.hosts;
 import java.io.IOException;
 
 /**
- * Cache of wanhive host identifiers
+ * Cache of the host identifiers
  * 
  * @author amit
  *

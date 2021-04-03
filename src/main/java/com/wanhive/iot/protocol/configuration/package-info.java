@@ -20,10 +20,10 @@
  */
 
 /**
- * Configuration management
+ * Application data management
  */
 /**
- * Routines for reading and writing application data from-and-to the filesystem.
+ * Routines for application data management.
  * 
  * @author amit
  *

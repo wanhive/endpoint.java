@@ -23,8 +23,7 @@
  * Endpoint profiles
  */
 /**
- * The reference implementation of endpoint profiles that can be saved to and
- * loaded from the local filesystem.
+ * The reference implementation of endpoint profiles
  * 
  * @author amit
  *

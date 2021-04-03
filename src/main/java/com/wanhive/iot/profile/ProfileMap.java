@@ -1,7 +1,7 @@
 /*
  * ProfileMap.java
  * 
- * Record keeper of the endpoint profiles
+ * Endpoint profiles manager
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.wanhive.iot.protocol.configuration.ObjectSerializer;
 
 /**
- * Record keeper of the endpoint profiles
+ * Endpoint profiles manager
  * 
  * @author amit
  *
@@ -44,8 +44,8 @@ public class ProfileMap {
 	/**
 	 * Constructor
 	 * 
-	 * @param pathname Pathname of the file containing the profiles. If the file
-	 *                 doesn't exist then an empty ProfileMap is created.
+	 * @param pathname Pathname of the file containing the endpoint profiles. If the
+	 *                 file doesn't exist then an empty ProfileMap is created.
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 * @throws FileNotFoundException
@@ -59,7 +59,7 @@ public class ProfileMap {
 	}
 
 	/**
-	 * Reads the profiles from the file system.
+	 * Reads the endpoint profiles from the file system.
 	 * 
 	 * @throws IOException
 	 * @throws ClassNotFoundException
@@ -76,7 +76,7 @@ public class ProfileMap {
 	}
 
 	/**
-	 * Returns a map containing all the profiles
+	 * Returns a Map of the profiles
 	 * 
 	 * @return The profiles Map
 	 */
@@ -85,7 +85,7 @@ public class ProfileMap {
 	}
 
 	/**
-	 * Writes the profiles to the file system
+	 * Writes the endpoint profiles to the file system
 	 * 
 	 * @throws IOException
 	 * @throws FileNotFoundException

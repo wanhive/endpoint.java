@@ -41,7 +41,7 @@ import java.util.NoSuchElementException;
 import com.wanhive.iot.protocol.bean.NameInfo;
 
 /**
- * Reference implementation of the Wanhive hosts manager.
+ * Reference implementation of the hosts manager.
  * 
  * @author amit
  *
