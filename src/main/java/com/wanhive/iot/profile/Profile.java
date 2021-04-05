@@ -1,7 +1,7 @@
 /*
  * Profile.java
  * 
- * Endpoint profile manager
+ * Endpoint profile
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -40,7 +40,7 @@ public class Profile extends Identity {
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
-	 * Remote end point identifier
+	 * Remote endpoint identifier
 	 */
 	private final AtomicLong id = new AtomicLong();
 	/**
@@ -52,26 +52,56 @@ public class Profile extends Identity {
 	 */
 	private Serializable reference;
 
+	/**
+	 * Returns this profile's remote endpoint identifier
+	 * 
+	 * @return The remote endpoint identifier
+	 */
 	public long getId() {
 		return id.get();
 	}
 
+	/**
+	 * Sets this profile's remote endpoint identifier
+	 * 
+	 * @param id Remote endpoint's identifier
+	 */
 	public void setId(long id) {
 		this.id.set(id);
 	}
 
+	/**
+	 * Returns this profile's name
+	 * 
+	 * @return This profile's name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Sets this profile's name
+	 * 
+	 * @param name The desired name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Returns the serializable object attached to this profile
+	 * 
+	 * @return This profile's attachment
+	 */
 	public Serializable getReference() {
 		return reference;
 	}
 
+	/**
+	 * Attaches a serializable object to this profile
+	 * 
+	 * @param reference The serializable attachment for this profile
+	 */
 	public void setReference(Serializable reference) {
 		this.reference = reference;
 	}

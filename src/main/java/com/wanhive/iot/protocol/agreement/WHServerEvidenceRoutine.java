@@ -1,7 +1,7 @@
 /*
  * WHServerEvidenceRoutine.java
  * 
- * Customized SRP-6a class for generating host's proof
+ * SRP-6a routine for generating host's proof
  * 
  * This program is part of Wanhive IoT Platform.
  * 

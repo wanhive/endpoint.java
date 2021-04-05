@@ -24,7 +24,7 @@
 package com.wanhive.iot.profile;
 
 /**
- * Loads an endpoint profile and executes it
+ * The runtime controller of the endpoint profiles.
  * 
  * @author amit
  *
@@ -47,22 +47,22 @@ public interface ProfileController {
 	/**
 	 * Creates and executes the endpoint associated with the given profile
 	 * 
-	 * @param profile The endpoint's profile
+	 * @param profile The endpoint profile
 	 */
 	void start(Profile profile);
 
 	/**
-	 * Stops the execution of the endpoint associated with the given profile
+	 * Stops execution of the endpoint associated with the given profile
 	 * 
-	 * @param profile The endpoint's profile
+	 * @param profile The endpoint profile
 	 */
 	void stop(Profile profile);
 
 	/**
-	 * Checks whether an endpoint with given profile is running
+	 * Checks whether an endpoint with the given profile is running
 	 * 
-	 * @param profile The endpoint's profile
-	 * @return Returns true if an endpoint associated with the profile is running,
+	 * @param profile The endpoint profile to check
+	 * @return true if an endpoint associated with the given profile is running,
 	 *         false otherwise.
 	 */
 	boolean isActive(Profile profile);

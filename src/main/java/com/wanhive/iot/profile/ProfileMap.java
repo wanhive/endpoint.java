@@ -76,7 +76,7 @@ public class ProfileMap {
 	}
 
 	/**
-	 * Returns a Map of the profiles
+	 * Returns a Map containing the endpoint profiles
 	 * 
 	 * @return The profiles Map
 	 */

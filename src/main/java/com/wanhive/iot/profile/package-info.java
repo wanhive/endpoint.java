@@ -23,7 +23,7 @@
  * Endpoint profiles
  */
 /**
- * The reference implementation of endpoint profiles
+ * The reference implementation of the endpoint profiles
  * 
  * @author amit
  *

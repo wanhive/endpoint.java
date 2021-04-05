@@ -20,10 +20,10 @@
  */
 
 /**
- * IO engine
+ * Endpoint executor
  */
 /**
- * The Wanhive IoT endpoint executor.
+ * The execution engine for the Wanhive client applications.
  * 
  * @author amit
  *

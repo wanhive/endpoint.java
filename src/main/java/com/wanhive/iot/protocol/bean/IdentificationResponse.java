@@ -40,18 +40,38 @@ public class IdentificationResponse {
 	 */
 	private byte[] salt;
 
+	/**
+	 * Returns the nonce
+	 * 
+	 * @return A byte array containing the nonce
+	 */
 	public byte[] getNonce() {
 		return nonce;
 	}
 
+	/**
+	 * Sets the nonce
+	 * 
+	 * @param nonce A byte array containing the nonce
+	 */
 	public void setNonce(byte[] nonce) {
 		this.nonce = nonce;
 	}
 
+	/**
+	 * Returns the salt
+	 * 
+	 * @return A byte array containing the salt
+	 */
 	public byte[] getSalt() {
 		return salt;
 	}
 
+	/**
+	 * Sets the salt
+	 * 
+	 * @param salt A byte array containing the salt
+	 */
 	public void setSalt(byte[] salt) {
 		this.salt = salt;
 	}

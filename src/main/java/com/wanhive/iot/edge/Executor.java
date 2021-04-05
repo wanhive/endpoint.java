@@ -1,7 +1,7 @@
 /*
  * Executor.java
  * 
- * The IO engine for Wanhive IoT endpoints
+ * Executes a Wanhive client application
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -32,9 +32,9 @@ import com.wanhive.iot.protocol.Client;
 import com.wanhive.iot.protocol.Message;
 
 /**
- * Bounded queue based threaded executor for the Wanhive IoT endpoints.
- * Maintains two separate queues, one for the outgoing messages and another one
- * for the incoming messages.
+ * Threaded executor for the Wanhive client applications. Maintains two separate
+ * bounded queues, one for the outgoing messages and another one for the
+ * incoming messages.
  * 
  * @author amit
  *

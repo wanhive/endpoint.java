@@ -1,7 +1,7 @@
 /*
  * WHClientEvidenceRoutine.java
  * 
- * Customized SRP-6a class for generating client's proof
+ * SRP-6a routine for generating client's proof
  * 
  * This program is part of Wanhive IoT Platform.
  * 
