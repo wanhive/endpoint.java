@@ -1,6 +1,6 @@
 # Wanhive EndPoint
 
-The IoT endpoint development library in the Java programming language.
+The IoT endpoint development library written in Java.
 
 This package is part of the Wanhive IoT Platform.
 
