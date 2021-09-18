@@ -32,9 +32,9 @@ import com.wanhive.iot.protocol.Client;
 import com.wanhive.iot.protocol.Message;
 
 /**
- * Threaded executor for the Wanhive client applications. Maintains two separate
- * bounded queues, one for the outgoing messages and another one for the
- * incoming messages.
+ * Threaded executor for the Wanhive client applications. Uses two bounded
+ * queues, one for the outgoing messages and another one for the incoming
+ * messages.
  * 
  * @author amit
  *
@@ -75,8 +75,8 @@ public class Executor implements Runnable, AutoCloseable {
 	 * Creates an Executor that stores the incoming messages in a bounded queue.
 	 * 
 	 * @param client      The Client to use for communication
-	 * @param inCapacity  The capacity of the incoming messages queue
-	 * @param outCapacity The capacity of the outgoing messages queue
+	 * @param inCapacity  Incoming messages queue's capacity
+	 * @param outCapacity Outgoing messages queue's capacity
 	 */
 	public Executor(Client client, int inCapacity, int outCapacity) {
 		this.client = client;
@@ -85,11 +85,11 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Creates an Executor that forwards the incoming messages to a Receiver.
+	 * Creates an Executor that uses a Receiver to process the incoming messages.
 	 * 
 	 * @param client      The Client to use for communication
 	 * @param receiver    The Receiver of the incoming messages
-	 * @param outCapacity The capacity of the outgoing messages queue
+	 * @param outCapacity Outgoing messages queue's capacity
 	 */
 	public Executor(Client client, Receiver receiver, int outCapacity) {
 		this.client = client;
@@ -100,7 +100,7 @@ public class Executor implements Runnable, AutoCloseable {
 
 	/**
 	 * Assigns a Client to this Executor. The existing Client is replaced, but not
-	 * closed. Fails if the Executor is running.
+	 * closed. Fails if the Executor is already running.
 	 * 
 	 * @param client The Client to use with this Executor
 	 */
@@ -114,8 +114,8 @@ public class Executor implements Runnable, AutoCloseable {
 
 	/**
 	 * Assigns a Receiver for processing the incoming messages. Fails if the
-	 * Executor is running. Also fails if the Executor was created with an incoming
-	 * messages queue.
+	 * Executor is already running. Also fails if the Executor was created with an
+	 * incoming messages queue.
 	 * 
 	 * @param receiver The Receiver to use
 	 */
@@ -132,7 +132,7 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Tries to put a message into the outgoing queue
 	 * 
-	 * @param message Message to send out
+	 * @param message The outgoing message
 	 * @return true on success, false otherwise
 	 */
 	public boolean offer(Message message) {
@@ -142,7 +142,7 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Puts a message into the outgoing queue
 	 * 
-	 * @param message Message to send out
+	 * @param message The outgoing message
 	 * @throws InterruptedException
 	 */
 	public void put(Message message) throws InterruptedException {
@@ -150,9 +150,10 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Returns true if the incoming queue contains at least one message
+	 * Returns true if the incoming queue is not empty
 	 * 
-	 * @return true if the incoming queue is not empty, false otherwise
+	 * @return true if the incoming queue contains at least one message, false
+	 *         otherwise
 	 */
 	public boolean hasIncomingMessage() {
 		return (in != null) && !in.isEmpty();
@@ -161,7 +162,7 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Returns a message from the incoming queue
 	 * 
-	 * @return A message from the incoming queue
+	 * @return An incoming message
 	 * @throws InterruptedException
 	 */
 	public Message take() throws InterruptedException {
@@ -173,7 +174,7 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Checks whether this Executor is in the running state
+	 * Returns the "running" state of the Executor
 	 * 
 	 * @return true if the Executor is running, false otherwise
 	 */
