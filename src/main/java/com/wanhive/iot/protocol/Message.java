@@ -566,4 +566,21 @@ public class Message {
 			buffer.position(p);
 		}
 	}
+
+	/**
+	 * Returns the number of messages required for carrying the given bytes of data
+	 * as payload
+	 * 
+	 * @param bytes Data size in bytes
+	 * @return Message count
+	 */
+	public static long packets(int bytes) {
+		if (bytes < 0) {
+			throw new IllegalArgumentException(BAD_MSG_LENGTH);
+		} else if (bytes <= PAYLOAD_SIZE) {
+			return 1;
+		} else {
+			return ((long) bytes + PAYLOAD_SIZE - 1) / PAYLOAD_SIZE;
+		}
+	}
 }
