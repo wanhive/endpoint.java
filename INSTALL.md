@@ -25,7 +25,7 @@ To use the installed library in a maven project, add the following dependency to
 		<dependency>
 			<groupId>com.wanhive.iot</groupId>
 			<artifactId>wanhive-endpoint</artifactId>
-			<version>0.8.0</version>
+			<version>0.9.0</version>
 		</dependency>
 ```
 
