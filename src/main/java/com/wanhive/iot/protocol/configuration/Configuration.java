@@ -48,12 +48,8 @@ public class Configuration {
 	 * @throws ConfigurationException
 	 */
 	public static INIConfiguration get(String pathname, char listDelimiter) throws ConfigurationException {
-		FileBasedConfigurationBuilder<INIConfiguration> builder = new FileBasedConfigurationBuilder<INIConfiguration>(
-				INIConfiguration.class)
-						.configure(new Parameters().properties().setFileName(pathname).setThrowExceptionOnMissing(true)
-								.setListDelimiterHandler(new DefaultListDelimiterHandler(listDelimiter)));
-		INIConfiguration config = builder.getConfiguration();
-		return config;
+		File file = new File(pathname);
+		return get(file, listDelimiter);
 	}
 
 	/**
