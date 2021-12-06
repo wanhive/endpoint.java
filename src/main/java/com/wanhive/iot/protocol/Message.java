@@ -38,27 +38,18 @@ import com.wanhive.iot.protocol.bean.MessageHeader;
  *
  */
 public class Message {
-	private static final String BAD_MSG_LENGTH = "Invalid message length";
 	/**
 	 * Stores the raw message data
 	 */
 	private final ByteBuffer buffer;
 	/**
-	 * The payload handler
+	 * The header structure
+	 */
+	private final Header header;
+	/**
+	 * The payload structure
 	 */
 	private final Payload payload;
-	/**
-	 * The maximum message size in bytes
-	 */
-	public static final int MTU = 1024;
-	/**
-	 * Message header size in bytes
-	 */
-	public static final int HEADER_SIZE = MessageHeader.SIZE;
-	/**
-	 * The maximum payload size in bytes
-	 */
-	public static final int PAYLOAD_SIZE = (MTU - HEADER_SIZE);
 
 	/**
 	 * Returns the backing array that stores the message data
@@ -70,23 +61,14 @@ public class Message {
 	}
 
 	/**
-	 * Returns true if the given value is a valid message length
-	 * 
-	 * @param length The message length to validate
-	 * @return true if the length is valid, false otherwise
-	 */
-	public static boolean isValidLength(int length) {
-		return length >= HEADER_SIZE && length <= MTU;
-	}
-
-	/**
 	 * Create a new message. MTU is the default message length.
 	 */
 	public Message() {
-		buffer = ByteBuffer.allocate(MTU);
-		payload = new Payload(buffer, HEADER_SIZE);
-		setLength((short) MTU);
-		setLabel(0);
+		buffer = ByteBuffer.allocate(Packet.MTU);
+		header = new Header(buffer);
+		payload = new Payload(buffer, Packet.HEADER_SIZE);
+		header.setLength((short) Packet.MTU);
+		header.setLabel(0);
 	}
 
 	/**
@@ -98,9 +80,10 @@ public class Message {
 	 * @return This message
 	 */
 	public Message prepareHeader(MessageAddress address, MessageControl ctrl, MessageContext ctx) {
-		return this.setLength(ctrl.getLength()).setSource(address.getSource()).setDestination(address.getDestination())
+		header().setLength(ctrl.getLength()).setSource(address.getSource()).setDestination(address.getDestination())
 				.setSequenceNumber(ctrl.getSequenceNumber()).setSession(ctrl.getSession()).setCommand(ctx.getCommand())
 				.setQualifier(ctx.getQualifier()).setStatus(ctx.getStatus());
+		return this;
 	}
 
 	/**
@@ -113,7 +96,9 @@ public class Message {
 	 * @return this message
 	 */
 	public Message prepareHeader(long label, MessageAddress address, MessageControl ctrl, MessageContext ctx) {
-		return this.prepareHeader(address, ctrl, ctx).setLabel(label);
+		prepareHeader(address, ctrl, ctx);
+		header().setLabel(label);
+		return this;
 	}
 
 	/**
@@ -127,232 +112,20 @@ public class Message {
 	}
 
 	/**
-	 * Deserializes and returns the message header
+	 * Returns the header
 	 * 
-	 * @param header This message's header data is copied here
+	 * @return This message's header
 	 */
-	public void getHeader(MessageHeader header) {
-		header.setLabel(getLabel());
-		header.getAddress().set(getSource(), getDestination());
-		header.getControl().set(getLength(), getSequenceNumber(), getSession());
-		header.getContext().set(getCommand(), getQualifier(), getStatus());
-	}
-
-	/**
-	 * Deserializes and returns the message header
-	 * 
-	 * @return The MessageHeader object containing this message's header
-	 */
-	public MessageHeader getHeader() {
-		MessageHeader header = new MessageHeader();
-		getHeader(header);
+	public Header header() {
 		return header;
 	}
 
 	/**
-	 * Returns the label
+	 * Returns the payload
 	 * 
-	 * @return Message's label
+	 * @return This message's payload
 	 */
-	public long getLabel() {
-		return buffer.getLong(0);
-	}
-
-	/**
-	 * Sets the label
-	 * 
-	 * @param label Message's label is set to the given value
-	 * @return This message
-	 */
-	public Message setLabel(long label) {
-		buffer.putLong(0, label);
-		return this;
-	}
-
-	/**
-	 * Returns the source identifier
-	 * 
-	 * @return Message's source identifier
-	 */
-	public long getSource() {
-		return buffer.getLong(8);
-	}
-
-	/**
-	 * Sets the source identifier
-	 * 
-	 * @param source Message's source identifier is set to the given value
-	 * @return This message
-	 */
-	public Message setSource(long source) {
-		buffer.putLong(8, source);
-		return this;
-	}
-
-	/**
-	 * Returns the destination identifier
-	 * 
-	 * @return Message's destination identifier
-	 */
-	public long getDestination() {
-		return buffer.getLong(16);
-	}
-
-	/**
-	 * Sets the destination identifier
-	 * 
-	 * @param destination Message's destination identifier is set to the given
-	 *                    value.
-	 * @return This message
-	 */
-	public Message setDestination(long destination) {
-		buffer.putLong(16, destination);
-		return this;
-	}
-
-	/**
-	 * Returns message's length in bytes
-	 * 
-	 * @return The message length
-	 */
-	public short getLength() {
-		return buffer.getShort(24);
-	}
-
-	/**
-	 * Sets the message length in bytes
-	 * 
-	 * @param length Message's length is set to this value
-	 * @return This message
-	 */
-	public Message setLength(short length) {
-		if (isValidLength(length)) {
-			buffer.limit(length);
-			buffer.putShort(24, length);
-			return this;
-		} else {
-			throw new IllegalArgumentException(BAD_MSG_LENGTH);
-		}
-	}
-
-	/**
-	 * Returns the sequence number
-	 * 
-	 * @return Message's sequence number
-	 */
-	public short getSequenceNumber() {
-		return buffer.getShort(26);
-	}
-
-	/**
-	 * Sets the sequence number
-	 * 
-	 * @param sequenceNumber Message's sequence number is set to the given value
-	 * @return This message
-	 */
-	public Message setSequenceNumber(short sequenceNumber) {
-		buffer.putShort(26, sequenceNumber);
-		return this;
-	}
-
-	/**
-	 * Returns the session identifier
-	 * 
-	 * @return Message's session identifier
-	 */
-	public byte getSession() {
-		return buffer.get(28);
-	}
-
-	/**
-	 * Sets the session identifier
-	 * 
-	 * @param session Message's session identifier is set to the given value
-	 * @return This message
-	 */
-	public Message setSession(byte session) {
-		buffer.put(28, session);
-		return this;
-	}
-
-	/**
-	 * Returns the command classifier
-	 * 
-	 * @return Message's command classifier
-	 */
-	public byte getCommand() {
-		return buffer.get(29);
-	}
-
-	/**
-	 * Sets the command classifier
-	 * 
-	 * @param command Message's command classifier is set to the given value
-	 * @return This message
-	 */
-	public Message setCommand(byte command) {
-		buffer.put(29, command);
-		return this;
-	}
-
-	/**
-	 * Returns the command qualifier
-	 * 
-	 * @return Message's command qualifier
-	 */
-	public byte getQualifier() {
-		return buffer.get(30);
-	}
-
-	/**
-	 * Sets the command qualifier
-	 * 
-	 * @param qualifier Message's command qualifier is set to the given value
-	 * @return This message
-	 */
-	public Message setQualifier(byte qualifier) {
-		buffer.put(30, qualifier);
-		return this;
-	}
-
-	/**
-	 * Returns the request/response status code
-	 * 
-	 * @return Message's status code
-	 */
-	public byte getStatus() {
-		return buffer.get(31);
-	}
-
-	/**
-	 * Sets the request/response status code
-	 * 
-	 * @param status Message's status code is set to the given value
-	 * @return This message
-	 */
-	public Message setStatus(byte status) {
-		buffer.put(31, status);
-		return this;
-	}
-
-	public Payload getPayload() {
+	public Payload payload() {
 		return this.payload;
-	}
-
-	/**
-	 * Returns the number of messages required for carrying the given bytes of data
-	 * as payload
-	 * 
-	 * @param bytes Data size in bytes
-	 * @return Message count
-	 */
-	public static long packets(int bytes) {
-		if (bytes < 0) {
-			throw new IllegalArgumentException(BAD_MSG_LENGTH);
-		} else if (bytes <= PAYLOAD_SIZE) {
-			return 1;
-		} else {
-			return ((long) bytes + PAYLOAD_SIZE - 1) / PAYLOAD_SIZE;
-		}
 	}
 }

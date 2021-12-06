@@ -52,7 +52,7 @@ public class Protocol {
 	 * @return true if the message matched the context, false otherwise
 	 */
 	public static boolean checkContext(Message message, byte command, byte qualifier) {
-		return (message.getCommand() == command && message.getQualifier() == qualifier);
+		return (message.header().getCommand() == command && message.header().getQualifier() == qualifier);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class Protocol {
 	 * @return true if the message matched the context, false otherwise
 	 */
 	public static boolean checkContext(Message message, byte command, byte qualifier, byte status) {
-		return checkContext(message, command, qualifier) && (message.getStatus() == status);
+		return checkContext(message, command, qualifier) && (message.header().getStatus() == status);
 	}
 
 	/**
@@ -145,15 +145,15 @@ public class Protocol {
 	 * @return A new identification request
 	 */
 	public Message createIdentificationRequest(long uid, final byte[] nonce) {
-		if (nonce == null || nonce.length == 0 || nonce.length > Message.PAYLOAD_SIZE) {
+		if (nonce == null || nonce.length == 0 || nonce.length > Packet.PAYLOAD_SIZE) {
 			throw new IllegalArgumentException(BAD_REQUEST);
 		} else {
 			Message message = new Message();
 			MessageAddress address = new MessageAddress(uid, 0);
-			MessageControl ctrl = new MessageControl((short) (Message.HEADER_SIZE + nonce.length), nextSequenceNumber(),
+			MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + nonce.length), nextSequenceNumber(),
 					getSession());
 			message.prepareHeader(address, ctrl, RequestContext.IDENTIFY);
-			message.getPayload().setBlob(0, nonce);
+			message.payload().setBlob(0, nonce);
 			return message;
 		}
 	}
@@ -166,20 +166,20 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public IdentificationResponse processIdentificationResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.IDENTIFY) || message.getSource() != 0) {
+		if (!checkContext(message, ResponseContext.IDENTIFY) || message.header().getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (message.getLength() <= Message.HEADER_SIZE + 4) {
+		} else if (message.header().getLength() <= Packet.HEADER_SIZE + 4) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
-			short saltLength = message.getPayload().getShort(0);
-			short nonceLength = message.getPayload().getShort(2);
-			if (saltLength <= 0 || nonceLength <= 0 || (saltLength + nonceLength + 4) > Message.PAYLOAD_SIZE) {
+			short saltLength = message.payload().getShort(0);
+			short nonceLength = message.payload().getShort(2);
+			if (saltLength <= 0 || nonceLength <= 0 || (saltLength + nonceLength + 4) > Packet.PAYLOAD_SIZE) {
 				throw new ProtocolException(BAD_RESPONSE);
 			}
 
 			IdentificationResponse response = new IdentificationResponse();
-			response.setSalt(message.getPayload().getBlob(4, saltLength));
-			response.setNonce(message.getPayload().getBlob(4 + saltLength, nonceLength));
+			response.setSalt(message.payload().getBlob(4, saltLength));
+			response.setNonce(message.payload().getBlob(4 + saltLength, nonceLength));
 			return response;
 		}
 	}
@@ -191,15 +191,15 @@ public class Protocol {
 	 * @return A new authentication request
 	 */
 	public Message createAuthenticationRequest(final byte[] proof) {
-		if (proof == null || proof.length == 0 || proof.length > Message.PAYLOAD_SIZE) {
+		if (proof == null || proof.length == 0 || proof.length > Packet.PAYLOAD_SIZE) {
 			throw new IllegalArgumentException(BAD_REQUEST);
 		} else {
 			Message message = new Message();
 			MessageAddress address = new MessageAddress(0, 0);
-			MessageControl ctrl = new MessageControl((short) (Message.HEADER_SIZE + proof.length), nextSequenceNumber(),
+			MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + proof.length), nextSequenceNumber(),
 					getSession());
 			message.prepareHeader(address, ctrl, RequestContext.AUTHENTICATE);
-			message.getPayload().setBlob(0, proof);
+			message.payload().setBlob(0, proof);
 			return message;
 		}
 	}
@@ -212,13 +212,13 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public byte[] processAuthenticationResponse(Message message) throws ProtocolException {
-		short msgLen = message.getLength();
-		if (!checkContext(message, ResponseContext.AUTHENTICATE) || message.getSource() != 0) {
+		short msgLen = message.header().getLength();
+		if (!checkContext(message, ResponseContext.AUTHENTICATE) || message.header().getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (msgLen <= Message.HEADER_SIZE) {
+		} else if (msgLen <= Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
-			return message.getPayload().getBlob(0, msgLen - Message.HEADER_SIZE);
+			return message.payload().getBlob(0, msgLen - Packet.HEADER_SIZE);
 		}
 	}
 
@@ -231,10 +231,10 @@ public class Protocol {
 	 * @return A new registration request
 	 */
 	public Message createRegisterRequest(long uid, byte[] hc) {
-		short length = Message.HEADER_SIZE;
+		short length = Packet.HEADER_SIZE;
 		Message message = new Message();
 		if (hc != null) {
-			message.getPayload().setBlob(0, hc);
+			message.payload().setBlob(0, hc);
 			length += (short) hc.length;
 		}
 		MessageAddress address = new MessageAddress(uid, 0);
@@ -251,9 +251,9 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public boolean processRegisterResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.REGISTER) || message.getSource() != 0) {
+		if (!checkContext(message, ResponseContext.REGISTER) || message.header().getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (message.getLength() != Message.HEADER_SIZE) {
+		} else if (message.header().getLength() != Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
 			return true;
@@ -267,10 +267,10 @@ public class Protocol {
 	 * @return A new session key request
 	 */
 	public Message createGetKeyRequest(byte[] hc) {
-		short length = Message.HEADER_SIZE;
+		short length = Packet.HEADER_SIZE;
 		Message message = new Message();
 		if (hc != null) {
-			message.getPayload().setBlob(0, hc);
+			message.payload().setBlob(0, hc);
 			length += (short) hc.length;
 		}
 		MessageAddress address = new MessageAddress(0, 0);
@@ -287,15 +287,15 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public byte[] processGetKeyResponse(Message message) throws ProtocolException {
-		short msgLen = message.getLength();
-		if (!checkContext(message, ResponseContext.GETKEY) || message.getSource() != 0) {
+		short msgLen = message.header().getLength();
+		if (!checkContext(message, ResponseContext.GETKEY) || message.header().getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (msgLen <= Message.HEADER_SIZE) {
+		} else if (msgLen <= Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (msgLen == (Message.HEADER_SIZE + 64)) {
-			return message.getPayload().getBlob(0, 64);
-		} else if (msgLen == (Message.HEADER_SIZE + 128)) {
-			return message.getPayload().getBlob(64, 64);
+		} else if (msgLen == (Packet.HEADER_SIZE + 64)) {
+			return message.payload().getBlob(0, 64);
+		} else if (msgLen == (Packet.HEADER_SIZE + 128)) {
+			return message.payload().getBlob(64, 64);
 		} else {
 			throw new ProtocolException(BAD_RESPONSE);
 		}
@@ -311,9 +311,9 @@ public class Protocol {
 	public Message createFindRootRequest(long uid) {
 		Message message = new Message();
 		MessageAddress address = new MessageAddress(0, 0);
-		MessageControl ctrl = new MessageControl((short) (Message.HEADER_SIZE + 8), nextSequenceNumber(), getSession());
+		MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + 8), nextSequenceNumber(), getSession());
 		message.prepareHeader(address, ctrl, RequestContext.FINDROOT);
-		message.getPayload().setLong(0, uid);
+		message.payload().setLong(0, uid);
 		return message;
 	}
 
@@ -325,12 +325,12 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public long processFindRootResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.FINDROOT) || message.getSource() != 0) {
+		if (!checkContext(message, ResponseContext.FINDROOT) || message.header().getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (message.getLength() != (Message.HEADER_SIZE + 16)) {
+		} else if (message.header().getLength() != (Packet.HEADER_SIZE + 16)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
-			return message.getPayload().getLong(8);
+			return message.payload().getLong(8);
 		}
 	}
 
@@ -345,10 +345,10 @@ public class Protocol {
 	public Message createPublishRequest(byte topic, byte[] payload) {
 		Message message = new Message();
 		MessageAddress address = new MessageAddress(0, 0);
-		MessageControl ctrl = new MessageControl((short) (Message.HEADER_SIZE + (payload == null ? 0 : payload.length)),
+		MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + (payload == null ? 0 : payload.length)),
 				nextSequenceNumber(), topic);
 		message.prepareHeader(address, ctrl, RequestContext.PUBLISH);
-		message.getPayload().setBlob(0, payload);
+		message.payload().setBlob(0, payload);
 		return message;
 	}
 
@@ -361,7 +361,7 @@ public class Protocol {
 	public Message createSubscribeRequest(byte topic) {
 		Message message = new Message();
 		MessageAddress address = new MessageAddress(0, 0);
-		MessageControl ctrl = new MessageControl((short) Message.HEADER_SIZE, nextSequenceNumber(), topic);
+		MessageControl ctrl = new MessageControl((short) Packet.HEADER_SIZE, nextSequenceNumber(), topic);
 		message.prepareHeader(address, ctrl, RequestContext.SUBSCRIBE);
 		return message;
 	}
@@ -374,12 +374,12 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public byte processSubscribeResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.SUBSCRIBE) || message.getSource() != 0) {
+		if (!checkContext(message, ResponseContext.SUBSCRIBE) || message.header().getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (message.getLength() != Message.HEADER_SIZE) {
+		} else if (message.header().getLength() != Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
-			return message.getSession();
+			return message.header().getSession();
 		}
 	}
 
@@ -392,7 +392,7 @@ public class Protocol {
 	public Message createUnsubscribeRequest(byte topic) {
 		Message message = new Message();
 		MessageAddress address = new MessageAddress(0, 0);
-		MessageControl ctrl = new MessageControl((short) Message.HEADER_SIZE, nextSequenceNumber(), topic);
+		MessageControl ctrl = new MessageControl((short) Packet.HEADER_SIZE, nextSequenceNumber(), topic);
 		message.prepareHeader(address, ctrl, RequestContext.UNSUBSCRIBE);
 		return message;
 	}
@@ -405,12 +405,12 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public byte processUnsubscribeResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.UNSUBSCRIBE) || message.getSource() != 0) {
+		if (!checkContext(message, ResponseContext.UNSUBSCRIBE) || message.header().getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (message.getLength() != Message.HEADER_SIZE) {
+		} else if (message.header().getLength() != Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
-			return message.getSession();
+			return message.header().getSession();
 		}
 	}
 }

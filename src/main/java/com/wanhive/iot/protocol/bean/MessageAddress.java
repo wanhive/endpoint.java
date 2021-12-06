@@ -1,7 +1,7 @@
 /*
  * MessageAddress.java
  * 
- * Message address structure
+ * The message address structure
  * 
  * This program is part of Wanhive IoT Platform.
  * 

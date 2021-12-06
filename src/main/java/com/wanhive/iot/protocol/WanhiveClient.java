@@ -146,8 +146,8 @@ public class WanhiveClient implements Client {
 
 	@Override
 	public void send(Message message) throws IOException {
-		int messageLength = message.getLength();
-		if (Message.isValidLength(messageLength)) {
+		int messageLength = message.header().getLength();
+		if (Packet.isValidLength(messageLength)) {
 			OutputStream out = socket.getOutputStream();
 			out.write(message.getBuffer(), 0, messageLength);
 		} else {
@@ -160,16 +160,16 @@ public class WanhiveClient implements Client {
 		Message message = new Message();
 
 		InputStream in = socket.getInputStream();
-		int bytes = in.read(message.getBuffer(), 0, Message.HEADER_SIZE);
-		if (bytes != Message.HEADER_SIZE) {
+		int bytes = in.read(message.getBuffer(), 0, Packet.HEADER_SIZE);
+		if (bytes != Packet.HEADER_SIZE) {
 			throw new EOFException(BAD_CONNECTION);
 		}
 
-		int messageLength = message.getLength();
-		if (!Message.isValidLength(messageLength)) {
+		short messageLength = message.header().getLength();
+		if (!Packet.isValidLength(messageLength)) {
 			throw new ProtocolException(BAD_MESSAGE);
-		} else if (messageLength > Message.HEADER_SIZE) {
-			bytes += in.read(message.getBuffer(), bytes, messageLength - Message.HEADER_SIZE);
+		} else if (messageLength > Packet.HEADER_SIZE) {
+			bytes += in.read(message.getBuffer(), bytes, messageLength - Packet.HEADER_SIZE);
 			if (bytes != messageLength) {
 				throw new EOFException(BAD_CONNECTION);
 			}
@@ -178,14 +178,15 @@ public class WanhiveClient implements Client {
 		}
 
 		// Make the message internally consistent and return
-		return message.setLength(message.getLength());
+		message.header().setLength(messageLength);
+		return message;
 	}
 
 	@Override
 	public Message receive(short sequenceNumber) throws IOException {
 		while (true) {
 			Message message = receive();
-			if (sequenceNumber == 0 || message.getSequenceNumber() == sequenceNumber) {
+			if (sequenceNumber == 0 || message.header().getSequenceNumber() == sequenceNumber) {
 				return message;
 			} else {
 				continue;
@@ -195,7 +196,7 @@ public class WanhiveClient implements Client {
 
 	@Override
 	public Message execute(Message request) throws IOException {
-		short sn = request.getSequenceNumber();
+		short sn = request.header().getSequenceNumber();
 		send(request);
 		return receive(sn);
 	}

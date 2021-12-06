@@ -1,7 +1,7 @@
 /*
  * MessageHeader.java
  * 
- * Message header
+ * The message header structure
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -25,7 +25,7 @@
 package com.wanhive.iot.protocol.bean;
 
 /**
- * Fixed size message header compliant with the Wanhive protocol
+ * The message header structure
  * 
  * @author amit
  *
@@ -47,11 +47,6 @@ public final class MessageHeader {
 	 * Message context
 	 */
 	private final MessageContext context;
-
-	/**
-	 * The message header size in bytes
-	 */
-	public static final int SIZE = 32;
 
 	public MessageHeader() {
 		this.label = 0;

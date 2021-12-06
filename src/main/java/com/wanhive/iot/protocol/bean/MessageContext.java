@@ -1,7 +1,7 @@
 /*
  * MessageContext.java
  * 
- * Message context structure
+ * The message context structure
  * 
  * This program is part of Wanhive IoT Platform.
  * 

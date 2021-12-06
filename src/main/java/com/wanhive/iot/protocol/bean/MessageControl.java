@@ -1,7 +1,7 @@
 /*
  * MessageControl.java
  * 
- * Message flow control structure
+ * The message flow control structure
  * 
  * This program is part of Wanhive IoT Platform.
  * 
