@@ -36,45 +36,32 @@ public final class MessageHeader {
 	 */
 	private long label;
 	/**
-	 * The source identifier
+	 * Message address
 	 */
-	private long source;
+	private final MessageAddress address;
 	/**
-	 * The destination identifier
+	 * Message flow control
 	 */
-	private long destination;
+	private final MessageControl control;
 	/**
-	 * The total message length in bytes (including the header)
+	 * Message context
 	 */
-	private short length;
-	/**
-	 * The message sequence number
-	 */
-	private short sequenceNumber;
-	/**
-	 * The session or topic identifier
-	 */
-	private byte session;
-	/**
-	 * The command classifier
-	 */
-	private byte command;
-	/**
-	 * The command qualifier
-	 */
-	private byte qualifier;
-	/**
-	 * The status code
-	 */
-	private byte status;
+	private final MessageContext context;
 
 	/**
 	 * The message header size in bytes
 	 */
 	public static final int SIZE = 32;
 
+	public MessageHeader() {
+		this.label = 0;
+		this.address = new MessageAddress();
+		this.control = new MessageControl();
+		this.context = new MessageContext();
+	}
+
 	/**
-	 * The getter for label identifier
+	 * Returns the label
 	 * 
 	 * @return The label identifier
 	 */
@@ -83,155 +70,73 @@ public final class MessageHeader {
 	}
 
 	/**
-	 * The setter for label identifier
+	 * Sets the label
 	 * 
-	 * @param label The label identifier will be set to this value
+	 * @param label The label identifier
 	 */
 	public void setLabel(long label) {
 		this.label = label;
 	}
 
 	/**
-	 * The getter for source identifier
+	 * Returns the message address structure
 	 * 
-	 * @return The source identifier
+	 * @return The MessageAddress object
 	 */
-	public long getSource() {
-		return source;
+	public MessageAddress getAddress() {
+		return address;
 	}
 
 	/**
-	 * The setter for source identifier
+	 * Returns the message flow control structure
 	 * 
-	 * @param The source identifier will be set to this value
+	 * @return The MessageControl object
 	 */
-	public void setSource(long source) {
-		this.source = source;
+	public MessageControl getControl() {
+		return control;
 	}
 
 	/**
-	 * The getter for destination identifier
+	 * Returns the message context structure
 	 * 
-	 * @return The destination identifier
+	 * @return The MessageContext object
 	 */
-	public long getDestination() {
-		return destination;
+	public MessageContext getContext() {
+		return context;
 	}
 
 	/**
-	 * The setter for destination identifier
+	 * Copies the message address information into this object
 	 * 
-	 * @param destination The destination identifier will be set to this value
+	 * @param address The MessageAddress object
+	 * @return This object
 	 */
-	public void setDestination(long destination) {
-		this.destination = destination;
+	public MessageHeader importAddress(MessageAddress address) {
+		getAddress().set(address.getSource(), address.getDestination());
+		return this;
 	}
 
 	/**
-	 * The getter for message length
+	 * Copies the message flow control information into this object
 	 * 
-	 * @return The message length
+	 * @param control The MessageControl object
+	 * @return This object
 	 */
-	public short getLength() {
-		return length;
+	public MessageHeader importControl(MessageControl control) {
+		getControl().setLength(control.getLength());
+		getControl().setSequenceNumber(control.getSequenceNumber());
+		getControl().setSession(control.getSession());
+		return this;
 	}
 
 	/**
-	 * The setter for message length
+	 * Copies the message context information into this object
 	 * 
-	 * @param length The message length in bytes
+	 * @param context The MessageContext object
+	 * @return This object
 	 */
-	public void setLength(short length) {
-		this.length = length;
-	}
-
-	/**
-	 * The getter for message's sequence number
-	 * 
-	 * @return The sequence number
-	 */
-	public short getSequenceNumber() {
-		return sequenceNumber;
-	}
-
-	/**
-	 * The setter for sequence number
-	 * 
-	 * @param sequenceNumber The sequence number will be set to this value
-	 */
-	public void setSequenceNumber(short sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
-	}
-
-	/**
-	 * The getter for message's session identifier
-	 * 
-	 * @return The session identifier
-	 */
-	public byte getSession() {
-		return session;
-	}
-
-	/**
-	 * The setter for message's session identifier
-	 * 
-	 * @param session The session identifier will be set to this value
-	 */
-	public void setSession(byte session) {
-		this.session = session;
-	}
-
-	/**
-	 * The getter for the command classifier
-	 * 
-	 * @return The command classifier
-	 */
-	public byte getCommand() {
-		return command;
-	}
-
-	/**
-	 * The setter for the command classifier
-	 * 
-	 * @param command The command classifier will be set to this value
-	 */
-	public void setCommand(byte command) {
-		this.command = command;
-	}
-
-	/**
-	 * The getter for the command qualifier
-	 * 
-	 * @return The command qualifier
-	 */
-	public byte getQualifier() {
-		return qualifier;
-	}
-
-	/**
-	 * The setter for the command qualifier
-	 * 
-	 * @param qualifier The command qualifier will be set to this value
-	 */
-	public void setQualifier(byte qualifier) {
-		this.qualifier = qualifier;
-	}
-
-	/**
-	 * The getter for the request/response status code
-	 * 
-	 * @return The status code
-	 */
-	public byte getStatus() {
-		return status;
-	}
-
-	/**
-	 * The setter for the request/response status code
-	 * 
-	 * @param status The status code will be set to this value
-	 */
-	public void setStatus(byte status) {
-		this.status = status;
+	public MessageHeader importContext(MessageContext context) {
+		getContext().set(context.getCommand(), context.getQualifier(), context.getStatus());
+		return this;
 	}
 }

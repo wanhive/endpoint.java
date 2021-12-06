@@ -26,7 +26,9 @@ package com.wanhive.iot.protocol;
 
 import java.nio.ByteBuffer;
 
+import com.wanhive.iot.protocol.bean.MessageAddress;
 import com.wanhive.iot.protocol.bean.MessageContext;
+import com.wanhive.iot.protocol.bean.MessageControl;
 import com.wanhive.iot.protocol.bean.MessageHeader;
 
 /**
@@ -38,9 +40,13 @@ import com.wanhive.iot.protocol.bean.MessageHeader;
 public class Message {
 	private static final String BAD_MSG_LENGTH = "Invalid message length";
 	/**
-	 * Stores the message data
+	 * Stores the raw message data
 	 */
 	private final ByteBuffer buffer;
+	/**
+	 * The payload handler
+	 */
+	private final Payload payload;
 	/**
 	 * The maximum message size in bytes
 	 */
@@ -78,6 +84,7 @@ public class Message {
 	 */
 	public Message() {
 		buffer = ByteBuffer.allocate(MTU);
+		payload = new Payload(buffer, HEADER_SIZE);
 		setLength((short) MTU);
 		setLabel(0);
 	}
@@ -85,87 +92,38 @@ public class Message {
 	/**
 	 * Populates message's header. Doesn't modify the label.
 	 * 
-	 * @param source         Source identifier of this message
-	 * @param destination    Destination identifier of this message
-	 * @param length         Total length of this message in bytes
-	 * @param sequenceNumber Sequence number of this message
-	 * @param session        Session identifier of this message
-	 * @param command        Command classifier of this message
-	 * @param qualifier      Command qualifier of this message
-	 * @param status         Request/response status of this message
+	 * @param address The message address structure
+	 * @param ctrl    The message flow control structure
+	 * @param ctx     The message context
 	 * @return This message
 	 */
-	public Message prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
-			byte command, byte qualifier, byte status) {
-		return this.setLength(length).setSource(source).setDestination(destination).setSequenceNumber(sequenceNumber)
-				.setSession(session).setCommand(command).setQualifier(qualifier).setStatus(status);
-	}
-
-	/**
-	 * Populates message's header. Doesn't modify the label.
-	 * 
-	 * @param source         Source identifier of this message
-	 * @param destination    Destination identifier of this message
-	 * @param length         Total length of this message in bytes
-	 * @param sequenceNumber Sequence number of this message
-	 * @param session        Session identifier of this message
-	 * @param ctx            Context of this message
-	 * @return This message
-	 */
-	public Message prepareHeader(long source, long destination, short length, short sequenceNumber, byte session,
-			MessageContext ctx) {
-		return prepareHeader(source, destination, length, sequenceNumber, session, ctx.getCommand(), ctx.getQualifier(),
-				ctx.getStatus());
+	public Message prepareHeader(MessageAddress address, MessageControl ctrl, MessageContext ctx) {
+		return this.setLength(ctrl.getLength()).setSource(address.getSource()).setDestination(address.getDestination())
+				.setSequenceNumber(ctrl.getSequenceNumber()).setSession(ctrl.getSession()).setCommand(ctx.getCommand())
+				.setQualifier(ctx.getQualifier()).setStatus(ctx.getStatus());
 	}
 
 	/**
 	 * Populates message's header
 	 * 
-	 * @param label          Label of this message
-	 * @param source         Source identifier of this message
-	 * @param destination    Destination identifier of this message
-	 * @param length         Total length of this message in bytes
-	 * @param sequenceNumber Sequence number of this message
-	 * @param session        Session identifier of this message
-	 * @param command        Command classifier of this message
-	 * @param qualifier      Command qualifier of this message
-	 * @param status         Request/response status of this message
-	 * @return This message
+	 * @param label   Label of this message
+	 * @param address The message address structure
+	 * @param ctrl    The message flow control structure
+	 * @param ctx     The message context
+	 * @return this message
 	 */
-	public Message prepareHeader(long label, long source, long destination, short length, short sequenceNumber,
-			byte session, byte command, byte qualifier, byte status) {
-		return prepareHeader(source, destination, length, sequenceNumber, session, command, qualifier, status)
-				.setLabel(label);
+	public Message prepareHeader(long label, MessageAddress address, MessageControl ctrl, MessageContext ctx) {
+		return this.prepareHeader(address, ctrl, ctx).setLabel(label);
 	}
 
 	/**
-	 * Populates message's header
-	 * 
-	 * @param label          Label of this message
-	 * @param source         Source identifier of this message
-	 * @param destination    Destination identifier of this message
-	 * @param length         Total length of this message in bytes
-	 * @param sequenceNumber Sequence number of this message
-	 * @param session        Session identifier of this message
-	 * @param ctx            Context of this message
-	 * @return This message
-	 */
-	public Message prepareHeader(long label, long source, long destination, short length, short sequenceNumber,
-			byte session, MessageContext ctx) {
-		return prepareHeader(label, source, destination, length, sequenceNumber, session, ctx.getCommand(),
-				ctx.getQualifier(), ctx.getStatus());
-	}
-
-	/**
-	 * Populates message's header
+	 * Populates this message's header
 	 * 
 	 * @param header Desired message header
 	 * @return This message
 	 */
 	public Message prepareHeader(MessageHeader header) {
-		return prepareHeader(header.getLabel(), header.getSource(), header.getDestination(), header.getLength(),
-				header.getSequenceNumber(), header.getSession(), header.getCommand(), header.getQualifier(),
-				header.getStatus());
+		return prepareHeader(header.getLabel(), header.getAddress(), header.getControl(), header.getContext());
 	}
 
 	/**
@@ -175,14 +133,9 @@ public class Message {
 	 */
 	public void getHeader(MessageHeader header) {
 		header.setLabel(getLabel());
-		header.setSource(getSource());
-		header.setDestination(getDestination());
-		header.setLength(getLength());
-		header.setSequenceNumber(getSequenceNumber());
-		header.setSession(getSession());
-		header.setCommand(getCommand());
-		header.setQualifier(getQualifier());
-		header.setStatus(getStatus());
+		header.getAddress().set(getSource(), getDestination());
+		header.getControl().set(getLength(), getSequenceNumber(), getSession());
+		header.getContext().set(getCommand(), getQualifier(), getStatus());
 	}
 
 	/**
@@ -382,189 +335,8 @@ public class Message {
 		return this;
 	}
 
-	/**
-	 * Reads a byte value from the payload at the given index
-	 * 
-	 * @param index The index from which the byte value will be read
-	 * @return The byte value at the given index
-	 */
-	public byte getByte(int index) {
-		return buffer.get(HEADER_SIZE + index);
-	}
-
-	/**
-	 * Writes a byte value at the given index in the payload
-	 * 
-	 * @param index The index at which the byte value will be written
-	 * @param value The byte value to write
-	 * @return This message
-	 */
-	public Message setByte(int index, byte value) {
-		buffer.put(HEADER_SIZE + index, value);
-		return this;
-	}
-
-	/**
-	 * Reads a char value from the payload at the given index
-	 * 
-	 * @param index The index from which the char value will be read
-	 * @return The char value at the given index
-	 */
-	public char getChar(int index) {
-		return buffer.getChar(HEADER_SIZE + index);
-	}
-
-	/**
-	 * Writes a char value at the given index in the payload
-	 * 
-	 * @param index The index at which the char value will be written
-	 * @param value The char value to write
-	 * @return This message
-	 */
-	public Message setChar(int index, char value) {
-		buffer.putChar(HEADER_SIZE + index, value);
-		return this;
-	}
-
-	/**
-	 * Reads a short value from the payload at the given index
-	 * 
-	 * @param index The index from which the short value will be read
-	 * @return The short value at the given index
-	 */
-	public short getShort(int index) {
-		return buffer.getShort(HEADER_SIZE + index);
-	}
-
-	/**
-	 * Writes a short value at the given index in the payload
-	 * 
-	 * @param index The index at which the short value will be written
-	 * @param value The short value to write
-	 * @return This message
-	 */
-	public Message setShort(int index, short value) {
-		buffer.putShort(HEADER_SIZE + index, value);
-		return this;
-	}
-
-	/**
-	 * Reads an int value from the payload at the given index
-	 * 
-	 * @param index The index from which the int value will be read
-	 * @return The int value at the given index
-	 */
-	public int getInt(int index) {
-		return buffer.getInt(HEADER_SIZE + index);
-	}
-
-	/**
-	 * Writes an int value at the given index in the payload
-	 * 
-	 * @param index The index at which the int value will be written
-	 * @param value The int value to write
-	 * @return This message
-	 */
-	public Message setInt(int index, int value) {
-		buffer.putInt(HEADER_SIZE + index, value);
-		return this;
-	}
-
-	/**
-	 * Reads a long value from the payload at the given index
-	 * 
-	 * @param index The index from which the short value will be read
-	 * @return The long value at the given index
-	 */
-	public long getLong(int index) {
-		return buffer.getLong(HEADER_SIZE + index);
-	}
-
-	/**
-	 * Writes a long value at the given index in the payload
-	 * 
-	 * @param index The index at which the long value will be written
-	 * @param value The long value to write
-	 * @return This message
-	 */
-	public Message setLong(int index, long value) {
-		buffer.putLong(HEADER_SIZE + index, value);
-		return this;
-	}
-
-	/**
-	 * Reads a double value from the payload at the given index
-	 * 
-	 * @param index The index from which the double value will be read
-	 * @return The double value at the given index
-	 */
-	public double getDouble(int index) {
-		return buffer.getDouble(HEADER_SIZE + index);
-	}
-
-	/**
-	 * Writes a double value at the given index in the payload
-	 * 
-	 * @param index The index at which the double value will be written
-	 * @param value The double value to write
-	 * @return This message
-	 */
-	public Message setDouble(int index, double value) {
-		buffer.putDouble(HEADER_SIZE + index, value);
-		return this;
-	}
-
-	/**
-	 * Reads a sequence of bytes value from the payload at the given index
-	 * 
-	 * @param index  The index from which the bytes will be read
-	 * @param length The number of bytes to read
-	 * @return The byte array at the given index
-	 */
-	public byte[] getBlob(int index, int length) {
-		int p = buffer.position();
-		try {
-			buffer.position(HEADER_SIZE + index);
-			byte[] blob = new byte[length];
-			buffer.get(blob);
-			return blob;
-		} finally {
-			buffer.position(p);
-		}
-	}
-
-	/**
-	 * Reads a sequence of bytes value from the payload at the given index
-	 * 
-	 * @param index The index from which the bytes will be read
-	 * @param blob  The byte array where the bytes will be copied
-	 */
-	public void getBlob(int index, byte[] blob) {
-		int p = buffer.position();
-		try {
-			buffer.position(HEADER_SIZE + index);
-			buffer.get(blob);
-		} finally {
-			buffer.position(p);
-		}
-	}
-
-	/**
-	 * Writes a sequence of bytes at the given index in the payload
-	 * 
-	 * @param index The index at which the bytes will be written
-	 * @param blob  The bytes to write
-	 * @return This message
-	 */
-	public Message setBlob(int index, byte[] blob) {
-		int p = buffer.position();
-		try {
-			buffer.position(HEADER_SIZE + index);
-			buffer.put(blob);
-			return this;
-		} finally {
-			buffer.position(p);
-		}
+	public Payload getPayload() {
+		return this.payload;
 	}
 
 	/**

@@ -1,7 +1,7 @@
 /*
  * MessageContext.java
  * 
- * The context of a request/response
+ * Message context structure
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -24,29 +24,90 @@
 package com.wanhive.iot.protocol.bean;
 
 /**
- * The context of a request/response
+ * The message context structure
  * 
  * @author amit
  *
  */
 public class MessageContext {
+	/**
+	 * Command ID
+	 */
 	private byte command;
+	/**
+	 * Qualifier ID
+	 */
 	private byte qualifier;
+	/**
+	 * Status code
+	 */
 	private byte status;
+
+	/**
+	 * The default constructor. Initializes all the fields to zero.
+	 */
+	public MessageContext() {
+		set((byte) 0, (byte) 0, (byte) 0);
+	}
+
+	/**
+	 * Constructor. Initializes the status code to zero.
+	 * 
+	 * @param command   The command identifier
+	 * @param qualifier The qualifier ID
+	 */
+	public MessageContext(byte command, byte qualifier) {
+		set(command, qualifier, (byte) 0);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param command   The command identifier
+	 * @param qualifier The qualifier ID
+	 * @param status    The status code
+	 */
+	public MessageContext(byte command, byte qualifier, byte status) {
+		set(command, qualifier, status);
+	}
+
+	/**
+	 * Sets the command and qualifier values
+	 * 
+	 * @param command   The command identifiers
+	 * @param qualifier The qualifier ID
+	 */
+	void set(byte command, byte qualifier) {
+		setCommand(command);
+		setQualifier(qualifier);
+	}
+
+	/**
+	 * Sets the command, qualifier and status values
+	 * 
+	 * @param command   The command identifier
+	 * @param qualifier The qualifier ID
+	 * @param status    The status code
+	 */
+	public void set(byte command, byte qualifier, byte status) {
+		setCommand(command);
+		setQualifier(qualifier);
+		setStatus(status);
+	}
 
 	/**
 	 * Returns the command
 	 * 
-	 * @return A byte value containing the command
+	 * @return The command identifier
 	 */
 	public byte getCommand() {
 		return command;
 	}
 
 	/**
-	 * Sets a command
+	 * Sets the command
 	 * 
-	 * @param command A byte value containing the command
+	 * @param command The command identifier
 	 */
 	public void setCommand(byte command) {
 		this.command = command;
@@ -55,16 +116,16 @@ public class MessageContext {
 	/**
 	 * Returns the qualifier
 	 * 
-	 * @return A byte value containing the qualifier
+	 * @return The qualifier ID
 	 */
 	public byte getQualifier() {
 		return qualifier;
 	}
 
 	/**
-	 * Sets a qualifier
+	 * Sets the qualifier
 	 * 
-	 * @param qualifier A byte value containing the qualifier
+	 * @param qualifier The qualifier ID
 	 */
 	public void setQualifier(byte qualifier) {
 		this.qualifier = qualifier;
@@ -73,52 +134,18 @@ public class MessageContext {
 	/**
 	 * Returns the status
 	 * 
-	 * @return A byte value containing the status code
+	 * @return The status code
 	 */
 	public byte getStatus() {
 		return status;
 	}
 
 	/**
-	 * Sets a status code
+	 * Sets the status code
 	 * 
-	 * @param status A byte value containing the status code
+	 * @param status The status code
 	 */
 	public void setStatus(byte status) {
-		this.status = status;
-	}
-
-	/**
-	 * The default constructor. Sets command, qualifier, and status to zero.
-	 */
-	public MessageContext() {
-		this.command = 0;
-		this.qualifier = 0;
-		this.status = 0;
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param command   The byte value of the command
-	 * @param qualifier The byte value of the qualifier
-	 */
-	public MessageContext(byte command, byte qualifier) {
-		this.command = command;
-		this.qualifier = qualifier;
-		this.status = 0;
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param command   The byte value of the command
-	 * @param qualifier The byte value of the qualifier
-	 * @param status    The byte value of the status
-	 */
-	public MessageContext(byte command, byte qualifier, byte status) {
-		this.command = command;
-		this.qualifier = qualifier;
 		this.status = status;
 	}
 }

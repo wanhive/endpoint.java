@@ -27,7 +27,9 @@ package com.wanhive.iot.protocol;
 import java.net.ProtocolException;
 
 import com.wanhive.iot.protocol.bean.IdentificationResponse;
+import com.wanhive.iot.protocol.bean.MessageAddress;
 import com.wanhive.iot.protocol.bean.MessageContext;
+import com.wanhive.iot.protocol.bean.MessageControl;
 
 /**
  * The wanhive protocol implementation
@@ -36,8 +38,8 @@ import com.wanhive.iot.protocol.bean.MessageContext;
  *
  */
 public class Protocol {
-	private static final String BAD_REQUEST = "Invalid request";
-	private static final String BAD_RESPONSE = "Invalid response or request denied";
+	protected static final String BAD_REQUEST = "Invalid request";
+	protected static final String BAD_RESPONSE = "Invalid response or request denied";
 	private short sequenceNumber;
 	private byte session;
 
@@ -147,9 +149,11 @@ public class Protocol {
 			throw new IllegalArgumentException(BAD_REQUEST);
 		} else {
 			Message message = new Message();
-			message.prepareHeader(uid, 0, (short) (Message.HEADER_SIZE + nonce.length), nextSequenceNumber(),
-					getSession(), RequestContext.IDENTIFY);
-			message.setBlob(0, nonce);
+			MessageAddress address = new MessageAddress(uid, 0);
+			MessageControl ctrl = new MessageControl((short) (Message.HEADER_SIZE + nonce.length), nextSequenceNumber(),
+					getSession());
+			message.prepareHeader(address, ctrl, RequestContext.IDENTIFY);
+			message.getPayload().setBlob(0, nonce);
 			return message;
 		}
 	}
@@ -167,15 +171,15 @@ public class Protocol {
 		} else if (message.getLength() <= Message.HEADER_SIZE + 4) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
-			short saltLength = message.getShort(0);
-			short nonceLength = message.getShort(2);
+			short saltLength = message.getPayload().getShort(0);
+			short nonceLength = message.getPayload().getShort(2);
 			if (saltLength <= 0 || nonceLength <= 0 || (saltLength + nonceLength + 4) > Message.PAYLOAD_SIZE) {
 				throw new ProtocolException(BAD_RESPONSE);
 			}
 
 			IdentificationResponse response = new IdentificationResponse();
-			response.setSalt(message.getBlob(4, saltLength));
-			response.setNonce(message.getBlob(4 + saltLength, nonceLength));
+			response.setSalt(message.getPayload().getBlob(4, saltLength));
+			response.setNonce(message.getPayload().getBlob(4 + saltLength, nonceLength));
 			return response;
 		}
 	}
@@ -191,9 +195,11 @@ public class Protocol {
 			throw new IllegalArgumentException(BAD_REQUEST);
 		} else {
 			Message message = new Message();
-			message.prepareHeader(0, 0, (short) (Message.HEADER_SIZE + proof.length), nextSequenceNumber(),
-					getSession(), RequestContext.AUTHENTICATE);
-			message.setBlob(0, proof);
+			MessageAddress address = new MessageAddress(0, 0);
+			MessageControl ctrl = new MessageControl((short) (Message.HEADER_SIZE + proof.length), nextSequenceNumber(),
+					getSession());
+			message.prepareHeader(address, ctrl, RequestContext.AUTHENTICATE);
+			message.getPayload().setBlob(0, proof);
 			return message;
 		}
 	}
@@ -212,7 +218,7 @@ public class Protocol {
 		} else if (msgLen <= Message.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
-			return message.getBlob(0, msgLen - Message.HEADER_SIZE);
+			return message.getPayload().getBlob(0, msgLen - Message.HEADER_SIZE);
 		}
 	}
 
@@ -228,10 +234,12 @@ public class Protocol {
 		short length = Message.HEADER_SIZE;
 		Message message = new Message();
 		if (hc != null) {
-			message.setBlob(0, hc);
+			message.getPayload().setBlob(0, hc);
 			length += (short) hc.length;
 		}
-		message.prepareHeader(uid, 0, length, nextSequenceNumber(), getSession(), RequestContext.REGISTER);
+		MessageAddress address = new MessageAddress(uid, 0);
+		MessageControl ctrl = new MessageControl(length, nextSequenceNumber(), getSession());
+		message.prepareHeader(address, ctrl, RequestContext.REGISTER);
 		return message;
 	}
 
@@ -262,10 +270,12 @@ public class Protocol {
 		short length = Message.HEADER_SIZE;
 		Message message = new Message();
 		if (hc != null) {
-			message.setBlob(0, hc);
+			message.getPayload().setBlob(0, hc);
 			length += (short) hc.length;
 		}
-		message.prepareHeader(0, 0, length, nextSequenceNumber(), getSession(), RequestContext.GETKEY);
+		MessageAddress address = new MessageAddress(0, 0);
+		MessageControl ctrl = new MessageControl(length, nextSequenceNumber(), getSession());
+		message.prepareHeader(address, ctrl, RequestContext.GETKEY);
 		return message;
 	}
 
@@ -283,9 +293,9 @@ public class Protocol {
 		} else if (msgLen <= Message.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (msgLen == (Message.HEADER_SIZE + 64)) {
-			return message.getBlob(0, 64);
+			return message.getPayload().getBlob(0, 64);
 		} else if (msgLen == (Message.HEADER_SIZE + 128)) {
-			return message.getBlob(64, 64);
+			return message.getPayload().getBlob(64, 64);
 		} else {
 			throw new ProtocolException(BAD_RESPONSE);
 		}
@@ -300,9 +310,10 @@ public class Protocol {
 	 */
 	public Message createFindRootRequest(long uid) {
 		Message message = new Message();
-		message.prepareHeader(0, 0, (short) (Message.HEADER_SIZE + 8), nextSequenceNumber(), getSession(),
-				RequestContext.FINDROOT);
-		message.setLong(0, uid);
+		MessageAddress address = new MessageAddress(0, 0);
+		MessageControl ctrl = new MessageControl((short) (Message.HEADER_SIZE + 8), nextSequenceNumber(), getSession());
+		message.prepareHeader(address, ctrl, RequestContext.FINDROOT);
+		message.getPayload().setLong(0, uid);
 		return message;
 	}
 
@@ -319,7 +330,7 @@ public class Protocol {
 		} else if (message.getLength() != (Message.HEADER_SIZE + 16)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else {
-			return message.getLong(8);
+			return message.getPayload().getLong(8);
 		}
 	}
 
@@ -333,9 +344,11 @@ public class Protocol {
 	 */
 	public Message createPublishRequest(byte topic, byte[] payload) {
 		Message message = new Message();
-		message.prepareHeader(0, 0, (short) (Message.HEADER_SIZE + (payload == null ? 0 : payload.length)),
-				nextSequenceNumber(), topic, RequestContext.PUBLISH);
-		message.setBlob(0, payload);
+		MessageAddress address = new MessageAddress(0, 0);
+		MessageControl ctrl = new MessageControl((short) (Message.HEADER_SIZE + (payload == null ? 0 : payload.length)),
+				nextSequenceNumber(), topic);
+		message.prepareHeader(address, ctrl, RequestContext.PUBLISH);
+		message.getPayload().setBlob(0, payload);
 		return message;
 	}
 
@@ -347,7 +360,9 @@ public class Protocol {
 	 */
 	public Message createSubscribeRequest(byte topic) {
 		Message message = new Message();
-		message.prepareHeader(0, 0, (short) Message.HEADER_SIZE, nextSequenceNumber(), topic, RequestContext.SUBSCRIBE);
+		MessageAddress address = new MessageAddress(0, 0);
+		MessageControl ctrl = new MessageControl((short) Message.HEADER_SIZE, nextSequenceNumber(), topic);
+		message.prepareHeader(address, ctrl, RequestContext.SUBSCRIBE);
 		return message;
 	}
 
@@ -376,8 +391,9 @@ public class Protocol {
 	 */
 	public Message createUnsubscribeRequest(byte topic) {
 		Message message = new Message();
-		message.prepareHeader(0, 0, (short) Message.HEADER_SIZE, nextSequenceNumber(), topic,
-				RequestContext.UNSUBSCRIBE);
+		MessageAddress address = new MessageAddress(0, 0);
+		MessageControl ctrl = new MessageControl((short) Message.HEADER_SIZE, nextSequenceNumber(), topic);
+		message.prepareHeader(address, ctrl, RequestContext.UNSUBSCRIBE);
 		return message;
 	}
 
