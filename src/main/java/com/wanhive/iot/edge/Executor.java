@@ -45,7 +45,7 @@ public class Executor implements Runnable, AutoCloseable {
 	private boolean running = false; // Condition variable
 	private final AtomicBoolean stopped = new AtomicBoolean(true); // Status flag
 
-	private Client client;
+	private Client client; // The connection
 	private Receiver receiver;
 	private Message outgoing;
 	private final BlockingQueue<Message> in;
@@ -68,6 +68,73 @@ public class Executor implements Runnable, AutoCloseable {
 			}
 			running = false;
 			notifier.notify();
+		}
+	}
+
+	/**
+	 * Creates a thread for reading messages from the network
+	 * 
+	 * @return The reader thread
+	 */
+	private Thread createReader() {
+		Thread reader = new Thread(() -> {
+			Logger.getGlobal().info("Reader started");
+			try {
+				while (true) {
+					if (receiver != null) {
+						receiver.receive(client.receive());
+					} else if (in != null) {
+						in.put(client.receive());
+					} else {
+						client.receive();
+					}
+				}
+			} catch (Exception e) {
+				close();
+			} finally {
+				Logger.getGlobal().info("Reader stopped");
+			}
+		});
+		return reader;
+	}
+
+	/**
+	 * Creates a thread for writing messages to the network
+	 * 
+	 * @return The writer thread
+	 */
+	private Thread createWriter() {
+		Thread writer = new Thread(() -> {
+			Logger.getGlobal().info("Writer started");
+			try {
+				while (true) {
+					if (outgoing == null) {
+						outgoing = out.take();
+					}
+					client.send(outgoing);
+					outgoing = null;
+				}
+			} catch (Exception e) {
+				close();
+			} finally {
+				Logger.getGlobal().info("Writer stopped");
+			}
+		});
+
+		return writer;
+	}
+
+	/**
+	 * Helper function for gracefully shutting down the reader and writer threads
+	 * 
+	 * @param worker A reader or writer thread object
+	 */
+	private void stopWorker(Thread worker) {
+		try {
+			worker.interrupt();
+			worker.join();
+		} catch (Exception e) {
+			Logger.getGlobal().warning(e.getMessage());
 		}
 	}
 
@@ -184,43 +251,8 @@ public class Executor implements Runnable, AutoCloseable {
 
 	@Override
 	public void run() {
-
-		Thread reader = new Thread(() -> {
-			Logger.getGlobal().info("Reader started");
-			try {
-				while (true) {
-					if (receiver != null) {
-						receiver.receive(client.receive());
-					} else if (in != null) {
-						in.put(client.receive());
-					} else {
-						client.receive();
-					}
-				}
-			} catch (Exception e) {
-				close();
-			} finally {
-				Logger.getGlobal().info("Reader stopped");
-			}
-		});
-
-		Thread writer = new Thread(() -> {
-			Logger.getGlobal().info("Writer started");
-			try {
-				while (true) {
-					if (outgoing == null) {
-						outgoing = out.take();
-					}
-					client.send(outgoing);
-					outgoing = null;
-				}
-			} catch (Exception e) {
-				close();
-			} finally {
-				Logger.getGlobal().info("Writer stopped");
-			}
-		});
-
+		Thread reader = createReader();
+		Thread writer = createWriter();
 		try {
 			stopped.set(false);
 			synchronized (notifier) {
@@ -232,23 +264,12 @@ public class Executor implements Runnable, AutoCloseable {
 				}
 			}
 		} catch (Exception e) {
-
+			Logger.getGlobal().warning(e.getMessage());
 		} finally {
-			try {
-				reader.interrupt();
-				reader.join();
-			} catch (Exception e2) {
-
-			}
-
-			try {
-				writer.interrupt();
-				writer.join();
-			} catch (Exception e2) {
-
-			}
-			Logger.getGlobal().info("Executor stopped");
+			stopWorker(reader);
+			stopWorker(writer);
 			stopped.set(true);
+			Logger.getGlobal().info("Executor stopped");
 		}
 	}
 
