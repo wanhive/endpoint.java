@@ -43,6 +43,10 @@ public class ClientFactory {
 	private static final String AUTHENTICATION_FAIL = "Authentication failed";
 	private static final String BOOTSTRAP_FAIL = "Bootstrapping failed";
 
+	private final Hosts hosts;
+	private final long[] authNodes;
+	private final long[] bootNodes;
+
 	/**
 	 * Configures the trust store
 	 * 
@@ -56,32 +60,40 @@ public class ClientFactory {
 	}
 
 	/**
+	 * Constructor
+	 * 
+	 * @param hosts     The hosts database for name resolution
+	 * @param authNodes The authenticator nodes
+	 * @param bootNodes The bootstrap nodes
+	 */
+	public ClientFactory(Hosts hosts, long[] authNodes, long[] bootNodes) {
+		this.hosts = hosts;
+		this.authNodes = authNodes;
+		this.bootNodes = bootNodes;
+	}
+
+	/**
 	 * Connects with the Wanhive network
 	 * 
-	 * @param identity  Identity of the client
-	 * @param hosts     Hosts database for the network address resolution
-	 * @param authNodes List of the stable authentication node IDs
-	 * @param bootNodes List of the stable bootstrap node IDs
-	 * @param timeout   Socket read timeout in milliseconds (during handshaking)
-	 * @param secure    If true then SSL/TLS connection will be established
+	 * @param identity Identity of the client
+	 * @param timeout  Socket read timeout in milliseconds (during handshaking)
+	 * @param secure   If true then SSL/TLS connection will be established
 	 * @return Client object which can be used for full-duplex messaging
 	 * @throws ProtocolException Could not connect to the network
 	 */
-	public static Client createClient(Identity identity, Hosts hosts, long[] authNodes, long[] bootNodes, int timeout,
-			boolean secure) throws ProtocolException {
-		try (WanhiveClient auth = authenticate(identity, hosts, authNodes, timeout, secure)) {
-			return bootstrap(identity, hosts, auth, bootNodes, timeout, secure);
+	public Client createClient(Identity identity, int timeout, boolean secure) throws ProtocolException {
+		try (WanhiveClient auth = authenticate(identity, timeout, secure)) {
+			return bootstrap(identity, auth, timeout, secure);
 		}
 	}
 
-	private static WanhiveClient authenticate(Identity identity, Hosts hosts, long[] nodes, int timeout, boolean secure)
-			throws ProtocolException {
+	private WanhiveClient authenticate(Identity identity, int timeout, boolean secure) throws ProtocolException {
 		if (identity.getPassword() == null || identity.getPassword().length == 0) {
 			return null;
 		}
 
 		boolean connected = false;
-		for (long node : nodes) {
+		for (long node : authNodes) {
 			if (connected) { // Something went bad
 				break;
 			}
@@ -122,10 +134,10 @@ public class ClientFactory {
 		session.step3(BigIntegerUtils.bigIntegerFromBytes(hostresp));
 	}
 
-	private static WanhiveClient bootstrap(Identity identity, Hosts hosts, Client authenticator, long[] nodes,
-			int timeout, boolean secure) throws ProtocolException {
+	private WanhiveClient bootstrap(Identity identity, Client authenticator, int timeout, boolean secure)
+			throws ProtocolException {
 		boolean connected = false;
-		for (long node : nodes) {
+		for (long node : bootNodes) {
 			if (connected) { // Something bad happened
 				break;
 			}
@@ -180,9 +192,7 @@ public class ClientFactory {
 		if (auth != null) {
 			message = auth.execute(message);
 		}
-		/*
-		 * Complete the registration
-		 */
+		// Complete the registration process
 		message = host.execute(message);
 		protocol.processRegisterResponse(message);
 	}

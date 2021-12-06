@@ -93,7 +93,8 @@ public class ClientTest {
 					config.getSection("CLIENT").getString("password", "").getBytes(Charset.forName("UTF-8")),
 					config.getSection("CLIENT").getInt("passwordHashRounds", 1));
 
-			Client client = ClientFactory.createClient(id, hosts, auths, boots, timeout, sslEnabled);
+			ClientFactory cf = new ClientFactory(hosts, auths, boots);
+			Client client = cf.createClient(id, timeout, sslEnabled);
 			System.out.println("CONNECTED");
 
 			/*
