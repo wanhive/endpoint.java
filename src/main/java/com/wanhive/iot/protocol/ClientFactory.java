@@ -23,9 +23,11 @@
  */
 package com.wanhive.iot.protocol;
 
+import java.io.IOException;
 import java.net.ProtocolException;
 
 import com.nimbusds.srp6.BigIntegerUtils;
+import com.nimbusds.srp6.SRP6Exception;
 import com.wanhive.iot.protocol.agreement.WHSRP6ClientSession;
 import com.wanhive.iot.protocol.bean.IdentificationResponse;
 import com.wanhive.iot.protocol.bean.Identity;
@@ -78,36 +80,14 @@ public class ClientFactory {
 			return null;
 		}
 
-		Protocol protocol = new Protocol();
 		boolean connected = false;
 		for (long node : nodes) {
-			if (connected) { // Something bad happened
+			if (connected) { // Something went bad
 				break;
 			}
 			try (WanhiveClient auth = new WanhiveClient(hosts.get(node), timeout, secure)) {
 				connected = true;
-				// -----------------------------------------------------------------
-				/*
-				 * Identification
-				 */
-				WHSRP6ClientSession session = WHSRP6ClientSession.getDefaultSession(identity.getRounds());
-				session.step1(WHSRP6ClientSession.getDefaultConfig(), Long.toString(identity.getUid()),
-						identity.getPassword());
-				Message message = protocol.createIdentificationRequest(identity.getUid(),
-						BigIntegerUtils.bigIntegerToBytes(session.getPublicClientValue()));
-				message = auth.execute(message);
-				IdentificationResponse iresp = protocol.processIdentificationResponse(message);
-				// -----------------------------------------------------------------
-				/*
-				 * Authentication
-				 */
-				session.step2(BigIntegerUtils.bigIntegerFromBytes(iresp.getSalt()),
-						BigIntegerUtils.bigIntegerFromBytes(iresp.getNonce()));
-				message = protocol.createAuthenticationRequest(
-						BigIntegerUtils.bigIntegerToBytes(session.getClientEvidenceMessage()));
-				message = auth.execute(message);
-				byte[] hostresp = protocol.processAuthenticationResponse(message);
-				session.step3(BigIntegerUtils.bigIntegerFromBytes(hostresp));
+				authenticate(auth, identity);
 				return new WanhiveClient(auth.release());
 			} catch (Exception e) {
 
@@ -117,11 +97,34 @@ public class ClientFactory {
 		throw new ProtocolException(AUTHENTICATION_FAIL);
 	}
 
+	private static void authenticate(Client host, Identity id) throws IOException, SRP6Exception {
+		Protocol protocol = new Protocol();
+		// -----------------------------------------------------------------
+		/*
+		 * Identification
+		 */
+		WHSRP6ClientSession session = WHSRP6ClientSession.getDefaultSession(id.getRounds());
+		session.step1(WHSRP6ClientSession.getDefaultConfig(), Long.toString(id.getUid()), id.getPassword());
+		Message message = protocol.createIdentificationRequest(id.getUid(),
+				BigIntegerUtils.bigIntegerToBytes(session.getPublicClientValue()));
+		message = host.execute(message);
+		IdentificationResponse iresp = protocol.processIdentificationResponse(message);
+		// -----------------------------------------------------------------
+		/*
+		 * Authentication
+		 */
+		session.step2(BigIntegerUtils.bigIntegerFromBytes(iresp.getSalt()),
+				BigIntegerUtils.bigIntegerFromBytes(iresp.getNonce()));
+		message = protocol
+				.createAuthenticationRequest(BigIntegerUtils.bigIntegerToBytes(session.getClientEvidenceMessage()));
+		message = host.execute(message);
+		byte[] hostresp = protocol.processAuthenticationResponse(message);
+		session.step3(BigIntegerUtils.bigIntegerFromBytes(hostresp));
+	}
+
 	private static WanhiveClient bootstrap(Identity identity, Hosts hosts, Client authenticator, long[] nodes,
 			int timeout, boolean secure) throws ProtocolException {
-		Protocol protocol = new Protocol();
 		boolean connected = false;
-
 		for (long node : nodes) {
 			if (connected) { // Something bad happened
 				break;
@@ -130,11 +133,9 @@ public class ClientFactory {
 				connected = true;
 				// -----------------------------------------------------------------
 				/*
-				 * Search for the host
+				 * Find the correct host
 				 */
-				Message message = protocol.createFindRootRequest(identity.getUid());
-				message = client.execute(message);
-				long root = protocol.processFindRootResponse(message);
+				long root = findRoot(client, identity);
 				if (root != node) {
 					client.connect(hosts.get(root), timeout, secure);
 				}
@@ -142,22 +143,12 @@ public class ClientFactory {
 				/*
 				 * Establish a unique session with the host
 				 */
-				message = protocol.createGetKeyRequest(null);
-				message = client.execute(message);
-				byte[] hc = protocol.processGetKeyResponse(message);
+				byte[] sid = createSession(client);
 				// -----------------------------------------------------------------
 				/*
 				 * Get the registration request signed by the authentication node
 				 */
-				message = protocol.createRegisterRequest(identity.getUid(), hc);
-				if (authenticator != null) {
-					message = authenticator.execute(message);
-				}
-				/*
-				 * Complete the registration
-				 */
-				message = client.execute(message);
-				protocol.processRegisterResponse(message);
+				authorize(client, authenticator, identity, sid);
 				// -----------------------------------------------------------------
 				client.setTimeout(0);
 				return new WanhiveClient(client.release());
@@ -167,5 +158,32 @@ public class ClientFactory {
 		}
 
 		throw new ProtocolException(BOOTSTRAP_FAIL);
+	}
+
+	private static long findRoot(Client host, Identity id) throws IOException {
+		Protocol protocol = new Protocol();
+		Message message = protocol.createFindRootRequest(id.getUid());
+		message = host.execute(message);
+		return protocol.processFindRootResponse(message);
+	}
+
+	private static byte[] createSession(Client host) throws IOException {
+		Protocol protocol = new Protocol();
+		Message message = protocol.createGetKeyRequest(null);
+		message = host.execute(message);
+		return protocol.processGetKeyResponse(message);
+	}
+
+	private static void authorize(Client host, Client auth, Identity id, byte[] sid) throws IOException {
+		Protocol protocol = new Protocol();
+		Message message = protocol.createRegisterRequest(id.getUid(), sid);
+		if (auth != null) {
+			message = auth.execute(message);
+		}
+		/*
+		 * Complete the registration
+		 */
+		message = host.execute(message);
+		protocol.processRegisterResponse(message);
 	}
 }
