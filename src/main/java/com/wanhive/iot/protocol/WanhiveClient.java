@@ -193,8 +193,6 @@ public class WanhiveClient implements Client {
 			Message message = receive();
 			if (sequenceNumber == 0 || message.header().getSequenceNumber() == sequenceNumber) {
 				return message;
-			} else {
-				continue;
 			}
 		}
 	}
