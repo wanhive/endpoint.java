@@ -166,7 +166,7 @@ public class WanhiveClient implements Client {
 			throw new EOFException(BAD_CONNECTION);
 		}
 
-		// STEP 2: Validate the message length
+		// STEP 2: check the message length
 		short messageLength = message.header().getLength();
 		if (!Packet.isValidLength(messageLength)) {
 			throw new ProtocolException(BAD_MESSAGE);
@@ -177,7 +177,7 @@ public class WanhiveClient implements Client {
 			bytes += in.read(message.getBuffer(), bytes, messageLength - Packet.HEADER_SIZE);
 		}
 
-		// STEP 4: check the message length
+		// STEP 4: check the message length again
 		if (bytes != messageLength) {
 			throw new EOFException(BAD_CONNECTION);
 		}
