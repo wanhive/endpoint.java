@@ -25,11 +25,8 @@
 package com.wanhive.iot.protocol.agreement;
 
 import java.math.BigInteger;
-import java.security.MessageDigest;
 
-import com.nimbusds.srp6.BigIntegerUtils;
 import com.nimbusds.srp6.SRP6CryptoParams;
-import com.nimbusds.srp6.SRP6Routines;
 import com.nimbusds.srp6.SRP6ServerEvidenceContext;
 import com.nimbusds.srp6.ServerEvidenceRoutine;
 
@@ -39,19 +36,13 @@ import com.nimbusds.srp6.ServerEvidenceRoutine;
  * @author amit
  *
  */
-public class WHServerEvidenceRoutine extends SRP6Routines implements ServerEvidenceRoutine {
+public class WHServerEvidenceRoutine extends WHEvidenceRoutine implements ServerEvidenceRoutine {
+	
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public BigInteger computeServerEvidence(SRP6CryptoParams cryptoParams, SRP6ServerEvidenceContext ctx) {
-		final int padLength = (cryptoParams.N.bitLength() + 7) / 8;
-		MessageDigest digest = cryptoParams.getMessageDigestInstance();
-		digest.reset();
-
-		digest.update(getPadded(ctx.A, padLength));
-		digest.update(getPadded(ctx.M1, padLength));
-		digest.update(getPadded(ctx.S, padLength));
-		return BigIntegerUtils.bigIntegerFromBytes(digest.digest());
+		return computeEvidence(cryptoParams, ctx.A, ctx.M1, ctx.S);
 	}
 
 }
