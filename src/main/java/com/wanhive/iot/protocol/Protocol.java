@@ -123,7 +123,7 @@ public class Protocol extends FlowControl {
 			throw new IllegalArgumentException(BAD_REQUEST);
 		} else {
 			Message message = new Message();
-			MessageAddress address = new MessageAddress(0, 0);
+			MessageAddress address = new MessageAddress();
 			MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + proof.length), nextSequenceNumber(),
 					getSession());
 			message.setHeader(address, ctrl, RequestContext.AUTHENTICATE);
@@ -205,7 +205,7 @@ public class Protocol extends FlowControl {
 			message.payload().setBlob(0, hc);
 			length += (short) hc.length;
 		}
-		MessageAddress address = new MessageAddress(0, 0);
+		MessageAddress address = new MessageAddress();
 		MessageControl ctrl = new MessageControl(length, nextSequenceNumber(), getSession());
 		message.setHeader(address, ctrl, RequestContext.GETKEY);
 		return message;
@@ -244,7 +244,7 @@ public class Protocol extends FlowControl {
 	 */
 	public Message createFindRootRequest(long uid) {
 		Message message = new Message();
-		MessageAddress address = new MessageAddress(0, 0);
+		MessageAddress address = new MessageAddress();
 		MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + 8), nextSequenceNumber(), getSession());
 		message.setHeader(address, ctrl, RequestContext.FINDROOT);
 		message.payload().setLong(0, uid);
@@ -280,7 +280,7 @@ public class Protocol extends FlowControl {
 	 */
 	public Message createPublishRequest(byte topic, byte[] payload) {
 		Message message = new Message();
-		MessageAddress address = new MessageAddress(0, 0);
+		MessageAddress address = new MessageAddress();
 		MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + (payload == null ? 0 : payload.length)),
 				nextSequenceNumber(), topic);
 		message.setHeader(address, ctrl, RequestContext.PUBLISH);
@@ -295,11 +295,7 @@ public class Protocol extends FlowControl {
 	 * @return A new subscription request
 	 */
 	public Message createSubscribeRequest(byte topic) {
-		Message message = new Message();
-		MessageAddress address = new MessageAddress(0, 0);
-		MessageControl ctrl = new MessageControl((short) Packet.HEADER_SIZE, nextSequenceNumber(), topic);
-		message.setHeader(address, ctrl, RequestContext.SUBSCRIBE);
-		return message;
+		return createTopicRequest(topic, true);
 	}
 
 	/**
@@ -310,15 +306,7 @@ public class Protocol extends FlowControl {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public byte processSubscribeResponse(Message message) throws ProtocolException {
-		if (message.header().getSource() != 0) {
-			throw new ProtocolException(BAD_RESPONSE);
-		} else if (!checkContext(message, ResponseContext.SUBSCRIBE, true)) {
-			throw new ProtocolException(BAD_RESPONSE);
-		} else if (message.header().getLength() != Packet.HEADER_SIZE) {
-			throw new ProtocolException(BAD_RESPONSE);
-		} else {
-			return message.header().getSession();
-		}
+		return processTopicResponse(message, true);
 	}
 
 	/**
@@ -328,11 +316,7 @@ public class Protocol extends FlowControl {
 	 * @return A new unsubscription request
 	 */
 	public Message createUnsubscribeRequest(byte topic) {
-		Message message = new Message();
-		MessageAddress address = new MessageAddress(0, 0);
-		MessageControl ctrl = new MessageControl((short) Packet.HEADER_SIZE, nextSequenceNumber(), topic);
-		message.setHeader(address, ctrl, RequestContext.UNSUBSCRIBE);
-		return message;
+		return createTopicRequest(topic, false);
 	}
 
 	/**
@@ -343,9 +327,39 @@ public class Protocol extends FlowControl {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public byte processUnsubscribeResponse(Message message) throws ProtocolException {
+		return processTopicResponse(message, false);
+	}
+
+	/**
+	 * Creates a subscribe/unsubscribe request
+	 * 
+	 * @param topic     The topic identifier
+	 * @param subscribe set to true to subscribe, false to unsubscribe
+	 * @return A new message carrying the request
+	 */
+	private Message createTopicRequest(byte topic, boolean subscribe) {
+		Message message = new Message();
+		MessageAddress address = new MessageAddress();
+		MessageControl ctrl = new MessageControl((short) Packet.HEADER_SIZE, nextSequenceNumber(), topic);
+		MessageContext ctx = subscribe ? RequestContext.SUBSCRIBE : RequestContext.UNSUBSCRIBE;
+		message.setHeader(address, ctrl, ctx);
+		return message;
+	}
+
+	/**
+	 * Processes a subscribe/unsubscribe response
+	 * 
+	 * @param message   The response message
+	 * @param subscribe set to true for subscription context, false for
+	 *                  unsubscription context
+	 * @return The topic identifier
+	 * @throws ProtocolException Request denied or invalid response
+	 */
+	private byte processTopicResponse(Message message, boolean subscribe) throws ProtocolException {
+		MessageContext ctx = subscribe ? RequestContext.SUBSCRIBE : RequestContext.UNSUBSCRIBE;
 		if (message.header().getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
-		} else if (!checkContext(message, ResponseContext.UNSUBSCRIBE, true)) {
+		} else if (!checkContext(message, ctx, true)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.header().getLength() != Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
