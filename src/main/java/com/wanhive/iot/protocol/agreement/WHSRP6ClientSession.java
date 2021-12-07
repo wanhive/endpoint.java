@@ -44,6 +44,7 @@ import com.nimbusds.srp6.SRP6ServerEvidenceContext;
 import com.nimbusds.srp6.SRP6Session;
 import com.nimbusds.srp6.URoutineContext;
 import com.nimbusds.srp6.XRoutine;
+import com.wanhive.iot.protocol.bean.Identity;
 
 /**
  * Client-side session manager for identification and authentication
@@ -98,12 +99,12 @@ public class WHSRP6ClientSession extends SRP6Session {
 	/**
 	 * The password key 'x'.
 	 */
-	private BigInteger x = null;
+	private BigInteger x;
 
 	/**
 	 * The client private value 'a'.
 	 */
-	private BigInteger a = null;
+	private BigInteger a;
 
 	/**
 	 * The current SRP-6a auth state.
@@ -113,135 +114,141 @@ public class WHSRP6ClientSession extends SRP6Session {
 	/**
 	 * Custom routine for password key 'x' computation.
 	 */
-	private XRoutine xRoutine = null;
+	private XRoutine xRoutine;
 
 	/**
 	 * Creates a new client-side SRP-6a authentication session and sets its state to
 	 * {@link State#INIT}.
 	 *
 	 * @param timeout The SRP-6a authentication session timeout in seconds. If the
-	 *                authenticating counterparty (server or client) fails to
+	 *                authenticating counter-party (server or client) fails to
 	 *                respond within the specified time the session will be closed.
 	 *                If zero timeouts are disabled.
 	 */
-	public WHSRP6ClientSession(final int timeout) {
-
+	private WHSRP6ClientSession(int timeout) {
 		super(timeout);
-
-		state = State.INIT;
-
 		updateLastActivityTime();
+		state = State.INIT;
+	}
+
+	private void computeA() {
+		MessageDigest digest = config.getMessageDigestInstance();
+		digest.reset();
+		this.a = srp6Routines.generatePrivateValue(config.N, random);
+		digest.reset();
+		this.A = srp6Routines.computePublicClientValue(config.N, config.g, a);
+	}
+
+	private void computeX() {
+		MessageDigest digest = config.getMessageDigestInstance();
+
+		digest.reset();
+		// Compute the password key 'x'
+		if (xRoutine != null) {
+			// With custom routine
+			this.x = xRoutine.computeX(config.getMessageDigestInstance(), BigIntegerUtils.bigIntegerToBytes(s),
+					userID.getBytes(Charset.forName("UTF-8")), password);
+
+		} else {
+			// With default routine
+			this.x = srp6Routines.computeX(digest, BigIntegerUtils.bigIntegerToBytes(s), password);
+		}
+	}
+
+	private void computeSessionKey() {
+		MessageDigest digest = config.getMessageDigestInstance();
+
+		digest.reset();
+		this.k = srp6Routines.computeK(digest, config.N, config.g);
+
+		digest.reset();
+		if (hashedKeysRoutine != null) {
+			URoutineContext hashedKeysContext = new URoutineContext(A, B);
+			this.u = hashedKeysRoutine.computeU(config, hashedKeysContext);
+		} else {
+			this.u = srp6Routines.computeU(digest, config.N, A, B);
+		}
+
+		this.S = srp6Routines.computeSessionKey(config.N, config.g, k, x, u, a, B);
+	}
+
+	private void computeClientEvidence() {
+		MessageDigest digest = config.getMessageDigestInstance();
+		digest.reset();
+		if (clientEvidenceRoutine != null) {
+			// With custom routine
+			SRP6ClientEvidenceContext ctx = new SRP6ClientEvidenceContext(userID, s, A, B, S);
+			this.M1 = clientEvidenceRoutine.computeClientEvidence(config, ctx);
+		} else {
+			// With default routine
+			this.M1 = srp6Routines.computeClientEvidence(digest, A, B, S);
+		}
+	}
+
+	private BigInteger computeM2() {
+		MessageDigest digest = config.getMessageDigestInstance();
+		digest.reset();
+		if (serverEvidenceRoutine != null) {
+			// With custom routine
+			SRP6ServerEvidenceContext ctx = new SRP6ServerEvidenceContext(A, M1, S);
+			return serverEvidenceRoutine.computeServerEvidence(config, ctx);
+		} else {
+			// With default routine: NONE
+			return null;
+		}
 	}
 
 	/**
-	 * Creates a new client-side SRP-6a authentication session and sets its state to
-	 * {@link State#INIT}. Session timeouts are disabled.
-	 */
-	public WHSRP6ClientSession() {
-
-		this(0);
-	}
-
-	/**
-	 * Creates and returns default session suitable for Wanhive
+	 * Creates and returns the default client session
 	 * 
-	 * @param rounds The password hashing rounds
-	 * 
-	 * @return A WHSRP6ClientSession object suitable for Wanhive
+	 * @param userID   The identity 'I' of the authenticating user, UTF-8 encoded.
+	 *                 Must not be {@code null} or empty.
+	 * @param password The user password 'P', UTF-8 encoded. Must not be
+	 *                 {@code null}.
+	 * @param rounds   The password hashing rounds
+	 * @return The client session object
 	 */
-	public static WHSRP6ClientSession getDefaultSession(int rounds) {
-		WHSRP6ClientSession session = new WHSRP6ClientSession();
-		session.setXRoutine(new WHXRoutine(rounds));
+	public static WHSRP6ClientSession getDefaultSession(Identity id, int timeout) {
+		WHSRP6ClientSession session = new WHSRP6ClientSession(timeout);
 		session.setClientEvidenceRoutine(new WHClientEvidenceRoutine());
 		session.setServerEvidenceRoutine(new WHServerEvidenceRoutine());
+
+		session.config = SRP6CryptoParams.getInstance(2048, "SHA-512");
+		session.userID = Long.toString(id.getUid());
+		session.password = id.getPassword();
+		session.xRoutine = new WHXRoutine(id.getRounds());
 		return session;
-	}
-
-	/**
-	 * Creates and returns default parameters suitable for Wanhive
-	 * 
-	 * @return SRP6CryptoParams object suitable for Wanhive
-	 */
-	public static SRP6CryptoParams getDefaultConfig() {
-		return SRP6CryptoParams.getInstance(2048, "SHA-512");
-	}
-
-	/**
-	 * Sets a custom routine for the password key 'x' computation. Note that the
-	 * custom routine must be set prior to {@link State#STEP_2}.
-	 *
-	 * @param routine The password key 'x' routine or {@code null} to use the
-	 *                {@link SRP6Routines#computeX default one} instead.
-	 */
-	public void setXRoutine(final XRoutine routine) {
-
-		xRoutine = routine;
-	}
-
-	/**
-	 * Gets the custom routine for the password key 'x' computation.
-	 *
-	 * @return The routine instance or {@code null} if the default
-	 *         {@link SRP6Routines#computeX default one} is used.
-	 */
-	public XRoutine getXRoutine() {
-
-		return xRoutine;
 	}
 
 	/**
 	 * Records the identity 'I' and password 'P' of the authenticating user. The
 	 * session is incremented to {@link State#STEP_1}.
 	 * 
-	 * <p>
-	 * Argument origin:
-	 * 
-	 * <ul>
-	 * <li>From user: user identity 'I' and password 'P'.
-	 * </ul>
-	 * 
-	 * @param config   The SRP-6a crypto parameters. Must not be {@code null}.
-	 * @param userID   The identity 'I' of the authenticating user, UTF-8 encoded.
-	 *                 Must not be {@code null} or empty.
-	 * @param password The user password 'P', UTF-8 encoded. Must not be
-	 *                 {@code null}.
-	 * 
-	 * @throws IllegalStateException If the method is invoked in a state other than
-	 *                               {@link State#INIT}.
 	 */
-	public void step1(final SRP6CryptoParams config, final String userID, final byte[] password) {
+	public void step1() {
+		// Check current state
+		if (state != State.INIT) {
+			throw new IllegalStateException("State violation: not in INIT state");
+		}
+
 		// Check arguments
-		if (config == null)
+		if (this.config == null) {
 			throw new IllegalArgumentException("The SRP-6a crypto parameters must not be null");
+		}
 
-		this.config = config;
-
-		MessageDigest digest = config.getMessageDigestInstance();
-
-		if (userID == null || userID.trim().isEmpty()) {
+		if (this.userID == null || this.userID.trim().isEmpty()) {
 			throw new IllegalArgumentException("The user identity 'I' must not be null or empty");
 		}
 
-		this.userID = userID;
-
-		if (password == null) {
+		if (this.password == null) {
 			throw new IllegalArgumentException("The user password 'P' must not be null");
 		}
 
-		this.password = password;
-
-		// Check current state
-		if (state != State.INIT)
-			throw new IllegalStateException("State violation: Session must be in INIT state");
-
 		// Generate client private and public values
-		a = srp6Routines.generatePrivateValue(config.N, random);
-		digest.reset();
+		computeA();
 
-		A = srp6Routines.computePublicClientValue(config.N, config.g, a);
-
+		// Increment the state
 		state = State.STEP_1;
-
 		updateLastActivityTime();
 	}
 
@@ -264,82 +271,42 @@ public class WHSRP6ClientSession extends SRP6Session {
 	 *
 	 * @return the client evidence message 'M1'.
 	 *
-	 * @throws IllegalStateException If the method is invoked in a state other than
-	 *                               {@link State#STEP_1}.
-	 * @throws SRP6Exception         If the session has timed out or the public
-	 *                               server value 'B' is invalid.
+	 * @throws SRP6Exception If the session has timed out or the public server value
+	 *                       'B' is invalid.
 	 */
 	public SRP6ClientCredentials step2(final BigInteger s, final BigInteger B) throws SRP6Exception {
-
-		MessageDigest digest = config.getMessageDigestInstance();
-
-		if (digest == null)
-			throw new IllegalArgumentException("Unsupported hash algorithm 'H': " + config.H);
-
-		if (s == null)
-			throw new IllegalArgumentException("The salt 's' must not be null");
-
-		this.s = s;
-
-		if (B == null)
-			throw new IllegalArgumentException("The public server value 'B' must not be null");
-
-		this.B = B;
-
 		// Check current state
-		if (state != State.STEP_1)
+		if (state != State.STEP_1) {
 			throw new IllegalStateException("State violation: Session must be in STEP_1 state");
+		}
 
 		// Check timeout
-		if (hasTimedOut())
+		if (hasTimedOut()) {
 			throw new SRP6Exception("Session timeout", SRP6Exception.CauseType.TIMEOUT);
+		}
+
+		// Check salt
+		if (s == null) {
+			throw new IllegalArgumentException("The salt 's' must not be null");
+		}
 
 		// Check B validity
-		if (!srp6Routines.isValidPublicValue(config.N, B))
+		if (B == null || !srp6Routines.isValidPublicValue(config.N, B)) {
 			throw new SRP6Exception("Bad server public value 'B'", SRP6Exception.CauseType.BAD_PUBLIC_VALUE);
+		}
+
+		this.s = s;
+		this.B = B;
 
 		// Compute the password key 'x'
-		if (xRoutine != null) {
-
-			// With custom routine
-			x = xRoutine.computeX(config.getMessageDigestInstance(), BigIntegerUtils.bigIntegerToBytes(s),
-					userID.getBytes(Charset.forName("UTF-8")), password);
-
-		} else {
-			// With default routine
-			x = srp6Routines.computeX(digest, BigIntegerUtils.bigIntegerToBytes(s), password);
-			digest.reset();
-		}
-
+		computeX();
 		// Compute the session key
-		k = srp6Routines.computeK(digest, config.N, config.g);
-		digest.reset();
-
-		if (hashedKeysRoutine != null) {
-			URoutineContext hashedKeysContext = new URoutineContext(A, B);
-			u = hashedKeysRoutine.computeU(config, hashedKeysContext);
-		} else {
-			u = srp6Routines.computeU(digest, config.N, A, B);
-			digest.reset();
-		}
-
-		S = srp6Routines.computeSessionKey(config.N, config.g, k, x, u, a, B);
-
+		computeSessionKey();
 		// Compute the client evidence message
-		if (clientEvidenceRoutine != null) {
-			// With custom routine
-			SRP6ClientEvidenceContext ctx = new SRP6ClientEvidenceContext(userID, s, A, B, S);
-			M1 = clientEvidenceRoutine.computeClientEvidence(config, ctx);
-
-		} else {
-			// With default routine
-			M1 = srp6Routines.computeClientEvidence(digest, A, B, S);
-			digest.reset();
-		}
-
+		computeClientEvidence();
+		// Increment the state
 		state = State.STEP_2;
 		updateLastActivityTime();
-
 		return new SRP6ClientCredentials(A, M1);
 	}
 
@@ -362,36 +329,30 @@ public class WHSRP6ClientSession extends SRP6Session {
 	 *                               evidence message 'M2' is invalid.
 	 */
 	public void step3(final BigInteger M2) throws SRP6Exception {
-
-		// Check argument
-		if (M2 == null)
-			throw new IllegalArgumentException("The server evidence message 'M2' must not be null");
-
-		this.M2 = M2;
-
 		// Check current state
-		if (state != State.STEP_2)
+		if (state != State.STEP_2) {
 			throw new IllegalStateException("State violation: Session must be in STEP_2 state");
-
-		// Check timeout
-		if (hasTimedOut())
-			throw new SRP6Exception("Session timeout", SRP6Exception.CauseType.TIMEOUT);
-
-		// Compute the own server evidence message 'M2'
-		BigInteger computedM2 = null;
-
-		if (serverEvidenceRoutine != null) {
-			// With custom routine
-			SRP6ServerEvidenceContext ctx = new SRP6ServerEvidenceContext(A, M1, S);
-			computedM2 = serverEvidenceRoutine.computeServerEvidence(config, ctx);
-		} else {
-			// With default routine: NONE
 		}
 
+		// Check timeout
+		if (hasTimedOut()) {
+			throw new SRP6Exception("Session timeout", SRP6Exception.CauseType.TIMEOUT);
+		}
+
+		// Check argument
+		if (M2 == null) {
+			throw new IllegalArgumentException("The server evidence message 'M2' must not be null");
+		}
+
+		this.M2 = M2;
+		// Compute the own server evidence message 'M2'
+		BigInteger computedM2 = computeM2();
+		// Verify M2
 		if (computedM2 != null && !computedM2.equals(M2)) {
 			throw new SRP6Exception("Bad server credentials", SRP6Exception.CauseType.BAD_CREDENTIALS);
 		}
-		
+
+		// Increment the state
 		state = State.STEP_3;
 		updateLastActivityTime();
 	}

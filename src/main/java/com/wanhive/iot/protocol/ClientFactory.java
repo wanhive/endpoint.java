@@ -115,8 +115,8 @@ public class ClientFactory {
 		/*
 		 * Identification
 		 */
-		WHSRP6ClientSession session = WHSRP6ClientSession.getDefaultSession(id.getRounds());
-		session.step1(WHSRP6ClientSession.getDefaultConfig(), Long.toString(id.getUid()), id.getPassword());
+		WHSRP6ClientSession session = WHSRP6ClientSession.getDefaultSession(id, 0);
+		session.step1();
 		Message message = protocol.createIdentificationRequest(id.getUid(),
 				BigIntegerUtils.bigIntegerToBytes(session.getPublicClientValue()));
 		message = host.execute(message);
