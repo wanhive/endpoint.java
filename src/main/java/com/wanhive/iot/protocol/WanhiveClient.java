@@ -158,26 +158,31 @@ public class WanhiveClient implements Client {
 	@Override
 	public Message receive() throws IOException {
 		Message message = new Message();
-
 		InputStream in = socket.getInputStream();
+
+		// STEP 1: fetch the header
 		int bytes = in.read(message.getBuffer(), 0, Packet.HEADER_SIZE);
 		if (bytes != Packet.HEADER_SIZE) {
 			throw new EOFException(BAD_CONNECTION);
 		}
 
+		// STEP 2: Validate the message length
 		short messageLength = message.header().getLength();
 		if (!Packet.isValidLength(messageLength)) {
 			throw new ProtocolException(BAD_MESSAGE);
-		} else if (messageLength > Packet.HEADER_SIZE) {
-			bytes += in.read(message.getBuffer(), bytes, messageLength - Packet.HEADER_SIZE);
-			if (bytes != messageLength) {
-				throw new EOFException(BAD_CONNECTION);
-			}
-		} else {
-			// No payload
 		}
 
-		// Make the message internally consistent and return
+		// STEP3: fetch the payload data
+		if (messageLength > Packet.HEADER_SIZE) {
+			bytes += in.read(message.getBuffer(), bytes, messageLength - Packet.HEADER_SIZE);
+		}
+
+		// STEP 4: check the message length
+		if (bytes != messageLength) {
+			throw new EOFException(BAD_CONNECTION);
+		}
+
+		// STEP 5: make the message internally consistent and return
 		message.header().setLength(messageLength);
 		return message;
 	}
