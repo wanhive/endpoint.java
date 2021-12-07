@@ -37,103 +37,29 @@ import com.wanhive.iot.protocol.bean.MessageControl;
  * @author amit
  *
  */
-public class Protocol {
-	protected static final String BAD_REQUEST = "Invalid request";
-	protected static final String BAD_RESPONSE = "Invalid response or request denied";
-	private short sequenceNumber;
-	private byte session;
-
-	/**
-	 * Verifies message's context
-	 * 
-	 * @param message   The message to check
-	 * @param command   The expected command classifier
-	 * @param qualifier The expected command qualifier
-	 * @return true if the message matched the context, false otherwise
-	 */
-	public static boolean checkContext(Message message, byte command, byte qualifier) {
-		return (message.header().getCommand() == command && message.header().getQualifier() == qualifier);
-	}
-
-	/**
-	 * Verifies message's context
-	 * 
-	 * @param message   The message to check
-	 * @param command   The expected command classifier
-	 * @param qualifier The expected command qualifier
-	 * @param status    The expected status code
-	 * @return true if the message matched the context, false otherwise
-	 */
-	public static boolean checkContext(Message message, byte command, byte qualifier, byte status) {
-		return checkContext(message, command, qualifier) && (message.header().getStatus() == status);
-	}
-
-	/**
-	 * Verifies message's context
-	 * 
-	 * @param message The message to check
-	 * @param ctx     The MessageContext object
-	 * @return true if the message matched the context, false otherwise
-	 */
-	public static boolean checkContext(Message message, MessageContext ctx) {
-		return checkContext(message, ctx.getCommand(), ctx.getQualifier(), ctx.getStatus());
-	}
-
-	/**
-	 * Increments the counter and returns the next sequence number
-	 * 
-	 * @return The next sequence number
-	 */
-	public short nextSequenceNumber() {
-		++sequenceNumber;
-		if (sequenceNumber <= 0) {
-			sequenceNumber = 1;
-		}
-		return sequenceNumber;
-	}
-
-	/**
-	 * Sets the sequence number
-	 * 
-	 * @param sequenceNumber The sequence number counter will be set to this value
-	 */
-	public void setSequenceNumber(short sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
-	}
-
-	/**
-	 * Returns the current sequence number
-	 * 
-	 * @return The current sequence number value
-	 */
-	public short getSequenceNumber() {
-		return sequenceNumber;
-	}
-
-	/**
-	 * Sets the session identifier
-	 * 
-	 * @param session The session identifier will be set to this value
-	 */
-	public void setSession(byte session) {
-		this.session = session;
-	}
-
-	/**
-	 * Returns the session identifier
-	 * 
-	 * @return The current session identifier value
-	 */
-	public byte getSession() {
-		return session;
-	}
+public class Protocol extends FlowControl {
+	public static final String BAD_REQUEST = "Invalid request";
+	public static final String BAD_RESPONSE = "Invalid response or request denied";
 
 	/**
 	 * The default constructor
 	 */
 	public Protocol() {
-		sequenceNumber = 0;
-		session = 0;
+
+	}
+
+	/**
+	 * Verifies message's context
+	 * 
+	 * @param message     The message whose context will be checked
+	 * @param context     The context to compare with
+	 * @param checkStatus Setting this to false will omit the status flag check
+	 * @return true if the message matched the context, false otherwise
+	 */
+	public static boolean checkContext(Message message, MessageContext context, boolean checkStatus) {
+		Header h = message.header();
+		return (h.getCommand() == context.getCommand() && h.getQualifier() == context.getQualifier()
+				&& (!checkStatus || h.getStatus() == context.getStatus()));
 	}
 
 	// -----------------------------------------------------------------
@@ -152,7 +78,7 @@ public class Protocol {
 			MessageAddress address = new MessageAddress(uid, 0);
 			MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + nonce.length), nextSequenceNumber(),
 					getSession());
-			message.prepareHeader(address, ctrl, RequestContext.IDENTIFY);
+			message.setHeader(address, ctrl, RequestContext.IDENTIFY);
 			message.payload().setBlob(0, nonce);
 			return message;
 		}
@@ -166,7 +92,9 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public IdentificationResponse processIdentificationResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.IDENTIFY) || message.header().getSource() != 0) {
+		if (message.header().getSource() != 0) {
+			throw new ProtocolException(BAD_RESPONSE);
+		} else if (!checkContext(message, ResponseContext.IDENTIFY, true)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.header().getLength() <= Packet.HEADER_SIZE + 4) {
 			throw new ProtocolException(BAD_RESPONSE);
@@ -198,7 +126,7 @@ public class Protocol {
 			MessageAddress address = new MessageAddress(0, 0);
 			MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + proof.length), nextSequenceNumber(),
 					getSession());
-			message.prepareHeader(address, ctrl, RequestContext.AUTHENTICATE);
+			message.setHeader(address, ctrl, RequestContext.AUTHENTICATE);
 			message.payload().setBlob(0, proof);
 			return message;
 		}
@@ -213,7 +141,9 @@ public class Protocol {
 	 */
 	public byte[] processAuthenticationResponse(Message message) throws ProtocolException {
 		short msgLen = message.header().getLength();
-		if (!checkContext(message, ResponseContext.AUTHENTICATE) || message.header().getSource() != 0) {
+		if (message.header().getSource() != 0) {
+			throw new ProtocolException(BAD_RESPONSE);
+		} else if (!checkContext(message, ResponseContext.AUTHENTICATE, true)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (msgLen <= Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
@@ -239,7 +169,7 @@ public class Protocol {
 		}
 		MessageAddress address = new MessageAddress(uid, 0);
 		MessageControl ctrl = new MessageControl(length, nextSequenceNumber(), getSession());
-		message.prepareHeader(address, ctrl, RequestContext.REGISTER);
+		message.setHeader(address, ctrl, RequestContext.REGISTER);
 		return message;
 	}
 
@@ -251,7 +181,9 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public boolean processRegisterResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.REGISTER) || message.header().getSource() != 0) {
+		if (message.header().getSource() != 0) {
+			throw new ProtocolException(BAD_RESPONSE);
+		} else if (!checkContext(message, ResponseContext.REGISTER, true)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.header().getLength() != Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
@@ -275,7 +207,7 @@ public class Protocol {
 		}
 		MessageAddress address = new MessageAddress(0, 0);
 		MessageControl ctrl = new MessageControl(length, nextSequenceNumber(), getSession());
-		message.prepareHeader(address, ctrl, RequestContext.GETKEY);
+		message.setHeader(address, ctrl, RequestContext.GETKEY);
 		return message;
 	}
 
@@ -288,7 +220,9 @@ public class Protocol {
 	 */
 	public byte[] processGetKeyResponse(Message message) throws ProtocolException {
 		short msgLen = message.header().getLength();
-		if (!checkContext(message, ResponseContext.GETKEY) || message.header().getSource() != 0) {
+		if (message.header().getSource() != 0) {
+			throw new ProtocolException(BAD_RESPONSE);
+		} else if (!checkContext(message, ResponseContext.GETKEY, true)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (msgLen <= Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
@@ -312,7 +246,7 @@ public class Protocol {
 		Message message = new Message();
 		MessageAddress address = new MessageAddress(0, 0);
 		MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + 8), nextSequenceNumber(), getSession());
-		message.prepareHeader(address, ctrl, RequestContext.FINDROOT);
+		message.setHeader(address, ctrl, RequestContext.FINDROOT);
 		message.payload().setLong(0, uid);
 		return message;
 	}
@@ -325,7 +259,9 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public long processFindRootResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.FINDROOT) || message.header().getSource() != 0) {
+		if (message.header().getSource() != 0) {
+			throw new ProtocolException(BAD_RESPONSE);
+		} else if (!checkContext(message, ResponseContext.FINDROOT, true)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.header().getLength() != (Packet.HEADER_SIZE + 16)) {
 			throw new ProtocolException(BAD_RESPONSE);
@@ -347,7 +283,7 @@ public class Protocol {
 		MessageAddress address = new MessageAddress(0, 0);
 		MessageControl ctrl = new MessageControl((short) (Packet.HEADER_SIZE + (payload == null ? 0 : payload.length)),
 				nextSequenceNumber(), topic);
-		message.prepareHeader(address, ctrl, RequestContext.PUBLISH);
+		message.setHeader(address, ctrl, RequestContext.PUBLISH);
 		message.payload().setBlob(0, payload);
 		return message;
 	}
@@ -362,7 +298,7 @@ public class Protocol {
 		Message message = new Message();
 		MessageAddress address = new MessageAddress(0, 0);
 		MessageControl ctrl = new MessageControl((short) Packet.HEADER_SIZE, nextSequenceNumber(), topic);
-		message.prepareHeader(address, ctrl, RequestContext.SUBSCRIBE);
+		message.setHeader(address, ctrl, RequestContext.SUBSCRIBE);
 		return message;
 	}
 
@@ -374,7 +310,9 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public byte processSubscribeResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.SUBSCRIBE) || message.header().getSource() != 0) {
+		if (message.header().getSource() != 0) {
+			throw new ProtocolException(BAD_RESPONSE);
+		} else if (!checkContext(message, ResponseContext.SUBSCRIBE, true)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.header().getLength() != Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);
@@ -393,7 +331,7 @@ public class Protocol {
 		Message message = new Message();
 		MessageAddress address = new MessageAddress(0, 0);
 		MessageControl ctrl = new MessageControl((short) Packet.HEADER_SIZE, nextSequenceNumber(), topic);
-		message.prepareHeader(address, ctrl, RequestContext.UNSUBSCRIBE);
+		message.setHeader(address, ctrl, RequestContext.UNSUBSCRIBE);
 		return message;
 	}
 
@@ -405,7 +343,9 @@ public class Protocol {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	public byte processUnsubscribeResponse(Message message) throws ProtocolException {
-		if (!checkContext(message, ResponseContext.UNSUBSCRIBE) || message.header().getSource() != 0) {
+		if (message.header().getSource() != 0) {
+			throw new ProtocolException(BAD_RESPONSE);
+		} else if (!checkContext(message, ResponseContext.UNSUBSCRIBE, true)) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (message.header().getLength() != Packet.HEADER_SIZE) {
 			throw new ProtocolException(BAD_RESPONSE);

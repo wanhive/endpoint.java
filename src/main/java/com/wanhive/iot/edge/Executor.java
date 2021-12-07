@@ -1,7 +1,7 @@
 /*
  * Executor.java
  * 
- * Executes a Wanhive client application
+ * Executes a client
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -32,15 +32,15 @@ import com.wanhive.iot.protocol.Client;
 import com.wanhive.iot.protocol.Message;
 
 /**
- * Threaded executor for the Wanhive client applications. Uses two bounded
- * queues, one for the outgoing messages and another one for the incoming
- * messages.
+ * Threaded executor for the client applications. Uses two bounded queues, one
+ * for the outgoing messages and another one for the incoming messages.
  * 
  * @author amit
  *
  */
 public class Executor implements Runnable, AutoCloseable {
 	private static final String BAD_REQUEST = "Not allowed";
+
 	private final Object notifier = new Object();
 	private boolean running = false; // Condition variable
 	private final AtomicBoolean stopped = new AtomicBoolean(true); // Status flag

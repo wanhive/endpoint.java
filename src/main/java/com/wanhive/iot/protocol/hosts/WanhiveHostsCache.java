@@ -1,7 +1,7 @@
 /*
  * WanhiveHostsCache.java
  * 
- * Hosts cache implementation
+ * Hosts cache manager
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -31,7 +31,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * The reference implementation of the hosts cache
+ * The hosts cache manager
  * 
  * @author amit
  *
@@ -50,8 +50,8 @@ public class WanhiveHostsCache implements HostsCache {
 			if (i < count) {
 				list = Arrays.copyOfRange(list, 0, i);
 			}
-			
-			//Apply Fisher–Yates shuffle algorithm
+
+			// Apply Fisher–Yates shuffle algorithm
 			Random rand = new Random();
 			for (int x = (list.length - 1); x > 0; --x) {
 				int j = rand.nextInt(list.length);

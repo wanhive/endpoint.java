@@ -1,7 +1,7 @@
 /*
  * Header.java
  * 
- * Wanhive's message header implementation
+ * Message header implementation
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -26,7 +26,7 @@ package com.wanhive.iot.protocol;
 import java.nio.ByteBuffer;
 
 /**
- * The message header implementation
+ * Message header implementation
  * 
  * @author amit
  *

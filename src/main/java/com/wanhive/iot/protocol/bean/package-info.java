@@ -23,7 +23,7 @@
  * Java beans
  */
 /**
- * Java beans for the handling of application data
+ * Java beans for application data handling
  * 
  * @author amit
  *

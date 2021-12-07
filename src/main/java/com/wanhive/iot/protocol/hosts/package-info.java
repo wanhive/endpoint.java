@@ -20,10 +20,10 @@
  */
 
 /**
- * Wanhive hosts management
+ * Hosts management
  */
 /**
- * Interfaces and classes for hosts management.
+ * Interfaces and classes for hosts management
  * 
  * @author amit
  *

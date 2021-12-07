@@ -23,7 +23,7 @@
  * Application data management
  */
 /**
- * Routines for application data management.
+ * Routines for application data management
  * 
  * @author amit
  *

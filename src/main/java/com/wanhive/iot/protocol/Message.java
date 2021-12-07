@@ -39,15 +39,15 @@ import com.wanhive.iot.protocol.bean.MessageHeader;
  */
 public class Message {
 	/**
-	 * Stores the raw message data
+	 * Serialized message data
 	 */
 	private final ByteBuffer buffer;
 	/**
-	 * The header structure
+	 * The header
 	 */
 	private final Header header;
 	/**
-	 * The payload structure
+	 * The payload
 	 */
 	private final Payload payload;
 
@@ -75,14 +75,15 @@ public class Message {
 	 * Populates message's header. Doesn't modify the label.
 	 * 
 	 * @param address The message address structure
-	 * @param ctrl    The message flow control structure
-	 * @param ctx     The message context
+	 * @param control The message flow control structure
+	 * @param context The message context
 	 * @return This message
 	 */
-	public Message prepareHeader(MessageAddress address, MessageControl ctrl, MessageContext ctx) {
-		header().setLength(ctrl.getLength()).setSource(address.getSource()).setDestination(address.getDestination())
-				.setSequenceNumber(ctrl.getSequenceNumber()).setSession(ctrl.getSession()).setCommand(ctx.getCommand())
-				.setQualifier(ctx.getQualifier()).setStatus(ctx.getStatus());
+	public Message setHeader(MessageAddress address, MessageControl control, MessageContext context) {
+		// Length should be set first
+		header().setLength(control.getLength()).setSource(address.getSource()).setDestination(address.getDestination())
+				.setSequenceNumber(control.getSequenceNumber()).setSession(control.getSession())
+				.setCommand(context.getCommand()).setQualifier(context.getQualifier()).setStatus(context.getStatus());
 		return this;
 	}
 
@@ -91,24 +92,24 @@ public class Message {
 	 * 
 	 * @param label   Label of this message
 	 * @param address The message address structure
-	 * @param ctrl    The message flow control structure
-	 * @param ctx     The message context
+	 * @param control The message flow control structure
+	 * @param context The message context
 	 * @return this message
 	 */
-	public Message prepareHeader(long label, MessageAddress address, MessageControl ctrl, MessageContext ctx) {
-		prepareHeader(address, ctrl, ctx);
+	public Message setHeader(long label, MessageAddress address, MessageControl control, MessageContext context) {
+		setHeader(address, control, context);
 		header().setLabel(label);
 		return this;
 	}
 
 	/**
-	 * Populates this message's header
+	 * Populates message's header
 	 * 
 	 * @param header Desired message header
 	 * @return This message
 	 */
-	public Message prepareHeader(MessageHeader header) {
-		return prepareHeader(header.getLabel(), header.getAddress(), header.getControl(), header.getContext());
+	public Message setHeader(MessageHeader header) {
+		return setHeader(header.getLabel(), header.getAddress(), header.getControl(), header.getContext());
 	}
 
 	/**

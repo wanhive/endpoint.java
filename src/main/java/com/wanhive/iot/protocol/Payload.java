@@ -53,7 +53,7 @@ public class Payload {
 	}
 
 	/**
-	 * Reads a byte value from the payload at the given index
+	 * Reads a byte value from the given index
 	 * 
 	 * @param index The index from which the byte value will be read
 	 * @return The byte value at the given index
@@ -63,7 +63,7 @@ public class Payload {
 	}
 
 	/**
-	 * Writes a byte value at the given index in the payload
+	 * Writes a byte value at the given index
 	 * 
 	 * @param index The index at which the byte value will be written
 	 * @param value The byte value to write
@@ -75,7 +75,7 @@ public class Payload {
 	}
 
 	/**
-	 * Reads a char value from the payload at the given index
+	 * Reads a char value from the given index
 	 * 
 	 * @param index The index from which the char value will be read
 	 * @return The char value at the given index
@@ -85,7 +85,7 @@ public class Payload {
 	}
 
 	/**
-	 * Writes a char value at the given index in the payload
+	 * Writes a char value at the given index
 	 * 
 	 * @param index The index at which the char value will be written
 	 * @param value The char value to write
@@ -97,7 +97,7 @@ public class Payload {
 	}
 
 	/**
-	 * Reads a short value from the payload at the given index
+	 * Reads a short value from the given index
 	 * 
 	 * @param index The index from which the short value will be read
 	 * @return The short value at the given index
@@ -107,7 +107,7 @@ public class Payload {
 	}
 
 	/**
-	 * Writes a short value at the given index in the payload
+	 * Writes a short value at the given index
 	 * 
 	 * @param index The index at which the short value will be written
 	 * @param value The short value to write
@@ -119,7 +119,7 @@ public class Payload {
 	}
 
 	/**
-	 * Reads an int value from the payload at the given index
+	 * Reads an int value from the given index
 	 * 
 	 * @param index The index from which the int value will be read
 	 * @return The int value at the given index
@@ -129,7 +129,7 @@ public class Payload {
 	}
 
 	/**
-	 * Writes an int value at the given index in the payload
+	 * Writes an int value at the given index
 	 * 
 	 * @param index The index at which the int value will be written
 	 * @param value The int value to write
@@ -141,7 +141,7 @@ public class Payload {
 	}
 
 	/**
-	 * Reads a long value from the payload at the given index
+	 * Reads a long value from the given index
 	 * 
 	 * @param index The index from which the short value will be read
 	 * @return The long value at the given index
@@ -151,7 +151,7 @@ public class Payload {
 	}
 
 	/**
-	 * Writes a long value at the given index in the payload
+	 * Writes a long value at the given index
 	 * 
 	 * @param index The index at which the long value will be written
 	 * @param value The long value to write
@@ -163,7 +163,7 @@ public class Payload {
 	}
 
 	/**
-	 * Reads a double value from the payload at the given index
+	 * Reads a double value from the given index
 	 * 
 	 * @param index The index from which the double value will be read
 	 * @return The double value at the given index
@@ -173,7 +173,7 @@ public class Payload {
 	}
 
 	/**
-	 * Writes a double value at the given index in the payload
+	 * Writes a double value at the given index
 	 * 
 	 * @param index The index at which the double value will be written
 	 * @param value The double value to write
@@ -185,7 +185,7 @@ public class Payload {
 	}
 
 	/**
-	 * Reads a sequence of bytes value from the payload at the given index
+	 * Reads a sequence of bytes from the given index
 	 * 
 	 * @param index  The index from which the bytes will be read
 	 * @param length The number of bytes to read
@@ -204,7 +204,7 @@ public class Payload {
 	}
 
 	/**
-	 * Reads a sequence of bytes value from the payload at the given index
+	 * Reads a sequence of bytes from the given index
 	 * 
 	 * @param index The index from which the bytes will be read
 	 * @param blob  The byte array where the bytes will be copied
@@ -220,7 +220,7 @@ public class Payload {
 	}
 
 	/**
-	 * Writes a sequence of bytes at the given index in the payload
+	 * Writes a sequence of bytes at the given index
 	 * 
 	 * @param index The index at which the bytes will be written
 	 * @param blob  The bytes to write

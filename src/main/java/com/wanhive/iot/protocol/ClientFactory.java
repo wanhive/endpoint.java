@@ -1,7 +1,7 @@
 /*
  * ClientFactory.java
  * 
- * Creates a Wanhive client
+ * Creates a client
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -34,7 +34,7 @@ import com.wanhive.iot.protocol.bean.Identity;
 import com.wanhive.iot.protocol.hosts.Hosts;
 
 /**
- * Creates a Wanhive client
+ * Creates a client
  * 
  * @author amit
  *

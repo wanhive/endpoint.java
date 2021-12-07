@@ -24,7 +24,7 @@
 package com.wanhive.iot.protocol.hosts;
 
 /**
- * Enumeration of the standard host types
+ * Host type enumeration
  * 
  * @author amit
  *

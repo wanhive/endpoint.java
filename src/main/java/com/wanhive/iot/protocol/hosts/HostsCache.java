@@ -27,18 +27,18 @@ package com.wanhive.iot.protocol.hosts;
 import java.io.IOException;
 
 /**
- * Cache of the host identifiers
+ * Hosts cache interface
  * 
  * @author amit
  *
  */
 public interface HostsCache {
 	/**
-	 * Returns list of host identifiers from a file
+	 * Returns a list of host identifiers
 	 * 
-	 * @param pathname The pathname of the file
+	 * @param pathname The pathname of file containing the host identifiers
 	 * @param count    The maximum number of identifiers to read from the file
-	 * @return An array of host identifiers
+	 * @return An array containing the host identifiers
 	 * @throws IOException
 	 */
 	public long[] get(String pathname, int count) throws IOException;

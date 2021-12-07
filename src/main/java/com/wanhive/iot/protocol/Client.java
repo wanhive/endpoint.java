@@ -1,7 +1,7 @@
 /*
  * Client.java
  * 
- * The Wanhive client interface
+ * The Client interface
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -26,7 +26,7 @@ package com.wanhive.iot.protocol;
 import java.io.IOException;
 
 /**
- * The Wanhive client interface (supports blocking IO)
+ * The Client interface (supports blocking IO)
  * 
  * @author amit
  *

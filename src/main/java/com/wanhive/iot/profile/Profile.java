@@ -1,7 +1,7 @@
 /*
  * Profile.java
  * 
- * Endpoint profile
+ * Serializable endpoint profile
  * 
  * This program is part of Wanhive IoT Platform.
  * 

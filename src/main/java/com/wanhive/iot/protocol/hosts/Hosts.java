@@ -1,7 +1,7 @@
 /*
  * Hosts.java
  * 
- * Hosts management
+ * Hosts management interface
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -27,7 +27,7 @@ package com.wanhive.iot.protocol.hosts;
 import com.wanhive.iot.protocol.bean.NameInfo;
 
 /**
- * Wanhive's hosts manager interface
+ * Hosts management interface
  * 
  * @author amit
  *

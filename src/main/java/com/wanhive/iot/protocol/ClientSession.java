@@ -1,7 +1,7 @@
 /*
  * ClientSession.java
  * 
- * Management of endpoint pairs
+ * Endpoints pair management
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -24,7 +24,7 @@
 package com.wanhive.iot.protocol;
 
 /**
- * Endpoint pair management
+ * Endpoints pair management
  * 
  * @author amit
  *
