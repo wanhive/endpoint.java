@@ -356,7 +356,7 @@ public class Protocol extends FlowControl {
 	 * @throws ProtocolException Request denied or invalid response
 	 */
 	private byte processTopicResponse(Message message, boolean subscribe) throws ProtocolException {
-		MessageContext ctx = subscribe ? RequestContext.SUBSCRIBE : RequestContext.UNSUBSCRIBE;
+		MessageContext ctx = subscribe ? ResponseContext.SUBSCRIBE : ResponseContext.UNSUBSCRIBE;
 		if (message.header().getSource() != 0) {
 			throw new ProtocolException(BAD_RESPONSE);
 		} else if (!checkContext(message, ctx, true)) {
