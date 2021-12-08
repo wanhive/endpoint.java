@@ -97,6 +97,40 @@ public class WanhiveHosts implements Hosts {
 	}
 
 	/**
+	 * Helper function for {@link #importHosts}
+	 * 
+	 * @param line The tab separated line to parse
+	 * @param ps   The prepared statement for database operations
+	 * @throws SQLException
+	 */
+	private void importHost(String line, PreparedStatement ps) throws SQLException {
+		if (line == null) {
+			return;
+		}
+		
+		line = line.trim();
+		if (line.length() == 0 || line.startsWith("#")) {
+			return;
+		}
+
+		String[] data = line.split("\t");
+		if (data == null || data.length < 3) {
+			return;
+		}
+
+		ps.clearParameters();
+		ps.setLong(1, Long.parseLong(data[0]));
+		ps.setString(2, data[1]);
+		ps.setString(3, data[2]);
+		if (data.length == 4) {
+			ps.setInt(4, Integer.parseInt(data[3]));
+		} else {
+			ps.setInt(4, 0);
+		}
+		ps.executeUpdate();
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param db Pathname of the SQLite3 database file
@@ -121,32 +155,9 @@ public class WanhiveHosts implements Hosts {
 			try {
 				conn.setAutoCommit(false);
 				try (PreparedStatement ps = conn.prepareStatement(query)) {
-					while (true) {
-						String line = reader.readLine();
-						if (line == null) {
-							break;
-						}
-
-						line = line.trim();
-						if (line.length() == 0 || line.startsWith("#")) {
-							continue;
-						}
-
-						String[] data = line.split("\t");
-						if (data == null || data.length < 3) {
-							continue;
-						}
-
-						ps.clearParameters();
-						ps.setLong(1, Long.parseLong(data[0]));
-						ps.setString(2, data[1]);
-						ps.setString(3, data[2]);
-						if (data.length == 4) {
-							ps.setInt(4, Integer.parseInt(data[3]));
-						} else {
-							ps.setInt(4, 0);
-						}
-						ps.executeUpdate();
+					String line = null;
+					while ((line = reader.readLine()) != null) {
+						importHost(line, ps);
 					}
 				}
 				conn.commit();
