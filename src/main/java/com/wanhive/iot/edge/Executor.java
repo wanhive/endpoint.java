@@ -73,7 +73,7 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Helper method for {@link #createReader()}
+	 * Helper method for {@link #createWorker(boolean)}
 	 * 
 	 * @throws IOException
 	 * @throws InterruptedException
@@ -89,28 +89,7 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Creates a thread for reading messages from the network
-	 * 
-	 * @return The reader {@link Thread}
-	 */
-	private Thread createReader() {
-		Thread reader = new Thread(() -> {
-			Logger.getGlobal().info("Reader started");
-			try {
-				while (true) {
-					receive();
-				}
-			} catch (Exception e) {
-				close();
-			} finally {
-				Logger.getGlobal().info("Reader stopped");
-			}
-		});
-		return reader;
-	}
-
-	/**
-	 * Helper method for {@link #createWriter()}
+	 * Helper method for {@link #createWorker(boolean)}
 	 * 
 	 * @throws InterruptedException
 	 * @throws IOException
@@ -124,29 +103,34 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Creates a thread for writing messages to the network
+	 * Helper method for creating reader and writer threads
 	 * 
-	 * @return The writer {@link Thread}
+	 * @param isReader Set to {@code true} to create a reader thread, otherwise a
+	 *                 writer thread is created
+	 * @return A reader/writer {@link Thread}
 	 */
-	private Thread createWriter() {
-		Thread writer = new Thread(() -> {
-			Logger.getGlobal().info("Writer started");
+	private Thread createWorker(final boolean isReader) {
+		final String name = isReader ? "Reader" : "Writer";
+		return new Thread(() -> {
+			Logger.getGlobal().info(name + " started");
 			try {
 				while (true) {
-					send();
+					if (isReader) {
+						receive();
+					} else {
+						send();
+					}
 				}
 			} catch (Exception e) {
 				close();
 			} finally {
-				Logger.getGlobal().info("Writer stopped");
+				Logger.getGlobal().info(name + " stopped");
 			}
 		});
-
-		return writer;
 	}
 
 	/**
-	 * Helper function for gracefully shutting down the reader and writer threads
+	 * Helper method for gracefully shutting down the reader and writer threads
 	 * 
 	 * @param worker A reader or writer {@link Thread} object
 	 */
@@ -274,8 +258,8 @@ public class Executor implements Runnable, AutoCloseable {
 
 	@Override
 	public void run() {
-		Thread reader = createReader();
-		Thread writer = createWriter();
+		Thread reader = createWorker(true);
+		Thread writer = createWorker(false);
 		try {
 			stopped.set(false);
 			synchronized (notifier) {
