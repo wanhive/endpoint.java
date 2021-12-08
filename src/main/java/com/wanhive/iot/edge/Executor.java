@@ -23,6 +23,7 @@
  */
 package com.wanhive.iot.edge;
 
+import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -72,6 +73,22 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
+	 * Helper method for {@link #createReader()}
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	private void receive() throws IOException, InterruptedException {
+		if (receiver != null) {
+			receiver.receive(client.receive());
+		} else if (in != null) {
+			in.put(client.receive());
+		} else {
+			client.receive();
+		}
+	}
+
+	/**
 	 * Creates a thread for reading messages from the network
 	 * 
 	 * @return The reader {@link Thread}
@@ -81,13 +98,7 @@ public class Executor implements Runnable, AutoCloseable {
 			Logger.getGlobal().info("Reader started");
 			try {
 				while (true) {
-					if (receiver != null) {
-						receiver.receive(client.receive());
-					} else if (in != null) {
-						in.put(client.receive());
-					} else {
-						client.receive();
-					}
+					receive();
 				}
 			} catch (Exception e) {
 				close();
@@ -96,6 +107,20 @@ public class Executor implements Runnable, AutoCloseable {
 			}
 		});
 		return reader;
+	}
+
+	/**
+	 * Helper method for {@link #createWriter()}
+	 * 
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	private void send() throws InterruptedException, IOException {
+		if (outgoing == null) {
+			outgoing = out.take();
+		}
+		client.send(outgoing);
+		outgoing = null;
 	}
 
 	/**
@@ -108,11 +133,7 @@ public class Executor implements Runnable, AutoCloseable {
 			Logger.getGlobal().info("Writer started");
 			try {
 				while (true) {
-					if (outgoing == null) {
-						outgoing = out.take();
-					}
-					client.send(outgoing);
-					outgoing = null;
+					send();
 				}
 			} catch (Exception e) {
 				close();
