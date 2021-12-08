@@ -34,11 +34,11 @@ import java.io.IOException;
  */
 public interface HostsCache {
 	/**
-	 * Returns a list of host identifiers
+	 * Returns a list of host identities
 	 * 
-	 * @param pathname The pathname of file containing the host identifiers
-	 * @param count    The maximum number of identifiers to read from the file
-	 * @return An array containing the host identifiers
+	 * @param pathname The pathname of file containing the host identities
+	 * @param count    The maximum number of identities to read from the file
+	 * @return An array containing the host identities
 	 * @throws IOException
 	 */
 	public long[] get(String pathname, int count) throws IOException;

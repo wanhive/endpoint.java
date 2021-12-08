@@ -1,7 +1,7 @@
 /*
  * WanhiveHostsCache.java
  * 
- * Hosts cache manager
+ * Hosts cache implementation
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -31,7 +31,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * The hosts cache manager
+ * The hosts cache implementation
  * 
  * @author amit
  *

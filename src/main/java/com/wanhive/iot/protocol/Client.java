@@ -35,25 +35,25 @@ public interface Client extends AutoCloseable {
 	/**
 	 * Sends a message to the network
 	 * 
-	 * @param message The message to send out
+	 * @param message The {@link Message} to send out
 	 * @throws IOException
 	 */
 	void send(Message message) throws IOException;
 
 	/**
-	 * Receives a message from the network
+	 * Receives a {@link Message} from the network
 	 * 
-	 * @return A message received from the network
+	 * @return A {@link Message} received from the network
 	 * @throws IOException
 	 */
 	Message receive() throws IOException;
 
 	/**
-	 * Reads from the connection until a message matching the given sequence number
-	 * is found
+	 * Reads from the connection until a {@link Message} matching the given sequence
+	 * number is found
 	 * 
 	 * @param sequenceNumber The desired sequence number (set to zero to ignore)
-	 * @return A message containing the matching sequence number
+	 * @return A {@link Message} containing the matching sequence number
 	 * @throws IOException
 	 */
 	Message receive(short sequenceNumber) throws IOException;
@@ -61,14 +61,14 @@ public interface Client extends AutoCloseable {
 	/**
 	 * Executes a request
 	 * 
-	 * @param request The request to the host
-	 * @return The response from the host
+	 * @param request The request {@link Message} to the host
+	 * @return The response {@link Message} from the host
 	 * @throws IOException
 	 */
 	Message execute(Message request) throws IOException;
 
 	/**
-	 * Sets the socket connection's read timeout to the given value
+	 * Sets connection's read timeout to the given value
 	 * 
 	 * @param milliseconds timeout value in milliseconds (set to 0 to block forever)
 	 * @throws IOException

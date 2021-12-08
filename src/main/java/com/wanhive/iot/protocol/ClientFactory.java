@@ -62,7 +62,7 @@ public class ClientFactory {
 	/**
 	 * Constructor
 	 * 
-	 * @param hosts     The hosts database for name resolution
+	 * @param hosts     The {@link Hosts} database for name resolution
 	 * @param authNodes The authenticator nodes
 	 * @param bootNodes The bootstrap nodes
 	 */
@@ -75,10 +75,10 @@ public class ClientFactory {
 	/**
 	 * Connects with the Wanhive network
 	 * 
-	 * @param identity Identity of the client
+	 * @param identity {@link Identity} of the client
 	 * @param timeout  Socket read timeout in milliseconds (during handshaking)
 	 * @param secure   If true then SSL/TLS connection will be established
-	 * @return Client object which can be used for full-duplex messaging
+	 * @return The {@link Client} connected to the wanhive network
 	 * @throws ProtocolException Could not connect to the network
 	 */
 	public Client createClient(Identity identity, int timeout, boolean secure) throws ProtocolException {
@@ -87,6 +87,15 @@ public class ClientFactory {
 		}
 	}
 
+	/**
+	 * Helper method for {@link #createClient(Identity, int, boolean)}
+	 * 
+	 * @param identity Client's {@link Identity}
+	 * @param timeout  Connection timeout during handshake
+	 * @param secure   If true then SSL/TLS connection will be established
+	 * @return A {@link WanhiveClient} connected to authentication server
+	 * @throws ProtocolException
+	 */
 	private WanhiveClient authenticate(Identity identity, int timeout, boolean secure) throws ProtocolException {
 		if (identity.getPassword() == null || identity.getPassword().length == 0) {
 			return null;
@@ -109,6 +118,14 @@ public class ClientFactory {
 		throw new ProtocolException(AUTHENTICATION_FAIL);
 	}
 
+	/**
+	 * Helper method for {@link #authenticate(Identity, int, boolean)}
+	 * 
+	 * @param host The {@link Client} connection to authentication server
+	 * @param id   Client's {@link Identity}
+	 * @throws IOException
+	 * @throws SRP6Exception
+	 */
 	private static void authenticate(Client host, Identity id) throws IOException, SRP6Exception {
 		Protocol protocol = new Protocol();
 		// -----------------------------------------------------------------
@@ -134,6 +151,16 @@ public class ClientFactory {
 		session.step3(BigIntegerUtils.bigIntegerFromBytes(hostresp));
 	}
 
+	/**
+	 * Helper method for {@link #createClient(Identity, int, boolean)}
+	 * 
+	 * @param identity      Client's {@link Identity}
+	 * @param authenticator The {@link Client} connection to authentication server
+	 * @param timeout       Connection timeout during handshake
+	 * @param secure        If true then SSL/TLS connection will be established
+	 * @return A {@link WanhiveClient} connected to overlay server
+	 * @throws ProtocolException
+	 */
 	private WanhiveClient bootstrap(Identity identity, Client authenticator, int timeout, boolean secure)
 			throws ProtocolException {
 		boolean connected = false;
@@ -172,6 +199,14 @@ public class ClientFactory {
 		throw new ProtocolException(BOOTSTRAP_FAIL);
 	}
 
+	/**
+	 * Helper method for {@link #bootstrap(Identity, Client, int, boolean)}
+	 * 
+	 * @param host The {@link Client} connection to bootstrap server
+	 * @param id   Client's {@link Identity}
+	 * @return Identity of the overlay server
+	 * @throws IOException
+	 */
 	private static long findRoot(Client host, Identity id) throws IOException {
 		Protocol protocol = new Protocol();
 		Message message = protocol.createFindRootRequest(id.getUid());
@@ -179,6 +214,13 @@ public class ClientFactory {
 		return protocol.processFindRootResponse(message);
 	}
 
+	/**
+	 * Helper method for {@link #bootstrap(Identity, Client, int, boolean)}
+	 * 
+	 * @param host The {@link Client} connection to overlay server
+	 * @return Session identifier
+	 * @throws IOException
+	 */
 	private static byte[] createSession(Client host) throws IOException {
 		Protocol protocol = new Protocol();
 		Message message = protocol.createGetKeyRequest(null);
@@ -186,6 +228,15 @@ public class ClientFactory {
 		return protocol.processGetKeyResponse(message);
 	}
 
+	/**
+	 * Helper method for {@link #bootstrap(Identity, Client, int, boolean)}
+	 * 
+	 * @param host The {@link Client} connection to overlay server
+	 * @param auth The {@link Client} connection to authentication server
+	 * @param id   Client's {@link Identity}
+	 * @param sid  The session identifier
+	 * @throws IOException
+	 */
 	private static void authorize(Client host, Client auth, Identity id, byte[] sid) throws IOException {
 		Protocol protocol = new Protocol();
 		Message message = protocol.createRegisterRequest(id.getUid(), sid);

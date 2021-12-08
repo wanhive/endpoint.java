@@ -67,7 +67,7 @@ public class Payload {
 	 * 
 	 * @param index The index at which the byte value will be written
 	 * @param value The byte value to write
-	 * @return This payload
+	 * @return {@code this} {@link Payload}
 	 */
 	public Payload setByte(int index, byte value) {
 		buffer.put(offset + index, value);
@@ -89,7 +89,7 @@ public class Payload {
 	 * 
 	 * @param index The index at which the char value will be written
 	 * @param value The char value to write
-	 * @return This message
+	 * @return {@code this} {@link Payload}
 	 */
 	public Payload setChar(int index, char value) {
 		buffer.putChar(offset + index, value);
@@ -111,7 +111,7 @@ public class Payload {
 	 * 
 	 * @param index The index at which the short value will be written
 	 * @param value The short value to write
-	 * @return This payload
+	 * @return {@code this} {@link Payload}
 	 */
 	public Payload setShort(int index, short value) {
 		buffer.putShort(offset + index, value);
@@ -133,7 +133,7 @@ public class Payload {
 	 * 
 	 * @param index The index at which the int value will be written
 	 * @param value The int value to write
-	 * @return This payload
+	 * @return {@code this} {@link Payload}
 	 */
 	public Payload setInt(int index, int value) {
 		buffer.putInt(offset + index, value);
@@ -155,7 +155,7 @@ public class Payload {
 	 * 
 	 * @param index The index at which the long value will be written
 	 * @param value The long value to write
-	 * @return This payload
+	 * @return {@code this} {@link Payload}
 	 */
 	public Payload setLong(int index, long value) {
 		buffer.putLong(offset + index, value);
@@ -177,7 +177,7 @@ public class Payload {
 	 * 
 	 * @param index The index at which the double value will be written
 	 * @param value The double value to write
-	 * @return This payload
+	 * @return {@code this} {@link Payload}
 	 */
 	public Payload setDouble(int index, double value) {
 		buffer.putDouble(offset + index, value);
@@ -224,7 +224,7 @@ public class Payload {
 	 * 
 	 * @param index The index at which the bytes will be written
 	 * @param blob  The bytes to write
-	 * @return This payload
+	 * @return {@code this} {@link Payload}
 	 */
 	public Payload setBlob(int index, byte[] blob) {
 		int p = buffer.position();

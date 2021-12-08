@@ -131,6 +131,9 @@ public class WHSRP6ClientSession extends SRP6Session {
 		state = State.INIT;
 	}
 
+	/**
+	 * Helper method for {@link #step1()}
+	 */
 	private void computeA() {
 		MessageDigest digest = config.getMessageDigestInstance();
 		digest.reset();
@@ -139,6 +142,9 @@ public class WHSRP6ClientSession extends SRP6Session {
 		this.A = srp6Routines.computePublicClientValue(config.N, config.g, a);
 	}
 
+	/**
+	 * Helper method for {@link #step2(BigInteger, BigInteger)}
+	 */
 	private void computeX() {
 		MessageDigest digest = config.getMessageDigestInstance();
 
@@ -155,6 +161,9 @@ public class WHSRP6ClientSession extends SRP6Session {
 		}
 	}
 
+	/**
+	 * Helper method for {@link #step2(BigInteger, BigInteger)}
+	 */
 	private void computeSessionKey() {
 		MessageDigest digest = config.getMessageDigestInstance();
 
@@ -172,6 +181,9 @@ public class WHSRP6ClientSession extends SRP6Session {
 		this.S = srp6Routines.computeSessionKey(config.N, config.g, k, x, u, a, B);
 	}
 
+	/**
+	 * Helper method for {@link #step2(BigInteger, BigInteger)}
+	 */
 	private void computeClientEvidence() {
 		MessageDigest digest = config.getMessageDigestInstance();
 		digest.reset();
@@ -185,6 +197,11 @@ public class WHSRP6ClientSession extends SRP6Session {
 		}
 	}
 
+	/**
+	 * Helper method for {@link #step3(BigInteger)}
+	 * 
+	 * @return The computed server evidence
+	 */
 	private BigInteger computeM2() {
 		MessageDigest digest = config.getMessageDigestInstance();
 		digest.reset();
@@ -232,7 +249,7 @@ public class WHSRP6ClientSession extends SRP6Session {
 		}
 
 		// Check arguments
-		if (this.config == null) {
+		if (this.config == null || this.config.getMessageDigestInstance() == null) {
 			throw new IllegalArgumentException("The SRP-6a crypto parameters must not be null");
 		}
 

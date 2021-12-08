@@ -50,7 +50,7 @@ public class Header {
 	/**
 	 * Returns the label
 	 * 
-	 * @return Message's label
+	 * @return The label
 	 */
 	public long getLabel() {
 		return buffer.getLong(0);
@@ -60,7 +60,7 @@ public class Header {
 	 * Sets the label
 	 * 
 	 * @param label The label
-	 * @return This header
+	 * @return {@code this} {@link Header}
 	 */
 	public Header setLabel(long label) {
 		buffer.putLong(0, label);
@@ -80,7 +80,7 @@ public class Header {
 	 * Sets the source identifier
 	 * 
 	 * @param source The source identifier
-	 * @return This header
+	 * @return {@code this} {@link Header}
 	 */
 	public Header setSource(long source) {
 		buffer.putLong(8, source);
@@ -100,7 +100,7 @@ public class Header {
 	 * Sets the destination identifier
 	 * 
 	 * @param destination The destination identifier
-	 * @return This header
+	 * @return {@code this} {@link Header}
 	 */
 	public Header setDestination(long destination) {
 		buffer.putLong(16, destination);
@@ -120,7 +120,7 @@ public class Header {
 	 * Sets the message length
 	 * 
 	 * @param length The message length in bytes
-	 * @return This header
+	 * @return {@code this} {@link Header}
 	 */
 	public Header setLength(short length) {
 		if (Packet.isValidLength(length)) {
@@ -145,7 +145,7 @@ public class Header {
 	 * Sets the sequence number
 	 * 
 	 * @param sequenceNumber The sequence number
-	 * @return This header
+	 * @return {@code this} {@link Header}
 	 */
 	public Header setSequenceNumber(short sequenceNumber) {
 		buffer.putShort(26, sequenceNumber);
@@ -165,7 +165,7 @@ public class Header {
 	 * Sets the session identifier
 	 * 
 	 * @param session The session identifier
-	 * @return This header
+	 * @return {@code this} {@link Header}
 	 */
 	public Header setSession(byte session) {
 		buffer.put(28, session);
@@ -185,7 +185,7 @@ public class Header {
 	 * Sets the command classifier
 	 * 
 	 * @param command The command classifier
-	 * @return This header
+	 * @return {@code this} {@link Header}
 	 */
 	public Header setCommand(byte command) {
 		buffer.put(29, command);
@@ -205,7 +205,7 @@ public class Header {
 	 * Sets the command qualifier
 	 * 
 	 * @param qualifier The command qualifier
-	 * @return This header
+	 * @return {@code this} {@link Header}
 	 */
 	public Header setQualifier(byte qualifier) {
 		buffer.put(30, qualifier);
@@ -225,7 +225,7 @@ public class Header {
 	 * Sets the request/response status code
 	 * 
 	 * @param status The status code
-	 * @return This header
+	 * @return {@code this} {@link Header}
 	 */
 	public Header setStatus(byte status) {
 		buffer.put(31, status);

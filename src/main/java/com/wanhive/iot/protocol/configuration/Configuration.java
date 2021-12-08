@@ -44,7 +44,7 @@ public class Configuration {
 	 * 
 	 * @param pathname      Pathname of the INI configuration file
 	 * @param listDelimiter The list delimiter character
-	 * @return An INIConfiguration object containing the configuration data
+	 * @return An {@link INIConfiguration} object
 	 * @throws ConfigurationException
 	 */
 	public static INIConfiguration get(String pathname, char listDelimiter) throws ConfigurationException {
@@ -55,9 +55,9 @@ public class Configuration {
 	/**
 	 * Parses an INI configuration file
 	 * 
-	 * @param file          The INI configuration file
+	 * @param file          The configuration {@link File}
 	 * @param listDelimiter The list delimiter character
-	 * @return An INIConfiguration object containing the configuration data
+	 * @return An {@link INIConfiguration} object
 	 * @throws ConfigurationException
 	 */
 	public static INIConfiguration get(File file, char listDelimiter) throws ConfigurationException {

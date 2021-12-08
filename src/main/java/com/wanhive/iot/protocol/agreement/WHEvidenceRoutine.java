@@ -43,11 +43,11 @@ public class WHEvidenceRoutine extends SRP6Routines {
 	/**
 	 * Computes proof
 	 * 
-	 * @param cryptoParams The crypto parameters for the SRP-6a protocol
+	 * @param cryptoParams The cryptographic parameters for the SRP-6a protocol
 	 * @param X            The first parameter for proof generation
 	 * @param Y            The second Parameter for proof generation
 	 * @param Z            The third parameter for proof generation
-	 * @return The resulting proof
+	 * @return The generated proof
 	 */
 	BigInteger computeEvidence(SRP6CryptoParams cryptoParams, BigInteger X, BigInteger Y, BigInteger Z) {
 		final int padLength = (cryptoParams.N.bitLength() + 7) / 8;

@@ -78,7 +78,7 @@ public class ProfileMap {
 	/**
 	 * Returns a Map containing the endpoint profiles
 	 * 
-	 * @return The profiles Map
+	 * @return A hash map of {@link Profile}s
 	 */
 	public Map<Long, Profile> get() {
 		return profiles;

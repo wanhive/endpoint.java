@@ -35,7 +35,7 @@ public interface Receiver {
 	/**
 	 * Processes an incoming message
 	 * 
-	 * @param message The message to process
+	 * @param message The {@link Message} to process
 	 */
 	public void receive(Message message);
 }

@@ -37,7 +37,7 @@ public interface Hosts extends AutoCloseable {
 	 * Returns the network address of a Wanhive host
 	 * 
 	 * @param identity Identity of the host
-	 * @return A NameInfo object containing the host's network address
+	 * @return A {@link NameInfo} object
 	 */
 	public NameInfo get(long identity);
 
@@ -45,23 +45,23 @@ public interface Hosts extends AutoCloseable {
 	 * Stores the network address of a Wanhive host
 	 * 
 	 * @param identity Host's identity
-	 * @param ni       A NameInfo object containing the host's network address
+	 * @param ni       A {@link NameInfo} object
 	 */
 	public void put(long identity, NameInfo ni);
 
 	/**
-	 * Removes a Wanhive host from the record
+	 * Removes a host from the record
 	 * 
-	 * @param identity The identity of the host to remove
+	 * @param identity Identity of the host to remove
 	 */
 	public void remove(long identity);
 
 	/**
-	 * Returns list of host identifiers of the given type
+	 * Returns a list of host identities of the given type
 	 * 
 	 * @param type  The host's type
 	 * @param limit The maximum number of identifiers to return
-	 * @return An array containing the host identifiers
+	 * @return An array containing the host identities
 	 */
 	public long[] list(int type, int limit);
 }

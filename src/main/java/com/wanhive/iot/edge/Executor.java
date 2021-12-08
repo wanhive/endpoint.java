@@ -52,7 +52,7 @@ public class Executor implements Runnable, AutoCloseable {
 	private final BlockingQueue<Message> out;
 
 	/**
-	 * Stops the Executor and closes the Client.
+	 * Stops {@code this} {@link Executor} and closes the {@link Client}.
 	 */
 	private void stop() {
 		synchronized (notifier) {
@@ -74,7 +74,7 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Creates a thread for reading messages from the network
 	 * 
-	 * @return The reader thread
+	 * @return The reader {@link Thread}
 	 */
 	private Thread createReader() {
 		Thread reader = new Thread(() -> {
@@ -101,7 +101,7 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Creates a thread for writing messages to the network
 	 * 
-	 * @return The writer thread
+	 * @return The writer {@link Thread}
 	 */
 	private Thread createWriter() {
 		Thread writer = new Thread(() -> {
@@ -127,7 +127,7 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Helper function for gracefully shutting down the reader and writer threads
 	 * 
-	 * @param worker A reader or writer thread object
+	 * @param worker A reader or writer {@link Thread} object
 	 */
 	private void stopWorker(Thread worker) {
 		try {
@@ -139,9 +139,10 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Creates an Executor that stores the incoming messages in a bounded queue.
+	 * Constructor: creates an {@link Executor} that stores the incoming messages in
+	 * a bounded queue.
 	 * 
-	 * @param client      The Client to use for communication
+	 * @param client      The connected {@link Client}
 	 * @param inCapacity  Incoming messages queue's capacity
 	 * @param outCapacity Outgoing messages queue's capacity
 	 */
@@ -152,10 +153,11 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Creates an Executor that uses a Receiver to process the incoming messages.
+	 * Constructor: creates an {@link Executor} that uses a {@link Receiver} to
+	 * process the incoming messages.
 	 * 
-	 * @param client      The Client to use for communication
-	 * @param receiver    The Receiver of the incoming messages
+	 * @param client      The connected {@link Client}
+	 * @param receiver    The {@link Receiver} of the incoming messages
 	 * @param outCapacity Outgoing messages queue's capacity
 	 */
 	public Executor(Client client, Receiver receiver, int outCapacity) {
@@ -166,10 +168,10 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Assigns a Client to this Executor. The existing Client is replaced, but not
-	 * closed. Fails if the Executor is already running.
+	 * Sets the {@link Client}. Any existing {@link Client} is replaced, but not
+	 * closed. Fails if the {@link Executor} is already running.
 	 * 
-	 * @param client The Client to use with this Executor
+	 * @param client The {@link Client} to use with this {@link Executor}
 	 */
 	public void setClient(Client client) {
 		if (!isRunning()) {
@@ -180,11 +182,11 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Assigns a Receiver for processing the incoming messages. Fails if the
-	 * Executor is already running. Also fails if the Executor was created with an
-	 * incoming messages queue.
+	 * Assigns a {@link Receiver} for processing the incoming messages. Fails if the
+	 * {@link Executor} is already running. Also fails if the {@link Executor} was
+	 * created with an incoming messages queue.
 	 * 
-	 * @param receiver The Receiver to use
+	 * @param receiver The {@link Receiver} to use
 	 */
 	public void setReceiver(Receiver receiver) {
 		if (isRunning()) {
@@ -199,7 +201,7 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Tries to put a message into the outgoing queue
 	 * 
-	 * @param message The outgoing message
+	 * @param message The outgoing {@link Message}
 	 * @return true on success, false otherwise
 	 */
 	public boolean offer(Message message) {
@@ -209,7 +211,7 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Puts a message into the outgoing queue
 	 * 
-	 * @param message The outgoing message
+	 * @param message The outgoing {@link Message}
 	 * @throws InterruptedException
 	 */
 	public void put(Message message) throws InterruptedException {
@@ -229,7 +231,7 @@ public class Executor implements Runnable, AutoCloseable {
 	/**
 	 * Returns a message from the incoming queue
 	 * 
-	 * @return An incoming message
+	 * @return An incoming {@link Message}
 	 * @throws InterruptedException
 	 */
 	public Message take() throws InterruptedException {
@@ -241,9 +243,9 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Returns the "running" state of the Executor
+	 * Returns the "running" state
 	 * 
-	 * @return true if the Executor is running, false otherwise
+	 * @return true if {@code this} {@link Executor} is running, false otherwise
 	 */
 	public boolean isRunning() {
 		return !stopped.get();

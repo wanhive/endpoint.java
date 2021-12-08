@@ -58,7 +58,7 @@ public class FlowControl {
 	}
 
 	/**
-	 * Sets the sequence number counter
+	 * Sets the sequence number counter to the given value
 	 * 
 	 * @param sequenceNumber The sequence number
 	 */

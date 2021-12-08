@@ -25,7 +25,7 @@
 package com.wanhive.iot.protocol.bean;
 
 /**
- * Deserialized response to identification Request
+ * Public 'ephemeral value' and 'salt' returned by a host during identification
  * 
  * @author amit
  *

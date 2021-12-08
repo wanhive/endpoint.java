@@ -61,7 +61,7 @@ public class Message {
 	}
 
 	/**
-	 * Create a new message. MTU is the default message length.
+	 * Create a new {@link Message}. MTU is the default message length.
 	 */
 	public Message() {
 		buffer = ByteBuffer.allocate(Packet.MTU);
@@ -72,12 +72,12 @@ public class Message {
 	}
 
 	/**
-	 * Populates message's header. Doesn't modify the label.
+	 * Populates the header. Doesn't modify the label.
 	 * 
 	 * @param address The message address structure
 	 * @param control The message flow control structure
 	 * @param context The message context
-	 * @return This message
+	 * @return {@code this} {@link Message}
 	 */
 	public Message setHeader(MessageAddress address, MessageControl control, MessageContext context) {
 		// Length should be set first
@@ -88,13 +88,13 @@ public class Message {
 	}
 
 	/**
-	 * Populates message's header
+	 * Populates the header
 	 * 
 	 * @param label   Label of this message
 	 * @param address The message address structure
 	 * @param control The message flow control structure
 	 * @param context The message context
-	 * @return this message
+	 * @return {@code this} {@link Message}
 	 */
 	public Message setHeader(long label, MessageAddress address, MessageControl control, MessageContext context) {
 		setHeader(address, control, context);
@@ -103,10 +103,10 @@ public class Message {
 	}
 
 	/**
-	 * Populates message's header
+	 * Populates the header
 	 * 
 	 * @param header Desired message header
-	 * @return This message
+	 * @return {@code this} {@link Message}
 	 */
 	public Message setHeader(MessageHeader header) {
 		return setHeader(header.getLabel(), header.getAddress(), header.getControl(), header.getContext());
@@ -115,7 +115,7 @@ public class Message {
 	/**
 	 * Returns the header
 	 * 
-	 * @return This message's header
+	 * @return The {@link Header}
 	 */
 	public Header header() {
 		return header;
@@ -124,7 +124,7 @@ public class Message {
 	/**
 	 * Returns the payload
 	 * 
-	 * @return This message's payload
+	 * @return The {@link Payload}
 	 */
 	public Payload payload() {
 		return this.payload;

@@ -41,7 +41,7 @@ public enum HostTypes {
 	/**
 	 * Returns the numeric host type identifier
 	 * 
-	 * @return The host type
+	 * @return The host type identifier
 	 */
 	public int getType() {
 		return this.type;

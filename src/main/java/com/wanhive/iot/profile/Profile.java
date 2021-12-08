@@ -44,16 +44,16 @@ public class Profile extends Identity {
 	 */
 	private final AtomicLong id = new AtomicLong();
 	/**
-	 * Name of this profile
+	 * This profile's name
 	 */
 	private String name;
 	/**
-	 * Generic reference
+	 * Generic attachment
 	 */
-	private Serializable reference;
+	private Serializable attachment;
 
 	/**
-	 * Returns this profile's remote endpoint identifier
+	 * Returns the remote endpoint identifier
 	 * 
 	 * @return The remote endpoint identifier
 	 */
@@ -62,7 +62,7 @@ public class Profile extends Identity {
 	}
 
 	/**
-	 * Sets this profile's remote endpoint identifier
+	 * Sets the remote endpoint identifier
 	 * 
 	 * @param id Remote endpoint's identifier
 	 */
@@ -89,20 +89,20 @@ public class Profile extends Identity {
 	}
 
 	/**
-	 * Returns the serializable object attached to this profile
+	 * Returns the attached object
 	 * 
-	 * @return This profile's attachment
+	 * @return The attached {@link Serializable} object
 	 */
-	public Serializable getReference() {
-		return reference;
+	public Serializable getAttachment() {
+		return attachment;
 	}
 
 	/**
-	 * Attaches a serializable object to this profile
+	 * Attaches a serializable object
 	 * 
-	 * @param reference The serializable attachment for this profile
+	 * @param attachment The {@link Serializable} attachment
 	 */
-	public void setReference(Serializable reference) {
-		this.reference = reference;
+	public void setAttachment(Serializable attachment) {
+		this.attachment = attachment;
 	}
 }

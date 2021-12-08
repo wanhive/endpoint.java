@@ -43,7 +43,7 @@ public class ObjectSerializer {
 	 * Writes a serializable object to the file system
 	 * 
 	 * @param pathname The pathname of the file where the object will be stored
-	 * @param object   The serializable object
+	 * @param object   The {@link Serializable} object
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
@@ -57,7 +57,7 @@ public class ObjectSerializer {
 	 * Writes a serializable object to the file system
 	 * 
 	 * @param file   The file where the object will be stored
-	 * @param object The serializable object
+	 * @param object The {@link Serializable} object
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
@@ -72,7 +72,7 @@ public class ObjectSerializer {
 	 * Reads a serializable object from the file system
 	 * 
 	 * @param pathname The pathname of the file containing the serialized object
-	 * @return The object read from the given file
+	 * @return The {@link Serializable} object read from the given file
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 * @throws ClassNotFoundException
@@ -86,8 +86,8 @@ public class ObjectSerializer {
 	/**
 	 * Reads a serializable object from the file system
 	 * 
-	 * @param file The file from where the object will be read
-	 * @return The object read from the given file
+	 * @param file The {@link File} from where the object will be read
+	 * @return The {@link Serializable} object read from the given file
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 * @throws ClassNotFoundException

@@ -57,7 +57,7 @@ public class WanhiveClient implements Client {
 	/**
 	 * Constructor
 	 * 
-	 * @param socket The socket to use for communication
+	 * @param socket The {@link Socket} to use for communication
 	 */
 	WanhiveClient(Socket socket) {
 		this.socket = socket;
@@ -76,9 +76,9 @@ public class WanhiveClient implements Client {
 	}
 
 	/**
-	 * Releases the underlying socket connection
+	 * Releases the underlying connection
 	 * 
-	 * @return The Socket connection object
+	 * @return The {@link Socket} connection
 	 */
 	Socket release() {
 		Socket rv = this.socket;
@@ -87,18 +87,18 @@ public class WanhiveClient implements Client {
 	}
 
 	/**
-	 * Returns the underlying socket
+	 * Returns the underlying connection
 	 * 
-	 * @return The Socket connection object
+	 * @return The {@link Socket} connection object
 	 */
 	Socket getSocket() {
 		return this.socket;
 	}
 
 	/**
-	 * Sets a new socket connection after closing the existing one
+	 * Sets a new connection after closing the existing one
 	 * 
-	 * @param socket The socket connection
+	 * @param socket The {@link Socket} connection
 	 */
 	void setSocket(Socket socket) {
 		if (socket != this.socket) {
@@ -111,7 +111,7 @@ public class WanhiveClient implements Client {
 	/**
 	 * Connects to a remote host (closes any existing connection).
 	 * 
-	 * @param host    The remote host
+	 * @param host    Remote host's details as {@link NameInfo}
 	 * @param timeout The read timeout in milliseconds (set to 0 to block forever)
 	 * @param ssl     Enable or disable secure connection
 	 * @throws IOException

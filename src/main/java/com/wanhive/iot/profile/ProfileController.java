@@ -47,30 +47,30 @@ public interface ProfileController {
 	/**
 	 * Creates and executes the endpoint associated with the given profile
 	 * 
-	 * @param profile The endpoint profile
+	 * @param profile The endpoint {@link Profile}
 	 */
 	void start(Profile profile);
 
 	/**
 	 * Stops execution of the endpoint associated with the given profile
 	 * 
-	 * @param profile The endpoint profile
+	 * @param profile The endpoint {@link Profile}
 	 */
 	void stop(Profile profile);
 
 	/**
 	 * Checks whether an endpoint with the given profile is running
 	 * 
-	 * @param profile The endpoint profile to check
-	 * @return true if an endpoint associated with the given profile is running,
-	 *         false otherwise.
+	 * @param profile The endpoint {@link Profile} to check
+	 * @return true if an endpoint associated with the given {@link Profile} is
+	 *         running, false otherwise.
 	 */
 	boolean isActive(Profile profile);
 
 	/**
 	 * Returns true if there exists an active profile
 	 * 
-	 * @return true if an endpoint is running, false otherwise
+	 * @return true if an endpoint {@link Profile} is running, false otherwise
 	 */
-	boolean hasActive();
+	boolean isBusy();
 }

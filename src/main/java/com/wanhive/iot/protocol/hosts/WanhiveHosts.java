@@ -1,7 +1,7 @@
 /*
  * WanhiveHosts.java
  * 
- * Hosts database manager
+ * Hosts database implementation
  * 
  * This program is part of Wanhive IoT Platform.
  * 
@@ -41,7 +41,7 @@ import java.util.NoSuchElementException;
 import com.wanhive.iot.protocol.bean.NameInfo;
 
 /**
- * Hosts database manager
+ * Hosts database implementation
  * 
  * @author amit
  *
@@ -70,12 +70,14 @@ public class WanhiveHosts implements Hosts {
 	/**
 	 * Initializes SQLite3 database and tables
 	 * 
+	 * @param name Database file's name
+	 * @return A new database {@link Connection}
 	 * @throws SQLException
 	 */
-	private Connection initDatabase(String db) throws SQLException {
+	private Connection initDatabase(String name) throws SQLException {
 		Connection conn = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:sqlite:" + db);
+			conn = DriverManager.getConnection("jdbc:sqlite:" + name);
 
 			String query = "CREATE TABLE IF NOT EXISTS hosts (uid INTEGER NOT NULL UNIQUE ON CONFLICT REPLACE, name TEXT NOT NULL DEFAULT '127.0.0.1', service TEXT NOT NULL DEFAULT '9000', type INTEGER NOT NULL DEFAULT 0)";
 			try (PreparedStatement ps = conn.prepareStatement(query)) {
@@ -97,17 +99,13 @@ public class WanhiveHosts implements Hosts {
 	}
 
 	/**
-	 * Helper function for {@link #importHosts}
+	 * Helper function for {@link #importHost(String, PreparedStatement)}
 	 * 
-	 * @param line The tab separated line to parse
-	 * @param ps   The prepared statement for database operations
+	 * @param line The tab separated line to parse. Cannot be {@code null}
+	 * @param ps   The {@link PreparedStatement} for database operations
 	 * @throws SQLException
 	 */
 	private void importHost(String line, PreparedStatement ps) throws SQLException {
-		if (line == null) {
-			return;
-		}
-		
 		line = line.trim();
 		if (line.length() == 0 || line.startsWith("#")) {
 			return;
@@ -122,11 +120,8 @@ public class WanhiveHosts implements Hosts {
 		ps.setLong(1, Long.parseLong(data[0]));
 		ps.setString(2, data[1]);
 		ps.setString(3, data[2]);
-		if (data.length == 4) {
-			ps.setInt(4, Integer.parseInt(data[3]));
-		} else {
-			ps.setInt(4, 0);
-		}
+		int type = (data.length >= 4) ? Integer.parseInt(data[3]) : 0;
+		ps.setInt(4, type);
 		ps.executeUpdate();
 	}
 

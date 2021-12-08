@@ -35,7 +35,7 @@ public class Packet {
 	 */
 	public static final int MTU = 1024;
 	/**
-	 * Message header size in bytes
+	 * Header size in bytes
 	 */
 	public static final int HEADER_SIZE = 32;
 	/**
@@ -44,9 +44,9 @@ public class Packet {
 	public static final int PAYLOAD_SIZE = (MTU - HEADER_SIZE);
 
 	/**
-	 * Validates the message length
+	 * Validates the packet length
 	 * 
-	 * @param length The message length
+	 * @param length The packet length
 	 * @return true if the length is valid, false otherwise
 	 */
 	public static boolean isValidLength(int length) {
@@ -56,8 +56,8 @@ public class Packet {
 	/**
 	 * Returns the number of packets required for carrying the given bytes of data
 	 * 
-	 * @param bytes Data size in bytes
-	 * @return Message count
+	 * @param bytes The data size in bytes
+	 * @return The packets count
 	 */
 	public static long count(int bytes) {
 		if (bytes < 0) {
