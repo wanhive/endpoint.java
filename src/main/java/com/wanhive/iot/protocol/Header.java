@@ -6,7 +6,7 @@
  * This program is part of Wanhive IoT Platform.
  * 
  * Apache-2.0 License
- * Copyright 2020 Wanhive Systems Private Limited
+ * Copyright 2021 Wanhive Systems Private Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

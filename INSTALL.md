@@ -25,13 +25,13 @@ To use the installed library in a maven project, add the following dependency to
 		<dependency>
 			<groupId>com.wanhive.iot</groupId>
 			<artifactId>wanhive-endpoint</artifactId>
-			<version>0.9.0</version>
+			<version>0.10.0</version>
 		</dependency>
 ```
 
 # Getting started
 
-The [ClientTest.java](https://github.com/wanhive/endpoint.java/blob/main/src/test/java/com/wanhive/iot/test/ClientTest.java) file contains a very basic example that connects to a Wanhive network and publishes few messages.
+The [ClientTest.java](src/test/java/com/wanhive/iot/test/ClientTest.java) file contains a very basic example that connects to a wanhive network and publishes few messages.
 
 This package also includes
 
