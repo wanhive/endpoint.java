@@ -57,6 +57,14 @@ public class WHSRP6ClientSession extends SRP6Session {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	/**
+	 * The default SRP-6a key length in bits
+	 */
+	private static final int DEFAULT_KEY_LENGTH = 2048;
+	/**
+	 * The default SRP-6a message digest name
+	 */
+	private static final String DEFAULT_DIGEST_NAME = "SHA-512";
 
 	/**
 	 * Enumerates the states of a client-side SRP-6a authentication session.
@@ -230,7 +238,7 @@ public class WHSRP6ClientSession extends SRP6Session {
 		session.setClientEvidenceRoutine(new WHClientEvidenceRoutine());
 		session.setServerEvidenceRoutine(new WHServerEvidenceRoutine());
 
-		session.config = SRP6CryptoParams.getInstance(2048, "SHA-512");
+		session.config = SRP6CryptoParams.getInstance(DEFAULT_KEY_LENGTH, DEFAULT_DIGEST_NAME);
 		session.userID = Long.toString(id.getUid());
 		session.password = id.getPassword();
 		session.xRoutine = new WHXRoutine(id.getRounds());
