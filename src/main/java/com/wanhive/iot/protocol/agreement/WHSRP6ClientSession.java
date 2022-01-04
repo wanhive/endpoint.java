@@ -60,7 +60,7 @@ public class WHSRP6ClientSession extends SRP6Session {
 	/**
 	 * The default SRP-6a key length in bits
 	 */
-	private static final int DEFAULT_KEY_LENGTH = 2048;
+	private static final int DEFAULT_KEY_LENGTH = 3072;
 	/**
 	 * The default SRP-6a message digest name
 	 */
