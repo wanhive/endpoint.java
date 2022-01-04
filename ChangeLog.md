@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Refactor the source code to improve maintainability.
 
+### Security
+
+- Use 3072-bit SRP-6a group to achieve greater password security.
+
 ## [0.10.0] - 2021-12-08
 
 ### Changed
