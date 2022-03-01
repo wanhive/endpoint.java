@@ -40,7 +40,7 @@ import com.wanhive.iot.protocol.Message;
  *
  */
 public class Executor implements Runnable, AutoCloseable {
-	private static final String BAD_REQUEST = "Not allowed";
+	private static final String BAD_REQUEST = "Not permitted";
 
 	private final Object notifier = new Object();
 	private boolean running = false; // Condition variable
@@ -79,12 +79,13 @@ public class Executor implements Runnable, AutoCloseable {
 	 * @throws InterruptedException
 	 */
 	private void receive() throws IOException, InterruptedException {
+		Message message = client.receive();
 		if (receiver != null) {
-			receiver.receive(client.receive());
+			receiver.receive(message);
 		} else if (in != null) {
-			in.put(client.receive());
+			in.put(message);
 		} else {
-			client.receive();
+			return;
 		}
 	}
 
@@ -194,12 +195,10 @@ public class Executor implements Runnable, AutoCloseable {
 	 * @param receiver The {@link Receiver} to use
 	 */
 	public void setReceiver(Receiver receiver) {
-		if (isRunning()) {
-			throw new IllegalStateException(BAD_REQUEST);
-		} else if (in != null) {
-			throw new IllegalArgumentException(BAD_REQUEST);
-		} else {
+		if (!isRunning() && in == null) {
 			this.receiver = receiver;
+		} else {
+			throw new IllegalStateException(BAD_REQUEST);
 		}
 	}
 
@@ -214,7 +213,7 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Puts a message into the outgoing queue
+	 * Puts a message into the outgoing queue, waits if the queue is full
 	 * 
 	 * @param message The outgoing {@link Message}
 	 * @throws InterruptedException
@@ -234,7 +233,7 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
-	 * Returns a message from the incoming queue
+	 * Returns a message from the incoming queue, waits if the queue is empty
 	 * 
 	 * @return An incoming {@link Message}
 	 * @throws InterruptedException
