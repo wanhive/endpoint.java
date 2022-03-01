@@ -247,6 +247,19 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
+	 * Returns a message from the incoming queue
+	 * 
+	 * @return An incoming {@link Message}, {@code null} if the queue is empty.
+	 */
+	public Message poll() {
+		if (in != null) {
+			return in.poll();
+		} else {
+			throw new IllegalStateException(BAD_REQUEST);
+		}
+	}
+
+	/**
 	 * Returns the "running" state
 	 * 
 	 * @return true if {@code this} {@link Executor} is running, false otherwise
