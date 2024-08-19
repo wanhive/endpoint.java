@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.wanhive.iot</groupId>
 	<artifactId>wanhive-endpoint</artifactId>
-	<version>0.12.0</version>
+	<version>0.13.0</version>
 	<name>Wanhive EndPoint</name>
 	<description>Endpoint development library for the Wanhive IoT Platform.</description>
 	<url>http://www.wanhive.com</url>
-	<inceptionYear>2022</inceptionYear>
+	<inceptionYear>2024</inceptionYear>
 
 	<!-- Project information -->
 	<organization>
