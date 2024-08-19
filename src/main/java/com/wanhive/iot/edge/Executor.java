@@ -260,6 +260,22 @@ public class Executor implements Runnable, AutoCloseable {
 	}
 
 	/**
+	 * Erases the outgoing queue
+	 */
+	public void clearOutgoingQueue() {
+		out.clear();
+	}
+
+	/**
+	 * Erases the incoming queue
+	 */
+	public void clearIncomingQueue() {
+		if (in != null) {
+			in.clear();
+		}
+	}
+
+	/**
 	 * Returns the "running" state
 	 * 
 	 * @return true if {@code this} {@link Executor} is running, false otherwise
