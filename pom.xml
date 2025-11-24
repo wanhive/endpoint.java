@@ -35,14 +35,14 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.13.3</version>
+			<version>5.14.1</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>2.25.1</version>
+			<version>2.25.2</version>
 			<type>pom</type>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.nimbusds/srp6a -->
@@ -55,7 +55,7 @@
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.50.3.0</version>
+			<version>3.51.0.0</version>
 		</dependency>
 		<!--
 		https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
